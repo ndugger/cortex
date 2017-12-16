@@ -127,7 +127,7 @@ class MyComponent extends Component {
     render () {
         return (
             element('section', null, [
-                element('header', null, 'Children render below...')
+                element('header', null, 'Children render below...'),
                 element('slot')
             ])
         )
