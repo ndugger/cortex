@@ -30,6 +30,7 @@ The bleeding-edge APIs are as follows:
 - Proxy
 - Reflect
 
+
 ## Performance
 
 Performance will mostly be beholden to the efficiency of shadow DOM, but the virtual DOM diffing
@@ -113,6 +114,25 @@ class ExampleApp extends Component {
 }
 
 document.body.appendChild(new ExampleApp());
+```
+
+
+## Shadow DOM
+
+quark uses Shadow DOM to render components; this means that you may take advantage of slots.
+
+```javascript
+class MyComponent extends Component {
+
+    render () {
+        return (
+            element('section', null, [
+                element('header', null, 'Children render below...')
+                element('slot')
+            ])
+        )
+    }
+}
 ```
 
 
