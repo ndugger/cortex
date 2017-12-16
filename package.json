@@ -1,0 +1,19 @@
+{
+  "name": "quark",
+  "version": "1.0.0",
+  "description": "Web Component Framework For Web Applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo null"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ndugger/quark.git"
+  },
+  "author": "Nick Dugger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ndugger/quark/issues"
+  },
+  "homepage": "https://github.com/ndugger/quark#readme"
+}
