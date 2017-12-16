@@ -5,7 +5,7 @@
 **Compatible with JSX**
 
 ```
-npm install git+https://github.com/ndugger/quark.git
+npm install git+https://github.com/ndugger/quark.git --save
 ```
 
 This project is open source; although I will be using it in production (in personal projects),
@@ -14,6 +14,21 @@ I will not offer any promise of support, nor will I quickly address issues unles
 The purpose of this project is to explore how to create a react-like component
 infrastructure and lifecycle using native Web Components (custom elements & shadow DOM).
 
+
+## Browser Support
+
+Since quark is based on bleeding-edge APIs, only **Chrome** (and **Opera**) is supported at the moment.
+
+**Firefox** is currently working on Shadow DOM, and **Edge** has it set as, "under consideration".
+
+There are no plans to ever support Internet Explorer.
+
+The bleeding-edge APIs are as follows:
+
+- Shadow DOM
+- Custom Elements
+- Proxy
+- Reflect
 
 ## Performance
 
