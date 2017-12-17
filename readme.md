@@ -149,3 +149,48 @@ element(MyComponent, null, [
     <div>With JSX</div>
 </MyComponent>
 ```
+
+
+## CSS / Styling
+
+Since shadow DOM allows for encapsulated styles, I figured quark should have a built-in way to take advantage of them. 
+All you have to do is add `get css () { }` to your component that returns a string of CSS.
+
+```javascript
+class MyComponent extends Component {
+    
+    get css () {
+        return `
+            :host {
+                display: block;
+            }
+            section {
+                background: #CCC;
+            }
+            header {
+                color: white;
+                background: #666;
+            }
+        `
+    }
+}
+```
+
+The reason that `css` is a getter, is so that you can consume the component's state to manipulate your styles.
+
+```javascript
+static initialState = {
+    error: false;
+}
+
+get css () {
+    const error = this.state.get('error');
+    
+    return `
+        header {
+            color: ${ error ? 'red' : 'white' };
+            background: #666;
+        }
+    `
+}
+```
