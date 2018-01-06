@@ -130,7 +130,7 @@ class MyComponent extends Component {
                 element('header', null, 'Children render below...'),
                 element('slot')
             ])
-        )
+        );
     }
 }
 ```
@@ -153,12 +153,12 @@ element(MyComponent, null, [
 
 ## CSS / Styling
 
-Since shadow DOM allows for encapsulated styles, I figured quark should have a built-in way to take advantage of them. 
+Since shadow DOM allows for encapsulated styles, I figured quark should have a built-in way to take advantage of them.
 All you have to do is add `get css () { }` to your component that returns a string of CSS.
 
 ```javascript
 class MyComponent extends Component {
-    
+
     get css () {
         return `
             :host {
@@ -171,7 +171,7 @@ class MyComponent extends Component {
                 color: white;
                 background: #666;
             }
-        `
+        `;
     }
 }
 ```
@@ -181,16 +181,32 @@ The reason that `css` is a getter, is so that you can consume the component's st
 ```javascript
 static initialState = {
     error: false;
-}
+};
 
 get css () {
     const error = this.state.get('error');
-    
+
     return `
         header {
             color: ${ error ? 'red' : 'white' };
             background: #666;
         }
-    `
+    `;
+}
+```
+
+## Building with Babel
+
+The recommended .babelrc file:
+
+```json
+{
+    "presets": [
+        [ "env", { "exclude": [ "transform-es2015-classes" ] } ]
+    ],
+    "plugins": [
+        "transform-class-properties",
+        [ "transform-react-jsx", { "pragma": "element" } ]
+    ]
 }
 ```
