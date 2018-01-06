@@ -5,7 +5,7 @@
 **Compatible with JSX**
 
 ```
-npm install git+https://github.com/ndugger/quark.git#v1.0.0 --save
+npm install git+https://github.com/ndugger/quark.git#v1.0.2 --save
 ```
 
 This project is open source; although I will be using it in production (in personal projects),
