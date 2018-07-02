@@ -98,7 +98,7 @@ module.exports.renderNode = function renderNode (parent, element) {
     element.childNodes.forEach(child => module.exports.renderNode(element.node, child));
 
     if (parent instanceof Node && parent !== element.node.parentNode) {
-        return; // parent.appendChild(element.node);
+        return parent.appendChild(element.node);
     }
 
     if (element.node[ symbols.updateComponent ]) {
