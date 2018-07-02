@@ -94,12 +94,13 @@ module.exports = class Component extends HTMLElementProxy {
         return '';
     }
 
-    constructor () {
+    constructor (properties = { }) {
         super();
 
         this[ symbols.elementTree ] = null;
 
         Object.assign(this, this.constructor.defaultProperties);
+        Object.assign(this, properties);
 
         this.state = new State(this, Object.entries(this.constructor.initialState));
 
