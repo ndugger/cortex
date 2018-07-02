@@ -40,7 +40,7 @@ module.exports.createNode = function createNode (element) {
     return {
         tagName,
         properties,
-        node: typeof tagName === 'string' ? document.createElement(tagName) : new tagName(properties),
+        node: typeof tagName === 'string' ? document.createElement(tagName) : new tagName(properties, childNodes),
         childNodes: childNodes.filter(child => child && !(child instanceof Text)).map(child => module.exports.createNode(child))
     };
 }
@@ -98,7 +98,7 @@ module.exports.renderNode = function renderNode (parent, element) {
     element.childNodes.forEach(child => module.exports.renderNode(element.node, child));
 
     if (parent instanceof Node && parent !== element.node.parentNode) {
-        return parent.appendChild(element.node);
+        return; // parent.appendChild(element.node);
     }
 
     if (element.node[ symbols.updateComponent ]) {

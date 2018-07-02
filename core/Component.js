@@ -94,7 +94,7 @@ module.exports = class Component extends HTMLElementProxy {
         return '';
     }
 
-    constructor (properties = { }, childNodes = [ ]) {
+    constructor (properties = { }, children = [ ]) {
         super();
 
         this[ symbols.elementTree ] = null;
@@ -114,8 +114,8 @@ module.exports = class Component extends HTMLElementProxy {
             }
         });
 
-        for (const child of childNodes) {
-            this.appendChild(child);
+        for (const child of children) {
+            this.appendChild(child.node);
         }
 
         this.dispatchEvent(new CustomEvent('create'));
