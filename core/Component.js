@@ -47,16 +47,16 @@ module.exports = class Component extends HTMLElementProxy {
         }
 
         if (!existingTree) {
-            this[ symbols.elementTree ] = newTree.map(element => element.createNode(element));
+            this[ symbols.elementTree ] = newTree.map(e => element.createNode(e));
 
             return this[ symbols.elementTree ];
         }
 
         if (existingTree.length > newTree.length) {
-            this[ symbols.elementTree ] = existingTree.map((element, i) => element.diffNode(element, newTree[ i ]));
+            this[ symbols.elementTree ] = existingTree.map((e, i) => element.diffNode(e, newTree[ i ]));
         }
         else {
-            this[ symbols.elementTree ] = newTree.map((element, i) => element.diffNode(existingTree[ i ], element));
+            this[ symbols.elementTree ] = newTree.map((e, i) => element.diffNode(existingTree[ i ], e));
         }
 
         return this[ symbols.elementTree ];
@@ -78,7 +78,7 @@ module.exports = class Component extends HTMLElementProxy {
                 }
             });
 
-            tree.forEach(element => element.renderNode(this.shadowRoot, element));
+            tree.forEach(e => element.renderNode(this.shadowRoot, e));
 
             this.dispatchEvent(new CustomEvent('render'));
         });
