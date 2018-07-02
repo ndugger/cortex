@@ -115,7 +115,7 @@ module.exports = class Component extends HTMLElementProxy {
         });
 
         for (const child of children) {
-            element.renderNode(this, child);
+            element.renderNode(this, element.createNode(child));
         }
 
         this.dispatchEvent(new CustomEvent('create'));
