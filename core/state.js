@@ -1,6 +1,6 @@
-import * as symbols from './symbols';
+const symbols = require('./symbols');
 
-export default class State {
+module.exports = class State {
 
     get [ Symbol.iterator ] () {
         return this[ symbols.map ][ Symbol.iterator ];

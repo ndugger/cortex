@@ -1,10 +1,31 @@
-import * as symbols from './symbols';
+const symbols = require('./symbols');
 
-export function removeNode (element) {
+module.exports = function element (tag, properties = { }, children = [ ], ...jsxChildren) {
+    const tagName = typeof tag === 'string' ? tag.toLowerCase() : tag;
+
+    if (typeof children === 'string' && jsxChildren.length === 0) {
+        return {
+            tagName,
+            properties: { ...properties, textContent: children },
+            childNodes: [ ]
+        };
+    }
+
+    const childArray = (Array.isArray(children) ? children : [ children ]).concat(jsxChildren);
+    const childNodes = childArray.map(x => typeof x === 'string' ? module.exports(null, null, x) : x);
+
+    return {
+        tagName,
+        properties,
+        childNodes
+    };
+};
+
+module.exports.removeNode = function removeNode (element) {
     element.node.remove();
 }
 
-export function createNode (element) {
+module.exports.createNode = function createNode (element) {
     const { tagName, properties, childNodes } = element;
 
     if (tagName === null) {
@@ -20,43 +41,43 @@ export function createNode (element) {
         tagName,
         properties,
         node: typeof tagName === 'string' ? document.createElement(tagName) : new tagName(properties),
-        childNodes: childNodes.filter(child => child && !(child instanceof Text)).map(child => createNode(child))
+        childNodes: childNodes.filter(child => child && !(child instanceof Text)).map(child => module.exports.createNode(child))
     };
 }
 
-export function diffNode (existingElement, newElement) {
+module.exports.diffNode = function diffNode (existingElement, newElement) {
 
     if (!existingElement && !newElement) {
         return;
     }
 
     if (existingElement && !newElement) {
-        return removeNode(existingElement);
+        return module.exports.removeNode(existingElement);
     }
 
     if (!existingElement && newElement) {
-        return createNode(newElement);
+        return module.exports.createNode(newElement);
     }
 
     if (existingElement.tagName !== newElement.tagName) {
-        removeNode(existingElement);
-        return createNode(newElement);
+        module.exports.removeNode(existingElement);
+        return module.exports.createNode(newElement);
     }
 
     if (existingElement.childNodes.length > newElement.childNodes.length) {
         return Object.assign(existingElement, {
             properties: newElement.properties || { },
-            childNodes: existingElement.childNodes.map((child, i) => diffNode(child, newElement.childNodes[ i ]))
+            childNodes: existingElement.childNodes.map((child, i) => module.exports.diffNode(child, newElement.childNodes[ i ]))
         });
     }
 
     return Object.assign(existingElement, {
         properties: newElement.properties || { },
-        childNodes: newElement.childNodes.map((child, i) => diffNode(existingElement.childNodes[ i ], child))
+        childNodes: newElement.childNodes.map((child, i) => module.exports.diffNode(existingElement.childNodes[ i ], child))
     });
 }
 
-export function renderNode (parent, element) {
+module.exports.renderNode = function renderNode (parent, element) {
 
     if (!element) {
         return;
@@ -74,7 +95,7 @@ export function renderNode (parent, element) {
         });
     }
 
-    element.childNodes.forEach(child => renderNode(element.node, child));
+    element.childNodes.forEach(child => module.exports.renderNode(element.node, child));
 
     if (parent instanceof Node && parent !== element.node.parentNode) {
         return parent.appendChild(element.node);
@@ -83,25 +104,4 @@ export function renderNode (parent, element) {
     if (element.node[ symbols.updateComponent ]) {
         element.node[ symbols.updateComponent ]();
     }
-}
-
-export default function element (tag, properties = { }, children = [ ], ...jsxChildren) {
-    const tagName = typeof tag === 'string' ? tag.toLowerCase() : tag;
-
-    if (typeof children === 'string' && jsxChildren.length === 0) {
-        return {
-            tagName,
-            properties: { ...properties, textContent: children },
-            childNodes: [ ]
-        };
-    }
-
-    const childArray = (Array.isArray(children) ? children : [ children ]).concat(jsxChildren);
-    const childNodes = childArray.map(x => typeof x === 'string' ? element(null, null, x) : x);
-
-    return {
-        tagName,
-        properties,
-        childNodes
-    };
 }

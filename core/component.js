@@ -1,6 +1,7 @@
-import element, { createNode, diffNode, renderNode } from './element';
-import State from './state';
-import * as symbols from './symbols';
+const State = require('./state');
+
+const element = require('./element');
+const symbols = require('./symbols');
 
 const lifecycleEvents = [
     'connect',
@@ -23,26 +24,7 @@ const HTMLElementProxy = new Proxy(HTMLElement, {
     }
 });
 
-export default class Component extends HTMLElementProxy {
-
-    static get [ symbols.elementName ] () {
-        const { elementName, name } = this;
-        const validName = elementName || name.replace(/([A-Z])/g, x => `-${ x.toLowerCase() }`).replace(/^-/, '');
-
-        if (!validName.includes('-')) {
-            return `x-${ validName }`;
-        }
-
-        return validName;
-    }
-
-    static elementName = null;
-
-    static defaultProperties = { };
-
-    static initialState = { };
-
-    [ symbols.elementTree ] = null;
+module.exports = class Component extends HTMLElementProxy {
 
     [ symbols.connectComponent ] () {
         this.dispatchEvent(new CustomEvent('connect'));
@@ -65,16 +47,16 @@ export default class Component extends HTMLElementProxy {
         }
 
         if (!existingTree) {
-            this[ symbols.elementTree ] = newTree.map(element => createNode(element));
+            this[ symbols.elementTree ] = newTree.map(element => element.createNode(element));
 
             return this[ symbols.elementTree ];
         }
 
         if (existingTree.length > newTree.length) {
-            this[ symbols.elementTree ] = existingTree.map((element, i) => diffNode(element, newTree[ i ]));
+            this[ symbols.elementTree ] = existingTree.map((element, i) => element.diffNode(element, newTree[ i ]));
         }
         else {
-            this[ symbols.elementTree ] = newTree.map((element, i) => diffNode(existingTree[ i ], element));
+            this[ symbols.elementTree ] = newTree.map((element, i) => element.diffNode(existingTree[ i ], element));
         }
 
         return this[ symbols.elementTree ];
@@ -96,7 +78,7 @@ export default class Component extends HTMLElementProxy {
                 }
             });
 
-            tree.forEach(element => renderNode(this.shadowRoot, element));
+            tree.forEach(element => element.renderNode(this.shadowRoot, element));
 
             this.dispatchEvent(new CustomEvent('render'));
         });
@@ -109,15 +91,13 @@ export default class Component extends HTMLElementProxy {
     }
 
     get css () {
-        return '' /* TODO `
-            :host {
-                display: contents;
-            }
-        `*/;
+        return '';
     }
 
     constructor () {
         super();
+
+        this[ symbols.elementTree ] = null;
 
         Object.assign(this, this.constructor.defaultProperties);
 
@@ -151,4 +131,21 @@ export default class Component extends HTMLElementProxy {
     render () {
         return [ ];
     }
-}
+};
+
+module.exports.elementName = null;
+module.exports.defaultProperties = { };
+module.exports.initialState = { };
+
+Object.defineProperty(module.exports, symbols.elementName, {
+    get () {
+        const { elementName, name } = this;
+        const validName = elementName || name.replace(/([A-Z])/g, x => `-${ x.toLowerCase() }`).replace(/^-/, '');
+
+        if (!validName.includes('-')) {
+            return `x-${ validName }`;
+        }
+
+        return validName;
+    }
+});

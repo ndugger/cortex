@@ -1,19 +1,19 @@
 {
   "name": "quark",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "Web Component Framework For Web Applications",
   "main": "index.js",
   "scripts": {
-    "test": "echo null"
+
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ndugger/quark.git"
+    "url": "git+https://github.com/cyclonic-games/quark.git"
   },
-  "author": "Nick Dugger",
+  "author": "Cyclonic Games",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ndugger/quark/issues"
+    "url": "https://github.com/cyclonic-games/quark/issues"
   },
-  "homepage": "https://github.com/ndugger/quark#readme"
+  "homepage": "https://github.com/cyclonic-games/quark#readme"
 }

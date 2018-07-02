@@ -1,5 +1,6 @@
-import Component from './lib/component';
-import element from './lib/element';
+const Component = require('./core/Component');
+const element = require('./core/element');
 
-export { Component, element };
-export default { Component, element };
+module.exports = { Component, element };
+module.exports.Component = Component;
+module.exports.element = element;
