@@ -70,7 +70,7 @@ module.exports = class Component extends HTMLElementProxy {
         window.requestAnimationFrame(() => {
             const tree = this[ symbols.diffComponent ]();
             const existingChildren = Array.from(this.shadowRoot.childNodes);
-            const newChildren = tree.map(element => element.node);
+            const newChildren = tree.filter(Boolean).map(element => element.node);
 
             existingChildren.forEach(child => {
                 if (!newChildren.includes(child)) {
@@ -94,13 +94,12 @@ module.exports = class Component extends HTMLElementProxy {
         return '';
     }
 
-    constructor (properties = { }, children = [ ]) {
+    constructor () {
         super();
 
         this[ symbols.elementTree ] = null;
 
         Object.assign(this, this.constructor.defaultProperties);
-        Object.assign(this, properties);
 
         this.state = new State(this, Object.entries(this.constructor.initialState));
 
@@ -113,10 +112,6 @@ module.exports = class Component extends HTMLElementProxy {
                 this.addEventListener(type, e => this[ handler ](e));
             }
         });
-
-        for (const child of children) {
-            element.renderNode(this, element.createNode(child));
-        }
 
         this.dispatchEvent(new CustomEvent('create'));
     }

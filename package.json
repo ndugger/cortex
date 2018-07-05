@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "Web Component Framework For Web Applications",
   "main": "index.js",
-  "scripts": {
-
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cyclonic-games/quark.git"

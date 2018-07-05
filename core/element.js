@@ -26,6 +26,11 @@ module.exports.removeNode = function removeNode (element) {
 }
 
 module.exports.createNode = function createNode (element) {
+
+    if (!element) {
+        return null;
+    }
+
     const { tagName, properties, childNodes } = element;
 
     if (tagName === null) {
@@ -40,7 +45,7 @@ module.exports.createNode = function createNode (element) {
     return {
         tagName,
         properties,
-        node: typeof tagName === 'string' ? document.createElement(tagName) : new tagName(properties, childNodes),
+        node: typeof tagName === 'string' ? document.createElement(tagName) : new tagName(),
         childNodes: childNodes.filter(child => child && !(child instanceof Text)).map(child => module.exports.createNode(child))
     };
 }
@@ -81,6 +86,10 @@ module.exports.renderNode = function renderNode (parent, element) {
 
     if (!element) {
         return;
+    }
+
+    if (!element.node) {
+        element = module.exports.createNode(element);
     }
 
     if (element.properties) {
