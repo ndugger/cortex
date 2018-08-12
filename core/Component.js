@@ -29,10 +29,12 @@ module.exports = class Component extends HTMLElementProxy {
     [ symbols.connectComponent ] () {
         this.dispatchEvent(new CustomEvent('connect'));
 
-        this[ symbols.renderComponent ]();
-
         window.requestAnimationFrame(() => {
-            this.dispatchEvent(new CustomEvent('ready'));
+            this[ symbols.renderComponent ]();
+
+            window.requestAnimationFrame(() => {
+                this.dispatchEvent(new CustomEvent('ready'));
+            });
         });
     }
 
@@ -67,25 +69,25 @@ module.exports = class Component extends HTMLElementProxy {
     }
 
     [ symbols.renderComponent ] () {
-        window.requestAnimationFrame(() => {
-            const tree = this[ symbols.diffComponent ]();
-            const existingChildren = Array.from(this.shadowRoot.childNodes);
-            const newChildren = tree.filter(Boolean).map(element => element.node);
+        const tree = this[ symbols.diffComponent ]();
+        const existingChildren = Array.from(this.shadowRoot.childNodes);
+        const newChildren = tree.filter(Boolean).map(element => element.node);
 
-            existingChildren.forEach(child => {
-                if (!newChildren.includes(child)) {
-                    child.remove();
-                }
-            });
-
-            tree.forEach(e => element.renderNode(this.shadowRoot, e));
-
-            this.dispatchEvent(new CustomEvent('render'));
+        existingChildren.forEach(child => {
+            if (!newChildren.includes(child)) {
+                child.remove();
+            }
         });
+
+        tree.forEach(e => element.renderNode(this.shadowRoot, e));
+
+        this.dispatchEvent(new CustomEvent('render'));
     }
 
     [ symbols.updateComponent ] () {
-        this[ symbols.renderComponent ]();
+        window.requestAnimationFrame(() => {
+            this[ symbols.renderComponent ]();
+        });
 
         this.dispatchEvent(new CustomEvent('update'));
     }
