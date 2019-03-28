@@ -1,11 +1,16 @@
 export default new Proxy(HTMLElement, {
 
-    construct(element, args, component): object {
+    construct: (element, args, widget): object => {
+        let tag = widget.name.replace(/([A-Z])/g, x => `-${ x.toLowerCase() }`).replace(/^-/, '');
 
-        if (!window.customElements.get(component.tag)) {
-            window.customElements.define(component.tag, component);
+        if (!tag.includes('-')) {
+            tag = `x-${ tag }`;
         }
 
-        return Reflect.construct(element, args, component);
+        if (!window.customElements.get(tag)) {
+            window.customElements.define(tag, widget);
+        }
+
+        return Reflect.construct(element, args, widget);
     }
 });

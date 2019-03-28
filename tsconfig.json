@@ -9,7 +9,7 @@
             "ES2017",
             "ES2018"
         ],
-        "module": "system",
+        "module": "es6",
         "moduleResolution": "node",
         "paths": {
             "*": [ "*" ]

@@ -1,32 +1,29 @@
-import HTMLElementProxy from 'core/HTMLElementProxy';
-import * as Utilities from 'core/Utilities';
-import Node from 'lib/Node';
+import HTMLElementProxy from '../core/HTMLElementProxy';
+import * as Utilities from '../core/Utilities';
+import Node from './Node';
 
 export default class Widget extends HTMLElementProxy {
 
-    public static readonly tag = 'x-widget';
-
     private tree: Node[];
 
-    protected options: any;
-
     private connectedCallback(): void {
-        this.dispatchEvent(new CustomEvent('connect'));
+        this.dispatchEvent(new CustomEvent('widgetconnect'));
 
         window.requestAnimationFrame(() => {
-            this.renderCallback();
+            this.renderedCallback();
 
             window.requestAnimationFrame(() => {
-                this.dispatchEvent(new CustomEvent('ready'));
+                this.dispatchEvent(new CustomEvent('widgetready'));
             });
         });
     }
 
     private disconnectedCallback(): void {
-        this.dispatchEvent(new CustomEvent('disconnect'));
+        this.dispatchEvent(new CustomEvent('widgetdisconnect'));
     }
 
-    private renderCallback(): void {
+    private renderedCallback(): void {
+        const style = this.design();
         const tree = Utilities.diffTree(this.tree, this.render());
         const existing = Array.from(this.shadowRoot.children);
         const incoming = tree.map(node => Reflect.get(node, 'element'));
@@ -38,34 +35,40 @@ export default class Widget extends HTMLElementProxy {
             }
         }
 
-        for (const node of tree) {
+        if (style) {
+            new Node(HTMLStyleElement, { textContent: style }).connect(this.shadowRoot);
+        }
+
+        this.tree = tree;
+
+        for (const node of this.tree) {
             node.connect(this.shadowRoot);
         }
 
-        this.dispatchEvent(new CustomEvent('render'));
+        this.dispatchEvent(new CustomEvent('widgetrender'));
     }
 
-    private handleWidgetConnect(event: Event): void {
+    protected handleWidgetConnect(event: Event): void {
         event; // override
     }
 
-    private handleWidgetCreate(event: Event): void {
+    protected handleWidgetCreate(event: Event): void {
         event; // override
     }
 
-    private handleWidgetDisconnect(event: Event): void {
+    protected handleWidgetDisconnect(event: Event): void {
         event; // override
     }
 
-    private handleWidgetReady(event: Event): void {
+    protected handleWidgetReady(event: Event): void {
         event; // override
     }
 
-    private handleWidgetRender(event: Event): void {
+    protected handleWidgetRender(event: Event): void {
         event; // override
     }
 
-    private handleWidgetUpdate(event: Event): void {
+    protected handleWidgetUpdate(event: Event): void {
         event; // override
     }
 
@@ -74,25 +77,29 @@ export default class Widget extends HTMLElementProxy {
 
         this.attachShadow({ mode: 'open' });
 
-        this.addEventListener('connect', event => this.handleWidgetConnect(event));
-        this.addEventListener('create', event => this.handleWidgetCreate(event));
-        this.addEventListener('disconnect', event => this.handleWidgetDisconnect(event));
-        this.addEventListener('ready', event => this.handleWidgetReady(event));
-        this.addEventListener('render', event => this.handleWidgetRender(event));
-        this.addEventListener('update', event => this.handleWidgetUpdate(event));
+        this.addEventListener('widgetconnect', event => this.handleWidgetConnect(event));
+        this.addEventListener('widgetcreate', event => this.handleWidgetCreate(event));
+        this.addEventListener('widgetdisconnect', event => this.handleWidgetDisconnect(event));
+        this.addEventListener('widgetready', event => this.handleWidgetReady(event));
+        this.addEventListener('widgetrender', event => this.handleWidgetRender(event));
+        this.addEventListener('widgetupdate', event => this.handleWidgetUpdate(event));
 
-        this.dispatchEvent(new CustomEvent('create'));
+        this.dispatchEvent(new CustomEvent('widgetcreate'));
     }
 
-    public update() {
-        window.requestAnimationFrame(() => {
-            this.renderCallback();
-        });
-
-        this.dispatchEvent(new CustomEvent('update'));
+    public design(): string {
+        return ''; // override
     }
 
     public render(): Node[] {
         return []; // override
+    }
+
+    public update(): void {
+        window.requestAnimationFrame(() => {
+            this.renderedCallback();
+        });
+
+        this.dispatchEvent(new CustomEvent('widgetupdate'));
     }
 }

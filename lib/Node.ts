@@ -1,22 +1,28 @@
-import Widget from 'lib/Widget';
+import Widget from './Widget';
 
-interface ElementClass {
-    new(): Element;
+interface ElementClass<ElementType> {
+    new(): ElementType;
     __proto__?: any;
 };
 
-export default class Node {
+const htmlClassNameExceptions = {
+    HTMLOListElement: 'ol',
+    HTMLParagraphElement: 'p',
+    HTMLUListElement: 'ul'
+};
 
-    public static getElement(node: Node): Element {
+export default class Node<ElementType extends Element = Element> {
+
+    public static getElement(node: Node<Element>): Element {
         return node.element;
     }
 
-    private children: Node[];
+    private children: Node<Element>[];
     private element: Element;
-    private options: any;
-    private type: ElementClass;
+    private options: { [ key in keyof ElementType ]?: any };
+    private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass, options: any = {}, children: Node[] = []) {
+    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: any } = {}, children: Node<Element>[] = []) {
         this.children = children;
         this.element = null;
         this.options = options;
@@ -29,7 +35,7 @@ export default class Node {
             this.create();
         }
 
-        for (const option of Object.keys(this.options)) {
+        if (this.options !== null) for (const option of Object.keys(this.options)) {
 
             if (this.element[ option ] && typeof this.element[ option ] === 'object') {
                 Object.assign(this.element[ option ], this.options[ option ]);
@@ -46,18 +52,24 @@ export default class Node {
         if (host !== this.element.parentNode) {
             host.append(this.element);
         }
-        else {
-            (this.element as unknown as Widget).update();
+        else if (this.element instanceof Widget) {
+            this.element.update();
         }
     }
 
     public create(): void {
 
-        if (this.type.__proto__ === HTMLElement) {
-            const name = this.type.name;
-            const tag = name.replace(/HTML(.*?)Element/, '$1').toLowerCase();
+        if (this.type.__proto__ === HTMLElement || this.type.__proto__ === SVGElement) {
 
-            this.element = document.createElement(tag);
+            if (this.type.name in htmlClassNameExceptions) {
+                this.element = document.createElement(htmlClassNameExceptions[ this.type.name ]);
+            }
+            else {
+                const name = this.type.name;
+                const tag = name.replace(/HTML(.*?)Element/, '$1').toLowerCase();
+
+                this.element = document.createElement(tag);
+            }
         }
         else {
             this.element = Reflect.construct(this.type, []);
@@ -85,7 +97,7 @@ export default class Node {
             return node;
         }
 
-        if (this.children.length > node.children.length) {
+        if (this.children.length >= node.children.length) {
             return Object.assign(this, {
                 children: this.children.map((child, index) => child.diff(node.children[ index ])),
                 options: node.options

@@ -1,4 +1,4 @@
-import Node from 'lib/Node';
+import Node from '../lib/Node';
 
 export function constructComponent(node: Node): Node {
     return node;
@@ -10,8 +10,10 @@ export function diffTree(existing: Node[], incoming: Node[]): Node[] {
         return incoming.map(node => constructComponent(node));
     }
 
-    if (existing.length > incoming.length) {
-        return existing.map((node, index) => node.diff(incoming[ index ])).filter(Boolean) as Node[];
+    if (existing.length >= incoming.length) {
+        const x = existing.map((node, index) => node.diff(incoming[ index ]));
+
+        return x.filter(Boolean) as Node[];
     }
     else {
         return incoming.map((node, index) => {

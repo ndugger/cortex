@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Web Component Framework For Web Applications",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+      "build": "webpack"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cyclonic-games/quark.git"
@@ -13,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/cyclonic-games/quark/issues"
   },
-  "homepage": "https://github.com/cyclonic-games/quark#readme"
+  "homepage": "https://github.com/cyclonic-games/quark#readme",
+  "devDependencies": {
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.3.4000",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  }
 }
