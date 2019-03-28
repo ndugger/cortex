@@ -1,13 +1,9 @@
 import Node from '../lib/Node';
 
-export function constructComponent(node: Node): Node {
-    return node;
-}
-
 export function diffTree(existing: Node[], incoming: Node[]): Node[] {
 
     if (!existing) {
-        return incoming.map(node => constructComponent(node));
+        return incoming;
     }
 
     if (existing.length >= incoming.length) {
