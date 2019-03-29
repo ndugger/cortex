@@ -4,15 +4,15 @@ interface TestState {
     clicked: boolean;
 }
 
-const store = new Quark.Store<TestState>({
+const state = new Quark.Store<TestState>({
     clicked: false
 });
 
-@Quark.observe(store)
+@Quark.observe(state)
 class TestButton extends Quark.Widget {
 
     private handleButtonClick(): void {
-        store.set('clicked', true);
+        state.set('clicked', true);
     }
 
     public design(): string {
@@ -29,7 +29,7 @@ class TestButton extends Quark.Widget {
     }
 
     public render(): Quark.Node[] {
-        const clicked = store.get('clicked');
+        const clicked = state.get('clicked');
 
         return [
             new Quark.Node(HTMLButtonElement, { className: 'xyz', onclick: (e) => this.handleButtonClick() }, [
@@ -40,7 +40,7 @@ class TestButton extends Quark.Widget {
     }
 }
 
-@Quark.observe(store)
+@Quark.observe(state)
 class TestCanvas extends Quark.Widget {
 
     protected handleWidgetRender(): void {
@@ -70,10 +70,6 @@ class TestCanvas extends Quark.Widget {
 }
 
 class TestContainer extends Quark.Widget<{ foo: boolean }> {
-
-    protected readonly initialState = {
-        foo: false
-    };
 
     private handleCanvasClick(): void {
         this.state.set('foo', true);
