@@ -1,30 +1,62 @@
 import HTMLElementProxy from '../core/HTMLElementProxy';
 import * as Utilities from '../core/Utilities';
 import Node from './Node';
+import Store from './Store';
 
-export default class Widget extends HTMLElementProxy {
+export default class Widget<StateType = any> extends HTMLElementProxy {
 
-    private tree: Node[];
+    private nodes: Node[];
+
+    protected state: Store<StateType>;
+
+    public onwidgetconnect: (event: Event) => void;
+    public onwidgetcreate: (event: Event) => void;
+    public onwidgetdisconnect: (event: Event) => void;
+    public onwidgetready: (event: Event) => void;
+    public onwidgetrender: (event: Event) => void;
+    public onwidgetupdate: (event: Event) => void;
 
     private connectedCallback(): void {
-        this.dispatchEvent(new CustomEvent('widgetconnect'));
+        const widgetConnect = new CustomEvent('widgetconnect');
+
+        if (this.onwidgetconnect) {
+            this.onwidgetconnect(widgetConnect);
+        }
+
+        this.dispatchEvent(widgetConnect);
 
         window.requestAnimationFrame(() => {
             this.renderedCallback();
 
+            if (!this.classList.contains(this.constructor.name)) {
+                this.className = this.constructor.name + (this.className ? ' ' : '') + this.className;
+            }
+
             window.requestAnimationFrame(() => {
-                this.dispatchEvent(new CustomEvent('widgetready'));
+                const widgetReady = new CustomEvent('widgetready');
+
+                if (this.onwidgetready) {
+                    this.onwidgetready(widgetReady);
+                }
+
+                this.dispatchEvent(widgetReady);
             });
         });
     }
 
     private disconnectedCallback(): void {
-        this.dispatchEvent(new CustomEvent('widgetdisconnect'));
+        const widegetDisconnect = new CustomEvent('widgetdisconnect');
+
+        if (this.onwidgetdisconnect) {
+            this.onwidgetdisconnect(widegetDisconnect);
+        }
+
+        this.dispatchEvent(widegetDisconnect);
     }
 
     private renderedCallback(): void {
         const style = this.design();
-        const tree = Utilities.diffTree(this.tree, this.render());
+        const tree = Utilities.diffTree(this.nodes, this.render());
         const existing = Array.from(this.shadowRoot.children);
         const incoming = tree.map(node => Reflect.get(node, 'element'));
 
@@ -39,13 +71,19 @@ export default class Widget extends HTMLElementProxy {
             new Node(HTMLStyleElement, { textContent: style }).connect(this.shadowRoot);
         }
 
-        this.tree = tree;
+        this.nodes = tree;
 
-        for (const node of this.tree) {
+        for (const node of this.nodes) {
             node.connect(this.shadowRoot);
         }
 
-        this.dispatchEvent(new CustomEvent('widgetrender'));
+        const widgetRender = new CustomEvent('widgetrender');
+
+        if (this.onwidgetrender) {
+            this.onwidgetrender(widgetRender);
+        }
+
+        this.dispatchEvent(widgetRender);
     }
 
     protected handleWidgetConnect(event: Event): void {
@@ -75,7 +113,8 @@ export default class Widget extends HTMLElementProxy {
     public constructor() {
         super();
 
-        this.attachShadow({ mode: 'open' });
+        this.state = new Store<StateType>();
+        this.state.observe(this);
 
         this.addEventListener('widgetconnect', event => this.handleWidgetConnect(event));
         this.addEventListener('widgetcreate', event => this.handleWidgetCreate(event));
@@ -83,8 +122,15 @@ export default class Widget extends HTMLElementProxy {
         this.addEventListener('widgetready', event => this.handleWidgetReady(event));
         this.addEventListener('widgetrender', event => this.handleWidgetRender(event));
         this.addEventListener('widgetupdate', event => this.handleWidgetUpdate(event));
+        this.attachShadow({ mode: 'open' });
 
-        this.dispatchEvent(new CustomEvent('widgetcreate'));
+        const widgetCreate = new CustomEvent('widgetcreate');
+
+        if (this.onwidgetcreate) {
+            this.onwidgetcreate(widgetCreate);
+        }
+
+        this.dispatchEvent(widgetCreate);
     }
 
     public design(): string {
@@ -95,11 +141,33 @@ export default class Widget extends HTMLElementProxy {
         return []; // override
     }
 
-    public update(): void {
+    public update(props: object = {}): void {
+        Object.assign(this, props);
+
+        for (const prop of Object.keys(props)) {
+
+            if (this[ prop ] === props[ prop ]) {
+                break;
+            }
+
+            if (this[ prop ] && typeof this[ prop ] === 'object') {
+                Object.assign(this[ prop ], props[ prop ]);
+            }
+            else {
+                this[ prop ] = props[ prop ];
+            }
+        }
+
         window.requestAnimationFrame(() => {
             this.renderedCallback();
         });
 
-        this.dispatchEvent(new CustomEvent('widgetupdate'));
+        const widgetUpdate = new CustomEvent('widgetupdate');
+
+        if (this.onwidgetupdate) {
+            this.onwidgetupdate(widgetUpdate);
+        }
+
+        this.dispatchEvent(widgetUpdate);
     }
 }

@@ -13,16 +13,16 @@ const htmlClassNameExceptions = {
 
 export default class Node<ElementType extends Element = Element> {
 
-    public static getElement(node: Node<Element>): Element {
+    public static getElement(node: Node): Element {
         return node.element;
     }
 
-    private children: Node<Element>[];
+    private children: Node[];
     private element: Element;
-    private options: { [ key in keyof ElementType ]?: any };
+    private options: { [ key in keyof ElementType ]?: ElementType[ key ] };
     private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: any } = {}, children: Node<Element>[] = []) {
+    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: ElementType[ key ] } = {}, children: Node[] = []) {
         this.children = children;
         this.element = null;
         this.options = options;
@@ -37,12 +37,20 @@ export default class Node<ElementType extends Element = Element> {
 
         if (this.options !== null) for (const option of Object.keys(this.options)) {
 
+            if (this.element[ option ] === this.options[ option ]) {
+                break;
+            }
+
             if (this.element[ option ] && typeof this.element[ option ] === 'object') {
                 Object.assign(this.element[ option ], this.options[ option ]);
             }
             else {
                 this.element[ option ] = this.options[ option ];
             }
+        }
+
+        if (!this.element.classList.contains(this.type.name)) {
+            this.element.className = this.type.name + (this.element.className ? ' ' : '') + this.element.className;
         }
 
         for (const child of this.children) {
@@ -58,8 +66,9 @@ export default class Node<ElementType extends Element = Element> {
     }
 
     public create(): void {
+        const proto = this.type.__proto__;
 
-        if (this.type.__proto__ === HTMLElement || this.type.__proto__ === SVGElement) {
+        if (proto === HTMLElement || proto === SVGElement) {
 
             if (this.type.name in htmlClassNameExceptions) {
                 this.element = document.createElement(htmlClassNameExceptions[ this.type.name ]);
@@ -84,7 +93,7 @@ export default class Node<ElementType extends Element = Element> {
         this.element.remove();
     }
 
-    public diff(node: void | Node): void | Node {
+    public diff(node: Node | void): Node | void {
 
         if (!node) {
             return this.remove();

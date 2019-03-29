@@ -1,32 +1,49 @@
 import * as Quark from '..';
 
+interface TestState {
+    clicked: boolean;
+}
+
+const store = new Quark.Store<TestState>({
+    clicked: false
+});
+
+@Quark.observe(store)
 class TestButton extends Quark.Widget {
+
+    private handleButtonClick(): void {
+        store.set('clicked', true);
+    }
 
     public design(): string {
         return `
-            :host {
-                display: contents;
-            }
-
-            button {
+            .HTMLButtonElement {
                 background: blue;
                 color: white;
+            }
+
+            .HTMLButtonElement.xyz {
+                color: yellow;
             }
         `;
     }
 
     public render(): Quark.Node[] {
+        const clicked = store.get('clicked');
+
         return [
-            new Quark.Node(HTMLButtonElement, null, [
-                new Quark.Node(HTMLSlotElement)
+            new Quark.Node(HTMLButtonElement, { className: 'xyz', onclick: (e) => this.handleButtonClick() }, [
+                new Quark.Node(HTMLSlotElement),
+                new Quark.Node(HTMLSpanElement, { textContent: `(clicked: ${ clicked })` })
             ])
         ];
     }
 }
 
+@Quark.observe(store)
 class TestCanvas extends Quark.Widget {
 
-    protected handleWidgetRender(event: CustomEvent): void {
+    protected handleWidgetRender(): void {
         const canvas = this.shadowRoot.querySelector('canvas');
         const context = canvas.getContext('2d');
         const r = Math.round(Math.random() * 255);
@@ -39,11 +56,7 @@ class TestCanvas extends Quark.Widget {
 
     public design(): string {
         return `
-            :host {
-                display: contents;
-            }
-
-            canvas {
+            .HTMLCanvasElement {
                 background: black;
             }
         `;
@@ -56,19 +69,21 @@ class TestCanvas extends Quark.Widget {
     }
 }
 
-class TestContainer extends Quark.Widget {
+class TestContainer extends Quark.Widget<{ foo: boolean }> {
 
-    private handleButtonClick(): void {
-        this.update();
+    private handleCanvasClick(): void {
+        this.state.set('foo', true);
     }
 
     public render(): Quark.Node[] {
+        const foo = this.state.get('foo');
+
         return [
-            new Quark.Node(TestButton, { onclick: () => this.handleButtonClick() }, [
-                new Quark.Node(HTMLSpanElement, { textContent: 'Click Here' })
+            new Quark.Node(TestButton, null, [
+                new Quark.Node(HTMLSpanElement, { textContent: `[foo: ${ foo }] Click Me` })
             ]),
             new Quark.Node(HTMLBRElement),
-            new Quark.Node(TestCanvas)
+            new Quark.Node(TestCanvas, { onclick: () => this.handleCanvasClick() })
         ];
     }
 }
