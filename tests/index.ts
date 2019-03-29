@@ -71,6 +71,10 @@ class TestCanvas extends Quark.Widget {
 
 class TestContainer extends Quark.Widget<{ foo: boolean }> {
 
+    protected readonly initialState = {
+        foo: false
+    };
+
     private handleCanvasClick(): void {
         this.state.set('foo', true);
     }

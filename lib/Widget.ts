@@ -7,7 +7,8 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
 
     private nodes: Node[];
 
-    protected state: Store<StateType>;
+    protected initialState: StateType = null;
+    protected state: Store<StateType> = null;
 
     public onwidgetconnect: (event: Event) => void;
     public onwidgetcreate: (event: Event) => void;
@@ -17,6 +18,14 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
     public onwidgetupdate: (event: Event) => void;
 
     private connectedCallback(): void {
+
+        if (this.initialState !== undefined) {
+            this.state = new Store<StateType>(this.initialState || undefined);
+            this.state.observe(this);
+
+            delete this.initialState;
+        }
+
         const widgetConnect = new CustomEvent('widgetconnect');
 
         if (this.onwidgetconnect) {
@@ -112,9 +121,6 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
 
     public constructor() {
         super();
-
-        this.state = new Store<StateType>();
-        this.state.observe(this);
 
         this.addEventListener('widgetconnect', event => this.handleWidgetConnect(event));
         this.addEventListener('widgetcreate', event => this.handleWidgetCreate(event));
