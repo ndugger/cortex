@@ -16,7 +16,7 @@ const htmlClassNameLookup = {
     HTMLUListElement: 'ul'
 };
 
-export default class Node<ElementType extends (Element & ElementWithTag) = Element> {
+export default class Node<ElementType extends Element = Element> {
 
     public static getElement(node: Node): Element {
         return node.element;
@@ -24,10 +24,10 @@ export default class Node<ElementType extends (Element & ElementWithTag) = Eleme
 
     private children: Node[];
     private element: Element;
-    private options: { [ key in keyof ElementType ]?: ElementType[ key ] };
+    private options: { [ key in keyof ElementType ]?: ElementType[ key ] } | ElementWithTag;
     private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: ElementType[ key ] } = {}, children: Node[] = []) {
+    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: ElementType[ key ] } | ElementWithTag = {}, children: Node[] = []) {
         this.children = children;
         this.element = null;
         this.options = options;
