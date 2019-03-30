@@ -5,7 +5,8 @@ interface ElementClass<ElementType> {
     __proto__?: any;
 };
 
-const htmlClassNameExceptions = {
+const htmlClassNameLookup = {
+    HTMLAnchorElement: 'a',
     HTMLOListElement: 'ol',
     HTMLParagraphElement: 'p',
     HTMLUListElement: 'ul'
@@ -70,8 +71,8 @@ export default class Node<ElementType extends Element = Element> {
 
         if (proto === HTMLElement || proto === SVGElement) {
 
-            if (this.type.name in htmlClassNameExceptions) {
-                this.element = document.createElement(htmlClassNameExceptions[ this.type.name ]);
+            if (this.type.name in htmlClassNameLookup) {
+                this.element = document.createElement(htmlClassNameLookup[ this.type.name ]);
             }
             else {
                 const name = this.type.name;
@@ -84,7 +85,7 @@ export default class Node<ElementType extends Element = Element> {
             this.element = Reflect.construct(this.type, []);
         }
 
-        for (const child of this.children) {
+        for (const child of this.children) if (child) {
             child.create();
         }
     }

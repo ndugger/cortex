@@ -4,7 +4,7 @@
   "description": "Web Component Framework For Web Applications",
   "main": "index.js",
   "scripts": {
-      "build": "webpack"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
