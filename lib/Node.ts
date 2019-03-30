@@ -82,8 +82,7 @@ export default class Node<ElementType extends (Element & ElementWithTag) = Eleme
                 throw new Error('Unable to create generic HTMLElement: missing `tag` from options');
             }
         }
-
-        if (proto === HTMLElement || proto === SVGElement) {
+        else if (proto === HTMLElement || proto === SVGElement) {
 
             if (this.type.name in htmlClassNameLookup) {
                 this.element = document.createElement(htmlClassNameLookup[ this.type.name ]);
