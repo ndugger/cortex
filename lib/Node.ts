@@ -54,7 +54,7 @@ export default class Node<ElementType extends Element = Element> {
             this.element.className = this.type.name + (this.element.className ? ' ' : '') + this.element.className;
         }
 
-        for (const child of this.children) {
+        for (const child of this.children) if (child) {
             child.connect(this.element);
         }
 
