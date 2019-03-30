@@ -1,5 +1,9 @@
 import Widget from './Widget';
 
+interface ElementWithTag {
+    tag?: string;
+}
+
 interface ElementClass<ElementType> {
     new(): ElementType;
     __proto__?: any;
@@ -12,7 +16,7 @@ const htmlClassNameLookup = {
     HTMLUListElement: 'ul'
 };
 
-export default class Node<ElementType extends Element = Element> {
+export default class Node<ElementType extends (Element & ElementWithTag) = Element> {
 
     public static getElement(node: Node): Element {
         return node.element;
@@ -68,6 +72,16 @@ export default class Node<ElementType extends Element = Element> {
 
     public create(): void {
         const proto = this.type.__proto__;
+
+        if (this.type as any === HTMLElement) {
+
+            if ('tag' in this.options) {
+                this.element = document.createElement(this.options.tag);
+            }
+            else {
+                throw new Error('Unable to create generic HTMLElement: missing `tag` from options');
+            }
+        }
 
         if (proto === HTMLElement || proto === SVGElement) {
 
