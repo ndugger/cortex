@@ -34,7 +34,7 @@ class TestButton extends Quark.Widget {
         return [
             new Quark.Node(HTMLButtonElement, { className: 'xyz', onclick: (e) => this.handleButtonClick() }, [
                 new Quark.Node(HTMLSlotElement),
-                new Quark.Node(HTMLSpanElement, { textContent: `(clicked: ${ clicked })` })
+                new Quark.Node(HTMLSpanElement, { style: { }, textContent: `(clicked: ${ clicked })` })
             ])
         ];
     }

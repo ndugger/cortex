@@ -1,16 +1,11 @@
 import Widget from './Widget';
 
-interface ElementWithStyle {
-    style?: {
-        [ key in keyof CSSStyleDeclaration ]?: any;
-    }
-}
+type DOMElement = Partial<Element & (HTMLElement | SVGElement)>;
 
-interface ElementWithTag {
+type WritableElement<ElementType extends DOMElement> = Partial<ElementType> | {
+    style?: Partial<CSSStyleDeclaration>;
     tag?: string;
-}
-
-type ElementMixin = ElementWithStyle & ElementWithTag;
+};
 
 interface ElementClass<ElementType> {
     new(): ElementType;
@@ -24,7 +19,7 @@ const htmlClassNameLookup = {
     HTMLUListElement: 'ul'
 };
 
-export default class Node<ElementType extends Element = Element> {
+export default class Node<ElementType extends DOMElement = DOMElement> {
 
     public static getElement(node: Node): Element {
         return node.element;
@@ -32,10 +27,10 @@ export default class Node<ElementType extends Element = Element> {
 
     private children: Node[];
     private element: Element;
-    private options: { [ key in keyof ElementType ]?: ElementType[ key ] } & ElementMixin;
+    private options: WritableElement<ElementType>;
     private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: ElementType[ key ] } & ElementMixin = {}, children: Node[] = []) {
+    public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node[] = []) {
         this.children = children;
         this.element = null;
         this.options = options;
