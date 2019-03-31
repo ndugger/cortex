@@ -64,7 +64,7 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
     }
 
     private renderedCallback(): void {
-        const style = this.design();
+        const style = this.theme();
         const tree = Utilities.diffTree(this.nodes, this.render());
         const existing = Array.from(this.shadowRoot.children);
         const incoming = tree.map(node => Reflect.get(node, 'element'));
@@ -139,12 +139,12 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
         this.dispatchEvent(widgetCreate);
     }
 
-    public design(): string {
-        return ''; // override
-    }
-
     public render(): Node[] {
         return []; // override
+    }
+
+    public theme(): string {
+        return ''; // override
     }
 
     public update(props: object = {}): void {

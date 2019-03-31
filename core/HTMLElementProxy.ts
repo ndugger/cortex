@@ -4,7 +4,7 @@ export default new Proxy(HTMLElement, {
         let tag = widget.name.replace(/([A-Z])/g, x => `-${ x.toLowerCase() }`).replace(/^-/, '');
 
         if (!tag.includes('-')) {
-            tag = `x-${ tag }`;
+            tag = `${ tag }-widget`;
         }
 
         if (!window.customElements.get(tag)) {
