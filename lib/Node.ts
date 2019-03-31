@@ -2,7 +2,7 @@ import Widget from './Widget';
 
 interface ElementWithStyle {
     style?: {
-        [ key in keyof CSSStyleDeclaration ]: any;
+        [ key in keyof CSSStyleDeclaration ]?: any;
     }
 }
 
