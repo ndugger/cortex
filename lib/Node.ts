@@ -1,8 +1,16 @@
 import Widget from './Widget';
 
+interface ElementWithStyle {
+    style?: {
+        [ key in keyof CSSStyleDeclaration ]: any;
+    }
+}
+
 interface ElementWithTag {
     tag?: string;
 }
+
+type ElementMixin = ElementWithStyle & ElementWithTag;
 
 interface ElementClass<ElementType> {
     new(): ElementType;
@@ -24,10 +32,10 @@ export default class Node<ElementType extends Element = Element> {
 
     private children: Node[];
     private element: Element;
-    private options: { [ key in keyof ElementType ]?: ElementType[ key ] } & ElementWithTag;
+    private options: { [ key in keyof ElementType ]?: ElementType[ key ] } & ElementMixin;
     private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: ElementType[ key ] } & ElementWithTag = {}, children: Node[] = []) {
+    public constructor(type: ElementClass<ElementType>, options: { [ key in keyof ElementType ]?: ElementType[ key ] } & ElementMixin = {}, children: Node[] = []) {
         this.children = children;
         this.element = null;
         this.options = options;
