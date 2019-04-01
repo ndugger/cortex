@@ -124,6 +124,8 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
     public constructor() {
         super();
 
+        this.self = this;
+
         this.addEventListener('widgetconnect', event => this.handleWidgetConnect(event));
         this.addEventListener('widgetcreate', event => this.handleWidgetCreate(event));
         this.addEventListener('widgetdisconnect', event => this.handleWidgetDisconnect(event));
