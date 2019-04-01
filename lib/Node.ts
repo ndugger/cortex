@@ -25,7 +25,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
         return node.element;
     }
 
-    public static jsxFactory<ElementType extends DOMElement = DOMElement>(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node | Node[] = [], ...jsx: Node[]): Node {
+    public static jsxFactory<ElementType extends DOMElement = DOMElement>(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node | Node[] = [], ...jsx: Node[]): Node<ElementType> {
         return new Node(type, options, children, ...jsx);
     }
 
