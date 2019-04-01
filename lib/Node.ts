@@ -30,8 +30,8 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
     private options: WritableElement<ElementType>;
     private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node[] = []) {
-        this.children = children;
+    public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node | Node[] = [], ...jsx: Node[]) {
+        this.children = (Array.isArray(children) ? children : [ children ]).concat(jsx);
         this.element = null;
         this.options = options;
         this.type = type;
