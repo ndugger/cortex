@@ -3,6 +3,9 @@ import Widget from './Widget';
 type DOMElement = Partial<Element & (HTMLElement | SVGElement)>;
 
 type WritableElement<ElementType extends DOMElement> = Partial<ElementType> | {
+    attributes: {
+        [ key: string ]: any;
+    };
     style?: Partial<CSSStyleDeclaration>;
     tag?: string;
 };
@@ -19,14 +22,20 @@ const htmlClassNameLookup = {
     HTMLUListElement: 'ul'
 };
 
+const svgClassNameLookup = {
+    SVGClipPathElement: 'clipPath'
+};
+
+const svgNamespace = 'http://www.w3.org/2000/svg';
+
 export default class Node<ElementType extends DOMElement = DOMElement> {
 
     public static getElement(node: Node): Element {
         return node.element;
     }
 
-    public static jsxFactory<ElementType extends DOMElement = DOMElement>(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node | Node[] = [], ...jsx: Node[]): Node<ElementType> {
-        return new Node(type, options, children, ...jsx);
+    public static jsxFactory<ElementType extends DOMElement = DOMElement>(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, ...children: Node[]): Node<ElementType> {
+        return new Node(type, options, children);
     }
 
     private children: Node[];
@@ -34,8 +43,8 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
     private options: WritableElement<ElementType>;
     private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node | Node[] = [], ...jsx: Node[]) {
-        this.children = (Array.isArray(children) ? children : [ children ]).concat(jsx);
+    public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node[]) {
+        this.children = children;
         this.element = null;
         this.options = options;
         this.type = type;
@@ -78,28 +87,35 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
     }
 
     public create(): void {
-        const proto = this.type.__proto__;
 
-        if (this.type as any === HTMLElement) {
-
-            if ('tag' in this.options) {
-                this.element = document.createElement(this.options.tag);
-            }
-            else {
-                throw new Error('Unable to create generic HTMLElement: missing `tag` from options');
-            }
+        if ((this.type === HTMLElement || this.type === SVGElement) && !('tag' in this.options)) {
+            throw new Error(`Unable to create generic ${ this.type.name }: missing 'tag' from options`);
         }
-        else if (proto === HTMLElement || proto === SVGElement) {
+
+        if (this.type.__proto__ === HTMLElement || this.type.__proto__ === SVGElement) {
 
             if (this.type.name in htmlClassNameLookup) {
                 this.element = document.createElement(htmlClassNameLookup[ this.type.name ]);
             }
-            else {
-                const name = this.type.name;
-                const tag = name.replace(/HTML(.*?)Element/, '$1').toLowerCase();
-
-                this.element = document.createElement(tag);
+            else if (this.type.name in svgClassNameLookup) {
+                this.element = document.createElementNS(svgNamespace, svgClassNameLookup[ this.type.name ]);
             }
+            else {
+
+                if (this.type.name.startsWith('HTML') && this.type.name.endsWith('Element')) {
+                    this.element = document.createElement(this.type.name.replace(/HTML(.*?)Element/, '$1').toLowerCase());
+                }
+
+                if (this.type.name.startsWith('SVG') && this.type.name.endsWith('Element')) {
+                    this.element = document.createElementNS(svgNamespace, this.type.name.replace(/SVG(.*?)Element/, '$1').toLowerCase());
+                }
+            }
+        }
+        else if (this.type === HTMLElement) {
+            this.element = document.createElement(this.options.tag);
+        }
+        else if (this.type === SVGElement) {
+            this.element = document.createElementNS(svgNamespace, this.options.tag);
         }
         else {
             this.element = Reflect.construct(this.type, []);
