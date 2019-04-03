@@ -83,6 +83,10 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
                         continue;
                     }
 
+                    if (object === true) {
+                        this.element.setAttribute(attribute, ''); // TODO do the same for namespaced attributes below
+                    }
+
                     if (typeof object === 'object') for (const [ key, value ] of Object.entries(object)) {
 
                         if (value === false) {
