@@ -1,10 +1,17 @@
 import Widget from './Widget';
 
-type DOMElement = Partial<Element & (HTMLElement | SVGElement)>;
+type DOMElement = Partial<Element & (HTMLElement | SVGElement)> & {
+    namespaces?: {
+        [ key: string ]: string;
+    };
+};
 
 type WritableElement<ElementType extends DOMElement> = Partial<ElementType> | {
-    attributes: {
+    attributes?: {
         [ key: string ]: any;
+    };
+    namespaces?: {
+        [ key: string ]: string;
     };
     style?: Partial<CSSStyleDeclaration>;
     tag?: string;
@@ -22,11 +29,8 @@ const htmlClassNameLookup = {
     HTMLUListElement: 'ul'
 };
 
-const svgClassNameLookup = {
-    SVGClipPathElement: 'clipPath'
-};
-
 const svgNamespace = 'http://www.w3.org/2000/svg';
+const xmlNamespace = 'http://www.w3.org/2000/xmlns/';
 
 export default class Node<ElementType extends DOMElement = DOMElement> {
 
@@ -43,7 +47,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
     private options: WritableElement<ElementType>;
     private type: ElementClass<ElementType>;
 
-    public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node[]) {
+    public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node[] = []) {
         this.children = children;
         this.element = null;
         this.options = options;
@@ -57,6 +61,55 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
         }
 
         if (this.options !== null) for (const option of Object.keys(this.options)) {
+
+            if (option === 'namespaces') for (const [ name, space ] of Object.entries(this.options[ option ])) {
+                this.element.setAttributeNS(xmlNamespace, `xmlns:${ name }`, space);
+
+                continue;
+            }
+
+            if (option === 'attributes') {
+
+                for (const attribute of Array.from(this.element.attributes)) {
+
+                    if (!(attribute.name in this.options[ option ]) || this.options[ option ][ attribute.name ] === false) {
+                        this.element.removeAttributeNode(attribute);
+                    }
+                }
+
+                for (const [ attribute, object ] of Object.entries(this.options[ option ])) {
+
+                    if (object === false) {
+                        continue;
+                    }
+
+                    if (typeof object === 'object') for (const [ key, value ] of Object.entries(object)) {
+
+                        if (value === false) {
+                            continue;
+                        }
+
+                        if (attribute in this.options.namespaces) {
+                            this.element.setAttributeNS(this.options.namespaces[ attribute ], `${ attribute }:${ key }`, value as string);
+                        }
+                        else {
+                            const root = document.querySelector(`xmlns:${ attribute }`);
+
+                            if (root) {
+                                this.element.setAttributeNS(root.getAttribute(`xmlns:${ attribute }`), `${ attribute }:${ key }`, value as string);
+                            }
+                            else {
+                                this.element.setAttributeNS(null, key, value as string);
+                            }
+                        }
+                    }
+                    else {
+                        this.element.setAttribute(attribute, object);
+                    }
+
+                    continue;
+                }
+            }
 
             if (this.element[ option ] === this.options[ option ]) {
                 break;
@@ -97,17 +150,18 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
             if (this.type.name in htmlClassNameLookup) {
                 this.element = document.createElement(htmlClassNameLookup[ this.type.name ]);
             }
-            else if (this.type.name in svgClassNameLookup) {
-                this.element = document.createElementNS(svgNamespace, svgClassNameLookup[ this.type.name ]);
-            }
             else {
 
                 if (this.type.name.startsWith('HTML') && this.type.name.endsWith('Element')) {
-                    this.element = document.createElement(this.type.name.replace(/HTML(.*?)Element/, '$1').toLowerCase());
+                    const tag = this.type.name.replace(/HTML(.*?)Element/, '$1').toLowerCase();
+
+                    this.element = document.createElement(tag);
                 }
 
                 if (this.type.name.startsWith('SVG') && this.type.name.endsWith('Element')) {
-                    this.element = document.createElementNS(svgNamespace, this.type.name.replace(/SVG(.*?)Element/, '$1').toLowerCase());
+                    const tag = this.type.name.replace(/SVG(.*?)Element/, '$1').replace(/^(FE|.)/, char => char.toLowerCase());
+
+                    this.element = document.createElementNS(svgNamespace, tag);
                 }
             }
         }

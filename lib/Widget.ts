@@ -10,8 +10,6 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
     protected initialState: StateType = null;
     protected state: Store<StateType> = null;
 
-    public readonly self: Partial<this>;
-
     public onwidgetconnect: (event: Event) => void;
     public onwidgetcreate: (event: Event) => void;
     public onwidgetdisconnect: (event: Event) => void;
@@ -123,8 +121,6 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
 
     public constructor() {
         super();
-
-        this.self = this;
 
         this.addEventListener('widgetconnect', event => this.handleWidgetConnect(event));
         this.addEventListener('widgetcreate', event => this.handleWidgetCreate(event));
