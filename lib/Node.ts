@@ -1,9 +1,14 @@
 import Widget from './Widget';
 
 type DOMElement = Partial<Element & (HTMLElement | SVGElement)> & {
+    attributes?: {
+        [ key: string ]: any;
+    };
     namespaces?: {
         [ key: string ]: string;
     };
+    style?: Partial<CSSStyleDeclaration>;
+    tag?: string;
 };
 
 type WritableElement<ElementType extends DOMElement> = Partial<ElementType> | {
