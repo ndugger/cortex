@@ -128,7 +128,13 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
         }
 
         for (const child of this.children) if (child) {
-            child.connect(this.element);
+
+            if (Array.isArray(child)) for (const sub of child) if (sub) {
+                sub.connect(this.element);
+            }
+            else {
+                child.connect(this.element);
+            }
         }
 
         if (host !== this.element.parentNode) {
