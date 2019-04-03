@@ -180,8 +180,9 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
             if (Array.isArray(child)) for (const sub of child) if (sub) {
                 sub.create();
             }
-
-            child.create();
+            else {
+                child.create();
+            }
         }
     }
 
