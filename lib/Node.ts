@@ -113,13 +113,15 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
 
                     continue;
                 }
+
+                continue;
             }
 
             if (this.element[ option ] === this.options[ option ]) {
                 break;
             }
 
-            if (this.element[ option ] && typeof this.element[ option ] === 'object') {
+            if (this.element[ option ] && typeof this.element[ option ] === 'object' && !Array.isArray(this.options[ option ])) {
                 Object.assign(this.element[ option ], this.options[ option ]);
             }
             else {
