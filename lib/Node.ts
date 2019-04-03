@@ -129,8 +129,11 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
 
         for (const child of this.children) if (child) {
 
-            if (Array.isArray(child)) for (const sub of child) if (sub) {
-                sub.connect(this.element);
+            if (Array.isArray(child)) for (const sub of child) {
+
+                if (sub) {
+                    sub.connect(this.element);
+                }
             }
             else {
                 child.connect(this.element);
@@ -183,8 +186,11 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
 
         for (const child of this.children) if (child) {
 
-            if (Array.isArray(child)) for (const sub of child) if (sub) {
-                sub.create();
+            if (Array.isArray(child)) for (const sub of child) {
+
+                if (sub) {
+                    sub.create();
+                }
             }
             else {
                 child.create();
