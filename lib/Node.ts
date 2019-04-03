@@ -176,6 +176,11 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
         }
 
         for (const child of this.children) if (child) {
+
+            if (Array.isArray(child)) for (const sub of child) if (sub) {
+                sub.create();
+            }
+
             child.create();
         }
     }
