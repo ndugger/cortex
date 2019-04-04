@@ -1,7 +1,7 @@
 const path = require('path');
 const env = process.env;
 
-const input = 'tests/index.ts';
+const input = 'tests/sandbox.spec.ts';
 const output = 'dist/';
 
 module.exports = {
@@ -18,15 +18,19 @@ module.exports = {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: [
-                    { loader: 'ts-loader' }
+                    {
+                        loader: 'ts-loader'
+                    }
                 ]
             }
         ]
     },
     resolve: {
-        alias: {
-            // rno: path.resolve(__dirname, 'src/main/typescript/rno/')
-        },
-        extensions: [ '.ts', '.tsx', '.js', '.jsx' ]
+        extensions: [
+            '.ts',
+            '.tsx',
+            '.js',
+            '.jsx'
+        ]
     }
 };

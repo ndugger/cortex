@@ -4,6 +4,8 @@
         "downlevelIteration": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "jsx": "react",
+        "jsxFactory": "Quark.Node.jsxFactory",
         "lib": [
             "DOM",
             "ES2015",

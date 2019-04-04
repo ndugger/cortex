@@ -5,7 +5,7 @@ import Store from './Store';
 
 export default class Widget<StateType = any> extends HTMLElementProxy {
 
-    private nodes: Node[];
+    public nodes: Node[];
 
     protected initialState: StateType = null;
     protected state: Store<StateType> = null;
@@ -23,7 +23,7 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
             this.state = new Store<StateType>(this.initialState || undefined);
             this.state.observe(this);
 
-            delete this.initialState;
+            // delete this.initialState;
         }
 
         const widgetConnect = new CustomEvent('widgetconnect');
