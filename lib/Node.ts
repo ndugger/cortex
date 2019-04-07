@@ -15,6 +15,7 @@ interface ElementOptions {
     };
     style?: Partial<CSSStyleDeclaration>;
     tag?: string;
+    viewBox?: any;
     width?: any;
 }
 

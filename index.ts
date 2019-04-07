@@ -5,14 +5,14 @@ import Widget from './lib/Widget';
 declare global {
 
     interface Element {
-        __props__: Partial<this> | JSXElement;
+        __props__: Partial<this> & JSXElement;
         tag?: string;
     }
 
     namespace JSX {
 
         interface ElementAttributesProperty {
-            __props__: Partial<this> | JSXElement;
+            __props__: Partial<this> & JSXElement;
         }
     }
 }
