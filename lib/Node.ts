@@ -1,31 +1,25 @@
 import Widget from './Widget';
 
-type DOMElement = Partial<Element & (HTMLElement | SVGElement)> & {
-    attributes?: {
-        [ key: string ]: any;
-    };
-    namespaces?: {
-        [ key: string ]: string;
-    };
-    style?: Partial<CSSStyleDeclaration>;
-    tag?: string;
-};
-
-type WritableElement<ElementType extends DOMElement> = Partial<ElementType> | {
-    attributes?: {
-        [ key: string ]: any;
-    };
-    namespaces?: {
-        [ key: string ]: string;
-    };
-    style?: Partial<CSSStyleDeclaration>;
-    tag?: string;
-};
-
 interface ElementClass<ElementType> {
     new(): ElementType;
     __proto__?: any;
 };
+
+interface ElementOptions {
+    attributes?: {
+        [ key: string ]: any;
+    };
+    height?: any;
+    namespaces?: {
+        [ key: string ]: string;
+    };
+    style?: Partial<CSSStyleDeclaration>;
+    tag?: string;
+    width?: any;
+}
+
+type DOMElement = Partial<Element & (HTMLElement | SVGElement)> & ElementOptions;
+type WritableElement<ElementType extends DOMElement> = Partial<ElementType> | ElementOptions;
 
 const htmlClassNameLookup = {
     HTMLAnchorElement: 'a',
