@@ -31,6 +31,8 @@ const htmlClassNameLookup = {
 const svgNamespace = 'http://www.w3.org/2000/svg';
 const xmlNamespace = 'http://www.w3.org/2000/xmlns/';
 
+export type JSXElement = WritableElement<Element>;
+
 export default class Node<ElementType extends DOMElement = DOMElement> {
 
     public static getElement(node: Node): Element {
