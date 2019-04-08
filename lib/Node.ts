@@ -6,17 +6,15 @@ interface ElementClass<ElementType> {
 };
 
 interface ElementOptions {
+    [ key: string ]: any;
     attributes?: {
         [ key: string ]: any;
     };
-    height?: any;
     namespaces?: {
         [ key: string ]: string;
     };
     style?: Partial<CSSStyleDeclaration>;
     tag?: string;
-    viewBox?: any;
-    width?: any;
 }
 
 type DOMElement = Partial<Element & (HTMLElement | SVGElement)> & ElementOptions;
