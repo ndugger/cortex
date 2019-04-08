@@ -132,7 +132,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
         }
 
         if (!this.element.classList.contains(this.type.name)) {
-            this.element.className = this.type.name + (this.element.className ? ' ' : '') + this.element.className;
+            this.element.classList.add(this.type.name);
         }
 
         for (const child of this.children) if (child) {
