@@ -1,7 +1,7 @@
 const path = require('path');
 const env = process.env;
 
-const input = 'tests/sandbox.spec.ts';
+const input = 'tests/sandbox.spec.tsx';
 const output = 'dist/';
 
 module.exports = {

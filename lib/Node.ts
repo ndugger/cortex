@@ -2,7 +2,6 @@ import Widget from './Widget';
 
 interface ElementClass<ElementType> {
     new(): ElementType;
-    __proto__?: any;
 };
 
 interface ElementOptions {
@@ -70,7 +69,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
 
             if (option === 'attributes') {
 
-                for (const attribute of Array.from(this.element.attributes)) {
+                for (const attribute of Array.from(this.element[ option ])) {
 
                     if (!(attribute.name in this.options[ option ]) || this.options[ option ][ attribute.name ] === false) {
                         this.element.removeAttributeNode(attribute);
@@ -85,6 +84,8 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
 
                     if (object === true) {
                         this.element.setAttribute(attribute, ''); // TODO do the same for namespaced attributes below
+
+                        continue;
                     }
 
                     if (typeof object === 'object') for (const [ key, value ] of Object.entries(object)) {
@@ -93,7 +94,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
                             continue;
                         }
 
-                        if (attribute in this.options.namespaces) {
+                        if ('namespaces' in this.options && attribute in this.options.namespaces) {
                             this.element.setAttributeNS(this.options.namespaces[ attribute ], `${ attribute }:${ key }`, value as string);
                         }
                         else {
@@ -108,7 +109,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
                         }
                     }
                     else {
-                        this.element.setAttribute(attribute, object);
+                        this.element.setAttribute(attribute, object as string);
                     }
 
                     continue;
@@ -118,7 +119,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
             }
 
             if (this.element[ option ] === this.options[ option ]) {
-                break;
+                continue;
             }
 
             if (this.element[ option ] && typeof this.element[ option ] === 'object' && !Array.isArray(this.options[ option ])) {
@@ -160,10 +161,16 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
             throw new Error(`Unable to create generic ${ this.type.name }: missing 'tag' from options`);
         }
 
-        if (this.type.__proto__ === HTMLElement || this.type.__proto__ === SVGElement) {
+        if ((this.type.name.startsWith('HTML') || this.type.name.startsWith('SVG')) && this.type.name.endsWith('Element')) {
 
             if (this.type.name in htmlClassNameLookup) {
                 this.element = document.createElement(htmlClassNameLookup[ this.type.name ]);
+            }
+            else if (this.type === HTMLElement) {
+                this.element = document.createElement(this.options.tag);
+            }
+            else if (this.type === SVGElement) {
+                this.element = document.createElementNS(svgNamespace, this.options.tag);
             }
             else {
 
@@ -174,17 +181,11 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
                 }
 
                 if (this.type.name.startsWith('SVG') && this.type.name.endsWith('Element')) {
-                    const tag = this.type.name.replace(/SVG(.*?)Element/, '$1').replace(/^(FE|.)/, char => char.toLowerCase());
+                    const tag = this.type.name.replace(/SVG(.*?)Element/, '$1').replace(/^(FE|SVG|.)/, char => char.toLowerCase());
 
                     this.element = document.createElementNS(svgNamespace, tag);
                 }
             }
-        }
-        else if (this.type === HTMLElement) {
-            this.element = document.createElement(this.options.tag);
-        }
-        else if (this.type === SVGElement) {
-            this.element = document.createElementNS(svgNamespace, this.options.tag);
         }
         else {
             this.element = Reflect.construct(this.type, []);
