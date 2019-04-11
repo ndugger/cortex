@@ -1,5 +1,5 @@
 import HTMLElementProxy from '../core/HTMLElementProxy';
-import * as Utilities from '../core/Utilities';
+import { diffTree } from '../core/Utilities';
 import Node from './Node';
 import Store from './Store';
 
@@ -65,7 +65,7 @@ export default class Widget<StateType = any> extends HTMLElementProxy {
 
     private renderedCallback(): void {
         const style = this.theme();
-        const tree = Utilities.diffTree(this.nodes, this.render());
+        const tree = diffTree(this.nodes, this.render());
         const existing = Array.from(this.shadowRoot.children);
         const incoming = tree.map(node => Reflect.get(node, 'element'));
 

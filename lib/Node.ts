@@ -224,13 +224,13 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
 
         if (this.children.length >= node.children.length) {
             return Object.assign(this, {
-                children: this.children.map((child, index) => child.diff(node.children[ index ])),
+                children: this.children.filter(Boolean).map((child, index) => child.diff(node.children[ index ])),
                 options: node.options
             });
         }
         else {
             return Object.assign(this, {
-                children: node.children.map((child, index) => {
+                children: node.children.filter(Boolean).map((child, index) => {
 
                     if (index + 1 > this.children.length) {
                         child.create();
