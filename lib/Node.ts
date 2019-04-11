@@ -47,7 +47,7 @@ export default class Node<ElementType extends DOMElement = DOMElement> {
     private type: ElementClass<ElementType>;
 
     public constructor(type: ElementClass<ElementType>, options: WritableElement<ElementType> = null, children: Node[] = []) {
-        this.children = children;
+        this.children = children.flat();
         this.element = null;
         this.options = options;
         this.type = type;
