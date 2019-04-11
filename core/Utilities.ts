@@ -3,7 +3,7 @@ import Node from '../lib/Node';
 export function diffTree(existing: Node[], incoming: Node[]): Node[] {
 
     if (!existing) {
-        return incoming;
+        return incoming.filter(Boolean);
     }
 
     if (existing.length >= incoming.length) {
