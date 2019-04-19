@@ -7,12 +7,12 @@
         "jsx": "react",
         "jsxFactory": "Quark.Node.jsxFactory",
         "lib": [
-            "DOM",
-            "ES2015",
-            "ES2016",
-            "ES2017",
-            "ES2018",
-            "ESNext"
+            "dom",
+            "es2015",
+            "es2016",
+            "es2017",
+            "es2018",
+            "esnext"
         ],
         "module": "es6",
         "moduleResolution": "node",

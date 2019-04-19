@@ -13,7 +13,7 @@ export function observe(store: Store): <SubscriberType>(subscriber: SubscriberTy
     });
 }
 
-export default class Store<DataType = object> extends EventTarget {
+export default class Store<DataType = any> extends EventTarget {
 
     private batch: boolean;
     private data: DataType;
