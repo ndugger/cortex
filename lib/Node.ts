@@ -68,7 +68,7 @@ export default class Node<Type extends InstantiableElement = any> {
                     }
 
                     if (object === true) {
-                        this.element.setAttribute(attribute, ''); // TODO do the same for namespaced attributes below
+                        this.element.setAttribute(attribute, '');
 
                         continue;
                     }
