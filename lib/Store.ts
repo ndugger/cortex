@@ -1,4 +1,4 @@
-import Widget from './Widget';
+import Component from './Component';
 
 export function observe(store: Store): <SubscriberType>(subscriber: SubscriberType) => SubscriberType {
     return subscriber => new Proxy(subscriber as any, {
@@ -13,15 +13,13 @@ export function observe(store: Store): <SubscriberType>(subscriber: SubscriberTy
     });
 }
 
-export default class Store<DataType = any> extends EventTarget {
+export default class Store<DataType = any> {
 
     private batch: boolean;
     private data: DataType;
-    private observers: Widget[];
+    private observers: Component[];
 
     public constructor(initial: DataType = {} as DataType) {
-        super();
-
         this.batch = false
         this.data = initial;
         this.observers = [];
@@ -41,23 +39,18 @@ export default class Store<DataType = any> extends EventTarget {
                 for (const observer of this.observers) {
                     observer.update();
                 }
-
             });
         }
 
         this.batch = true;
     }
 
-    public emit(): void {
-
-    }
-
-    public observe<WidgetType extends Widget>(instance: WidgetType): void {
-        instance.addEventListener('widgetconnect', () => {
+    public observe<ComponentType extends Component>(instance: ComponentType): void {
+        instance.addEventListener('componentconnect', () => {
             if (!this.observers.includes(instance)) this.observers.push(instance);
         });
 
-        instance.addEventListener('widgetdisconnect', () => {
+        instance.addEventListener('componentdisconnect', () => {
             this.observers.splice(this.observers.indexOf(instance), 1);
         });
     }

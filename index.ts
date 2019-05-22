@@ -1,20 +1,33 @@
-import Node, { JSXElement } from './lib/Node';
+import Node from './lib/Node';
 import Store, { observe } from './lib/Store';
-import Widget from './lib/Widget';
+import Component from './lib/Component';
+
+type Properties = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>> & {
+    attributes?: {
+        [ K: string ]: any
+    };
+    namespaces?: {
+        [ K: string ]: string;
+    };
+    tag?: string;
+};
 
 declare global {
 
     interface Element {
-        __props__: Partial<this> | JSXElement;
-        tag?: string;
+        __props__: Properties & {
+            [ K in keyof this ]?: Partial<this[ K ]>;
+        };
     }
 
     namespace JSX {
 
+        interface IntrinsicElements { }
+
         interface ElementAttributesProperty {
-            __props__: Partial<this> | JSXElement;
+            __props__: any;
         }
     }
 }
 
-export { Node, Store, Widget, observe };
+export { Node, Store, Component, observe };
