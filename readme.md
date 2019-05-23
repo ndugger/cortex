@@ -19,7 +19,7 @@ import * as Cortex from 'cortex';
 class Example extends Cortex.Component {
 
     private handleClick(event: Event): void {
-        alert('button was clicked!');
+        alert('button was clicked!')
     }
 
     public render(): Cortex.Node[] {
@@ -27,7 +27,7 @@ class Example extends Cortex.Component {
             <HTMLButtonElement onclick={ e => this.handleClick(e) }>
                 <HTMLSlotElement/>
             </HTMLButtonElement>
-        ];
+        ]
     }
 
     public theme(): string {
@@ -36,15 +36,15 @@ class Example extends Cortex.Component {
                 background: blue;
                 color: white;
             }
-        `;
+        `
     }
 }
 
-const example = new Example();
+const example = new Example()
 
-example.append(new Text('Hello World'));
+example.append(new Text('Hello World'))
 
-document.body.append(example);
+document.body.append(example)
 ```
 
 ![](https://i.imgur.com/6nMCuib.png)
@@ -66,11 +66,11 @@ There are two public methods that you can/should override: `render` & `theme`. T
 
 ```typescript
 public render(): Cortex.Node[] {
-    return [];
+    return []
 }
 
 public theme(): string {
-    return ``;
+    return ``
 }
 ```
 
@@ -80,11 +80,13 @@ Cortex also supports JSX, so within the render method, you can markup your compo
 public render(): Cortex.Node[] {
     return [
         <HTMLButtonElement/>
-    ];
+    ]
 }
 ```
 
 **Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class into the JSX; no "literals" allowed, like `div`, `button`, etc.
+
+If there is no standalone class for an element (like `section`, `header`, etc.), you may do `<HTMLElement tag='section'/>`.
 
 Because you must always pass in a class, cortex takes some "left turns" when it comes to certain things, like with CSS classes. Cortex will automatically apply a `className` that is equal to the class' name that you passed in for the element.
 
@@ -102,40 +104,82 @@ public theme(): Cortex.Node[] {
 }
 ```
 
-### Lifecycle Methods
-
-#### create - `handleComponentCreate(event: CustomEvent): void`
-Dispatched when the component's constructor is called.
-
-#### connect - `handleComponentConnect(event: CustomEvent): void`
-Dispatched when the component has been attached to the DOM.
-
-#### disconnect - `handleComponentDisconnect(event: CustomEvent): void`
-Dispatched when the component has been disconnected from the DOM.
-
-#### render - `handleComponentRender(event: CustomEvent): void`
-Dispatched when the component has been rendered.
-
-#### ready - `handleComponentReady(event: CustomEvent): void`
-Dispatched after the component has been rendered and is ready to be used.
-
-#### update - `handleComponentUpdate(event: CustomEvent): void`
-Dispatched every time the component's state changes.
-
-
----
-
-**Old Readme (Very Outdated):**
-
-### State & Updating
-Component state is managed by an object that implements `Map` (due to issues surrounding extending `Map`);
-every change to the state's entries triggers the component to **update**, and then **render**.
+Since cortex uses shadow DOM under the hood, not only is your CSS properly scoped to the component, but you can also make use of slot-based content. Instead of accessing children through a property of that component, simply render an `HTMLSlotElement` and watch as the DOM automatically inserts your content within.
 
 ```typescript
-handleSomeAction(): void {
-    this.state.set('foo', true);
-    this.state.delete('bar');
+<HTMLButtonElement>
+    <HTMLSlotElement/>
+</HTMLButtonElement>
+```
+
+### Lifecycle Methods
+
+##### create - `protected handleComponentCreate(event: CustomEvent): void`
+Dispatched when the component's constructor is called.
+
+##### connect - `protected handleComponentConnect(event: CustomEvent): void`
+Dispatched when the component has been attached to the DOM.
+
+##### disconnect - `protected handleComponentDisconnect(event: CustomEvent): void`
+Dispatched when the component has been disconnected from the DOM.
+
+##### render - `protected handleComponentRender(event: CustomEvent): void`
+Dispatched when the component has been rendered.
+
+##### ready - `protected handleComponentReady(event: CustomEvent): void`
+Dispatched after the component has been rendered and is ready to be used.
+
+##### update - `protected handleComponentUpdate(event: CustomEvent): void`
+Dispatched every time the component's state changes.
+
+### State Management
+Cortex ships with some basic state management built in. You can either have separate stores that components may observe, or you may define an interface for a component's instance's state.
+
+```typescript
+import * as Cortex from 'cortex';
+
+interface State {
+    foo: string;
+}
+
+const state = new Cortex.Store<State>({
+    foo: 'bar'
+})
+
+@Cortex.observe(state)
+export default class Example extends Cortex.Component {
+
 }
 ```
 
-you may also force a component to update without using the built-in state, by calling the `update` method.
+```typescript
+interface ExampleState {
+    foo: string
+}
+
+export default class Example extends Cortex.Component<ExampleState> {
+
+    protected initialState = {
+        foo: 'bar'
+    }
+}
+```
+
+The `Store` object has 2 methods, modeled after `Map`: `get` & `set`. The `set` method will trigger an update on every component that observes that store.
+
+```typescript
+private handleFoo(event: CustomEvent): void {
+    state.set('foo', 'baz');
+}
+
+public render(): Cortex.Node[] {
+    const foo = state.get('foo')
+
+    return [
+        <HTMLSpanElement textContent={ foo }/>
+    ]
+}
+```
+
+### SVG Support
+WIP
