@@ -32,7 +32,7 @@ export default class Node<Type extends InstantiableElement = any> {
     private type: Type;
 
     private constructor(type: Type, properties: Properties = null, children: Node[] = []) {
-        this.children = children.flat();
+        this.children = children.flat().map(child => child instanceof Node ? child : Node.create(HTMLSpanElement, { textContent: child }));
         this.element = null;
         this.properties = properties;
         this.type = type;
@@ -131,8 +131,7 @@ export default class Node<Type extends InstantiableElement = any> {
                 child.connect(this.element);
             }
             else {
-                Node.create(HTMLSpanElement, { textContent: child }).connect(this.element);
-                console.log('CONNECT', child);
+                console.error('Big OOF. This should never happen.');
             }
         }
 
@@ -163,13 +162,13 @@ export default class Node<Type extends InstantiableElement = any> {
             }
             else {
 
-                if (this.type.name.startsWith('HTML') && this.type.name.endsWith('Element')) {
+                if (this.type.name.startsWith('HTML')) {
                     const tag = this.type.name.replace(/HTML(.*?)Element/, '$1').toLowerCase();
 
                     this.element = document.createElement(tag);
                 }
 
-                if (this.type.name.startsWith('SVG') && this.type.name.endsWith('Element')) {
+                if (this.type.name.startsWith('SVG')) {
                     const tag = this.type.name.replace(/SVG(.*?)Element/, '$1').replace(/^(FE|SVG|.)/, match => match.toLowerCase());
 
                     this.element = document.createElementNS(Constants.SVG_NAMESPACE, tag);
@@ -192,7 +191,7 @@ export default class Node<Type extends InstantiableElement = any> {
                 child.create();
             }
             else {
-                console.log('CREATE', child);
+                console.error('Big OOF. This should never happen.');
             }
         }
     }
@@ -210,8 +209,7 @@ export default class Node<Type extends InstantiableElement = any> {
         }
 
         if (!(node instanceof Node)) {
-            console.log('NOT NODE', node);
-            // return Node.create(HTMLSpanElement, { textContent: node });
+            console.error('Big OOF. This should never happen.');
         }
 
         if (this.type !== node.type) {
@@ -223,26 +221,13 @@ export default class Node<Type extends InstantiableElement = any> {
 
         if (this.children.length >= node.children.length) {
             return Object.assign(this, {
-                children: this.children.filter(Boolean).map((child, index) => {
-
-                    if (!(child instanceof Node)) {
-                        console.log(1, child);
-                        return //Node.create(HTMLSpanElement, { textContent: child });
-                    }
-
-                    return child.diff(node.children[ index ])
-                }),
-                properties: node.properties // BIG OOF
+                children: this.children.filter(Boolean).map((child, index) => child.diff(node.children[ index ])),
+                properties: node.properties
             });
         }
         else {
             return Object.assign(this, {
                 children: node.children.filter(Boolean).map((child, index) => {
-
-                    if (!(child instanceof Node)) {
-                        console.log(2, child);
-                        return //Node.create(HTMLSpanElement, { textContent: child });
-                    }
 
                     if (index + 1 > this.children.length) {
                         child.create();

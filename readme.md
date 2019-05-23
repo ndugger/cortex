@@ -1,3 +1,22 @@
+# cortex
+Lightweight Web Component Framework
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+**Old Readme (Very Outdated):**
+
 # quark
 
 [ Shadow DOM + Virtual DOM ] Web Component Framework For Web Applications
