@@ -1,15 +1,15 @@
-import * as Quark from '..';
+import * as Cortex from '..';
 
 interface State {
     count: number;
 }
 
-const state = new Quark.Store<State>({
+const state = new Cortex.Store<State>({
     count: 0
 });
 
-@Quark.observe(state)
-class Button extends Quark.Component {
+@Cortex.observe(state)
+class Button extends Cortex.Component {
 
     public hint: string;
 
@@ -17,11 +17,13 @@ class Button extends Quark.Component {
         state.set('count', state.get('count') + 1);
     }
 
-    public render(): Quark.Node[] {
+    public render(): Cortex.Node[] {
         return [
             <HTMLButtonElement onclick={ e => this.handleClick(e) }>
                 <HTMLSlotElement/>
-                <HTMLSpanElement textContent={ `(${ state.get('count') })` }/>
+
+                ({ state.get('count').toString() })
+
             </HTMLButtonElement>
         ];
     }
@@ -42,21 +44,23 @@ interface SandboxState {
     bar: string;
 }
 
-@Quark.observe(state)
-class Sandbox extends Quark.Component<SandboxState> {
+@Cortex.observe(state)
+class Sandbox extends Cortex.Component<SandboxState> {
 
     protected initialState = {
         foo: 'hello world',
         bar: 'lorem ipsum'
     };
 
-    public render(): Quark.Node[] {
+    public render(): Cortex.Node[] {
         return [
             <HTMLElement attributes={ { foo: true } } tag='section'>
                 <HTMLElement tag='h1' textContent={ this.state.get('foo') }/>
                 <HTMLHRElement style={ { height: '8px' } }/>
                 <Button hint='asdf'>
-                    { this.state.get('bar') }
+
+                    { `${ this.state.get('bar') } - ${ Math.random() }` }
+
                 </Button>
             </HTMLElement>
         ];

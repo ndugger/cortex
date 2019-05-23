@@ -8,8 +8,8 @@ export default class Component<StateType = any> extends HTMLElementProxy {
 
     public nodes: Node[];
 
-    protected initialState: StateType = null;
-    protected state: Store<StateType> = null;
+    protected initialState: StateType;
+    protected state: Store<StateType>;
 
     public oncomponentconnect: (event: Event) => void;
     public oncomponentcreate: (event: Event) => void;
@@ -21,7 +21,7 @@ export default class Component<StateType = any> extends HTMLElementProxy {
     private connectedCallback(): void {
 
         if (this.initialState !== undefined) {
-            this.state = new Store<StateType>(this.initialState || undefined);
+            this.state = new Store<StateType>(this.initialState);
             this.state.observe(this);
         }
 

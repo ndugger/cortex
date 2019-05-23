@@ -3,7 +3,7 @@
         "baseUrl": ".",
         "experimentalDecorators": true,
         "jsx": "react",
-        "jsxFactory": "Quark.Node.create",
+        "jsxFactory": "Cortex.Node.create",
         "lib": [
             "dom",
             "esnext"

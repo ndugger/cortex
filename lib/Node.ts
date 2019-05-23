@@ -132,6 +132,7 @@ export default class Node<Type extends InstantiableElement = any> {
             }
             else {
                 Node.create(HTMLSpanElement, { textContent: child }).connect(this.element);
+                console.log('CONNECT', child);
             }
         }
 
@@ -190,6 +191,9 @@ export default class Node<Type extends InstantiableElement = any> {
             else if (child instanceof Node) {
                 child.create();
             }
+            else {
+                console.log('CREATE', child);
+            }
         }
     }
 
@@ -200,7 +204,14 @@ export default class Node<Type extends InstantiableElement = any> {
     public diff(node: Node | void): Node | void {
 
         if (!node) {
-            return this.remove();
+            this.remove();
+
+            return;
+        }
+
+        if (!(node instanceof Node)) {
+            console.log('NOT NODE', node);
+            // return Node.create(HTMLSpanElement, { textContent: node });
         }
 
         if (this.type !== node.type) {
@@ -212,13 +223,26 @@ export default class Node<Type extends InstantiableElement = any> {
 
         if (this.children.length >= node.children.length) {
             return Object.assign(this, {
-                children: this.children.filter(child => child instanceof Node).map((child, index) => child.diff(node.children[ index ])),
-                properties: node.properties
+                children: this.children.filter(Boolean).map((child, index) => {
+
+                    if (!(child instanceof Node)) {
+                        console.log(1, child);
+                        return //Node.create(HTMLSpanElement, { textContent: child });
+                    }
+
+                    return child.diff(node.children[ index ])
+                }),
+                properties: node.properties // BIG OOF
             });
         }
         else {
             return Object.assign(this, {
-                children: node.children.filter(child => child instanceof Node).map((child, index) => {
+                children: node.children.filter(Boolean).map((child, index) => {
+
+                    if (!(child instanceof Node)) {
+                        console.log(2, child);
+                        return //Node.create(HTMLSpanElement, { textContent: child });
+                    }
 
                     if (index + 1 > this.children.length) {
                         child.create();

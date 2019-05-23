@@ -1,21 +1,21 @@
 {
-  "name": "quark",
+  "name": "cortex",
   "version": "1.0.0",
-  "description": "Web Component Framework For Web Applications",
+  "description": "Lightweight Web Component Framework",
   "main": "index.js",
   "scripts": {
     "build": "webpack"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cyclonic-games/quark.git"
+    "url": "git+https://github.com/ndugger/cortex.git"
   },
-  "author": "Cyclonic Games",
+  "author": "Nick Dugger",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cyclonic-games/quark/issues"
+    "url": "https://github.com/ndugger/cortex/issues"
   },
-  "homepage": "https://github.com/cyclonic-games/quark#readme",
+  "homepage": "https://github.com/ndugger/cortex#readme",
   "devDependencies": {
     "ts-loader": "^5.3.3",
     "typescript": "^3.4.5",
