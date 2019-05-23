@@ -2,9 +2,9 @@ import * as Constants from '../core/Constants';
 
 import Component from './Component';
 
-type InstantiableElement = Partial<(HTMLElement | SVGElement)> & {
-    new(): HTMLElement | SVGElement;
-}
+type InstantiableElement = typeof Text | (Partial<(HTMLElement | SVGElement)> & {
+    new(data?: string): HTMLElement | SVGElement;
+});
 
 type Properties = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>> & {
     attributes?: {
@@ -32,7 +32,7 @@ export default class Node<Type extends InstantiableElement = any> {
     private type: Type;
 
     private constructor(type: Type, properties: Properties = null, children: Node[] = []) {
-        this.children = children.flat().map(child => child instanceof Node ? child : Node.create(HTMLSpanElement, { textContent: child }));
+        this.children = children.flat().map(child => child instanceof Node ? child : Node.create(Text, { textContent: child }));
         this.element = null;
         this.properties = properties;
         this.type = type;
@@ -83,7 +83,7 @@ export default class Node<Type extends InstantiableElement = any> {
                             this.element.setAttributeNS(this.properties.namespaces[ attribute ], `${ attribute }:${ key }`, value as string);
                         }
                         else {
-                            const root = document.querySelector(`xmlns:${ attribute }`);
+                            const root = host.querySelector(`xmlns:${ attribute }`);
 
                             if (root) {
                                 this.element.setAttributeNS(root.getAttribute(`xmlns:${ attribute }`), `${ attribute }:${ key }`, value as string);
@@ -115,7 +115,7 @@ export default class Node<Type extends InstantiableElement = any> {
             }
         }
 
-        if (!this.element.classList.contains(this.type.name)) {
+        if (!(this.element instanceof Text) && !this.element.classList.contains(this.type.name)) {
             this.element.classList.add(this.type.name);
         }
 
@@ -176,7 +176,7 @@ export default class Node<Type extends InstantiableElement = any> {
             }
         }
         else {
-            this.element = new this.type();
+            this.element = new this.type() as Element;
         }
 
         for (const child of this.children) if (child) {
