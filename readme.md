@@ -3,7 +3,9 @@ Lightweight Web Component Framework
 
 ### Why "cortex"?
 **cor·tex**
+
 /ˈkôrˌteks/
+
 > the thin outer layer of the cerebrum (the cerebral cortex ), composed of folded gray matter and playing an important role in consciousness.
 
 Just as your cerebral cortex is a thin layer, cortex (library) is a thin layer on top of "native" web components. It helps orchestrate state management, diffing, and lifecycle triggers, like rendering and updating.
@@ -24,6 +26,15 @@ class Example extends Cortex.Component {
         return [
             <HTMLButtonElement onclick={ e => this.handleClick(e) }/>
         ];
+    }
+
+    public theme(): string {
+        return `
+            .${ HTMLButtonElement.name } {
+                background: blue;
+                color: white;
+            }
+        `;
     }
 }
 
