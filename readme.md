@@ -24,7 +24,9 @@ class Example extends Cortex.Component {
 
     public render(): Cortex.Node[] {
         return [
-            <HTMLButtonElement onclick={ e => this.handleClick(e) }/>
+            <HTMLButtonElement onclick={ e => this.handleClick(e) }>
+                <HTMLSlotElement/>
+            </HTMLButtonElement>
         ];
     }
 
@@ -38,7 +40,10 @@ class Example extends Cortex.Component {
     }
 }
 
-document.body.append(new Example());
+const example = new Example();
+
+example.append(new Text('Hello World'));
+document.body.append(example);
 ```
 
 
