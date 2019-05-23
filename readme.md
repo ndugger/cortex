@@ -43,10 +43,11 @@ class Example extends Cortex.Component {
 const example = new Example();
 
 example.append(new Text('Hello World'));
+
 document.body.append(example);
 ```
 
-
+![](https://i.imgur.com/6nMCuib.png)
 
 
 
