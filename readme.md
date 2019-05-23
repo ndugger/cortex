@@ -49,33 +49,85 @@ document.body.append(example);
 
 ![](https://i.imgur.com/6nMCuib.png)
 
+### Explanation
+"Native" web components are class-based. You need to extend the base class `HTMLElement` in order for it to be compatible with the DOM.
 
+The `Component` class acts as proxy to the `HTMLElement` class that also automatically registers the custom element, and adds lifecycle capabilities.
 
+```typescript
+import * as Cortex from 'cortex';
 
+export default class Example extends Cortex.Component {
 
+}
+```
+
+There are two public methods that you can/should override: `render` & `theme`. The `render` method returns an array of `Cortex.Node`s (which is a virtual representation of that component's tree). The `theme` method returns a string containing the CSS for that component.
+
+```typescript
+public render(): Cortex.Node[] {
+    return [];
+}
+
+public theme(): string {
+    return ``;
+}
+```
+
+Cortex also supports JSX, so within the render method, you can markup your components very similarly to React.
+
+```typescript
+public render(): Cortex.Node[] {
+    return [
+        <HTMLButtonElement/>
+    ];
+}
+```
+
+**Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class into the JSX; no "literals" allowed, like `div`, `button`, etc.
+
+Because you must always pass in a class, cortex takes some "left turns" when it comes to certain things, like with CSS classes. Cortex will automatically apply a `className` that is equal to the class' name that you passed in for the element.
+
+This means that `<HTMLButtonElement/>` becomes `<button class='HTMLButtonElement'/>` in the DOM.
+
+This also contributes to styling your components, because you can now target your elements via their actual class name.
+
+```typescript
+public theme(): Cortex.Node[] {
+    return `
+        .${ HTMLButtonElement.name } {
+
+        }
+    `
+}
+```
+
+### Lifecycle Methods
+
+#### create - `handleComponentCreate(event: CustomEvent): void`
+Dispatched when the component's constructor is called.
+
+#### connect - `handleComponentConnect(event: CustomEvent): void`
+Dispatched when the component has been attached to the DOM.
+
+#### disconnect - `handleComponentDisconnect(event: CustomEvent): void`
+Dispatched when the component has been disconnected from the DOM.
+
+#### render - `handleComponentRender(event: CustomEvent): void`
+Dispatched when the component has been rendered.
+
+#### ready - `handleComponentReady(event: CustomEvent): void`
+Dispatched after the component has been rendered and is ready to be used.
+
+#### update - `handleComponentUpdate(event: CustomEvent): void`
+Dispatched every time the component's state changes.
 
 
 ---
 
 **Old Readme (Very Outdated):**
 
-# quark
-
-[ Shadow DOM + Virtual DOM ] Web Component Framework For Web Applications
-
-**Compatible with JSX**
-
-```
-npm install ndugger/quark --save
-```
-
-## Performance
-Performance will mostly be beholden to the efficiency of shadow DOM, but the virtual DOM diffing
-will have a significant impact as well.
-
-TODO
-
-## State & Updating
+### State & Updating
 Component state is managed by an object that implements `Map` (due to issues surrounding extending `Map`);
 every change to the state's entries triggers the component to **update**, and then **render**.
 
@@ -87,28 +139,3 @@ handleSomeAction(): void {
 ```
 
 you may also force a component to update without using the built-in state, by calling the `update` method.
-
-
-## Lifecycle Methods
-
-#### create - `handleComponentCreate(event)`
-Dispatched when the component's constructor is called.
-
-#### connect - `handleComponentConnect(event)`
-Dispatched when the component has been attached to the DOM.
-
-#### disconnect - `handleComponentDisconnect(event)`
-Dispatched when the component has been disconnected from the DOM.
-
-#### render - `handleComponentRender(event)`
-Dispatched when the component has been rendered.
-
-#### ready - `handleComponentReady(event)`
-Dispatched after the component has been rendered and is ready to be used.
-
-#### update - `handleComponentUpdate(event)`
-Dispatched every time the component's state changes.
-
-## TODO
-- Updates are batched, in a sense, but it needs to be better
-- Add event dispatching to the `Store` for a reux-like feel
