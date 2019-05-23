@@ -1,7 +1,16 @@
 # cortex
 Lightweight Web Component Framework
 
+### Why "cortex"?
+**cor·tex**
+/ˈkôrˌteks/
+> the thin outer layer of the cerebrum (the cerebral cortex ), composed of folded gray matter and playing an important role in consciousness.
 
+Cortex (library) is a thin layer on top of "native" web components. It helps orchestrate state management, diffing, and lifecycle triggers, like rendering and updating.
+
+The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like CSS, Custom Elements, and Shadow DOM.
+
+This allows us to keep the library size very small.
 
 
 
