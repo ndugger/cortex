@@ -6,13 +6,29 @@ Lightweight Web Component Framework
 /ˈkôrˌteks/
 > the thin outer layer of the cerebrum (the cerebral cortex ), composed of folded gray matter and playing an important role in consciousness.
 
-Cortex (library) is a thin layer on top of "native" web components. It helps orchestrate state management, diffing, and lifecycle triggers, like rendering and updating.
+Just as your cerebral cortex is a thin layer, cortex (library) is a thin layer on top of "native" web components. It helps orchestrate state management, diffing, and lifecycle triggers, like rendering and updating.
 
-The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like CSS, Custom Elements, and Shadow DOM.
+The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very small.
 
-This allows us to keep the library size very small.
+### Example
+```typescript
+import * as Cortex from 'cortex';
 
+class Example extends Cortex.Component {
 
+    private handleClick(event: Event): void {
+        alert('button was clicked!');
+    }
+
+    public render(): Cortex.Node[] {
+        return [
+            <HTMLButtonElement onclick={ e => this.handleClick(e) }/>
+        ];
+    }
+}
+
+document.body.append(new Example());
+```
 
 
 
