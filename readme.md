@@ -115,22 +115,40 @@ Since cortex uses shadow DOM under the hood, not only is your CSS properly scope
 
 ### Lifecycle Methods
 
-##### create - `protected handleComponentCreate(event: CustomEvent): void`
+##### create
+```typescript
+protected handleComponentCreate(event: CustomEvent): void
+```
 Dispatched when the component's constructor is called.
 
-##### connect - `protected handleComponentConnect(event: CustomEvent): void`
+##### connect
+```typescript
+protected handleComponentConnect(event: CustomEvent): void
+```
 Dispatched when the component has been attached to the DOM.
 
-##### disconnect - `protected handleComponentDisconnect(event: CustomEvent): void`
+##### disconnect
+```typescript
+protected handleComponentDisconnect(event: CustomEvent): void
+```
 Dispatched when the component has been disconnected from the DOM.
 
-##### render - `protected handleComponentRender(event: CustomEvent): void`
+##### render
+```typescript
+protected handleComponentRender(event: CustomEvent): void
+```
 Dispatched when the component has been rendered.
 
-##### ready - `protected handleComponentReady(event: CustomEvent): void`
+##### ready
+```typescript
+protected handleComponentReady(event: CustomEvent): void
+```
 Dispatched after the component has been rendered and is ready to be used.
 
-##### update - `protected handleComponentUpdate(event: CustomEvent): void`
+##### update
+```typescript
+protected handleComponentUpdate(event: CustomEvent): void
+```
 Dispatched every time the component's state changes.
 
 ### State Management
@@ -140,7 +158,7 @@ Cortex ships with some basic state management built in. You can either have sepa
 import * as Cortex from 'cortex';
 
 interface State {
-    foo: string;
+    foo: string
 }
 
 const state = new Cortex.Store<State>({
