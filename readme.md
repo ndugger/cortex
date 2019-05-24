@@ -115,37 +115,37 @@ Since cortex uses shadow DOM under the hood, not only is your CSS properly scope
 
 ### Lifecycle Methods
 
-##### create
+##### - create
 ```typescript
 protected handleComponentCreate(event: CustomEvent): void
 ```
 Dispatched when the component's constructor is called.
 
-##### connect
+##### - connect
 ```typescript
 protected handleComponentConnect(event: CustomEvent): void
 ```
 Dispatched when the component has been attached to the DOM.
 
-##### disconnect
+##### - disconnect
 ```typescript
 protected handleComponentDisconnect(event: CustomEvent): void
 ```
 Dispatched when the component has been disconnected from the DOM.
 
-##### render
+##### - render
 ```typescript
 protected handleComponentRender(event: CustomEvent): void
 ```
 Dispatched when the component has been rendered.
 
-##### ready
+##### - ready
 ```typescript
 protected handleComponentReady(event: CustomEvent): void
 ```
 Dispatched after the component has been rendered and is ready to be used.
 
-##### update
+##### - update
 ```typescript
 protected handleComponentUpdate(event: CustomEvent): void
 ```
