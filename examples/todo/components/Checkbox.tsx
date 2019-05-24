@@ -49,8 +49,12 @@ export default class Checkbox extends Cortex.Component<CheckboxState> {
 
     public theme(): string {
         return `
+            :host {
+                display: contents;
+            }
+
             .${ Icon.name } {
-                color: rgb(10, 161, 211);
+                color: blue;
                 cursor: default;
                 user-select: none;
             }

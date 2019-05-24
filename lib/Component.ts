@@ -70,29 +70,17 @@ export default class Component<StateType = any> extends HTMLElementProxy {
         this.dispatchEvent(new CustomEvent('componentrender'));
     }
 
-    protected handleComponentConnect(event: CustomEvent): void {
-        return; // override
-    }
+    protected handleComponentConnect(event: CustomEvent): void {}
 
-    protected handleComponentCreate(event: CustomEvent): void {
-        return; // override
-    }
+    protected handleComponentCreate(event: CustomEvent): void {}
 
-    protected handleComponentDisconnect(event: CustomEvent): void {
-        return; // override
-    }
+    protected handleComponentDisconnect(event: CustomEvent): void {}
 
-    protected handleComponentReady(event: CustomEvent): void {
-        return; // override
-    }
+    protected handleComponentReady(event: CustomEvent): void {}
 
-    protected handleComponentRender(event: CustomEvent): void {
-        return; // override
-    }
+    protected handleComponentRender(event: CustomEvent): void {}
 
-    protected handleComponentUpdate(event: CustomEvent): void {
-        return; // override
-    }
+    protected handleComponentUpdate(event: CustomEvent): void {}
 
     public constructor() {
         super();
@@ -110,11 +98,11 @@ export default class Component<StateType = any> extends HTMLElementProxy {
     }
 
     public render(): Node[] {
-        return []; // override
+        return [];
     }
 
     public theme(): string {
-        return ''; // override
+        return '';
     }
 
     public update(props: object = {}): void {
