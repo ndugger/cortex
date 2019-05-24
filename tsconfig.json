@@ -11,7 +11,8 @@
         "module": "es6",
         "moduleResolution": "node",
         "paths": {
-            "*": [ "*" ]
+            "*": [ "*" ],
+            "cortex": [ "." ]
         },
         "removeComments": true,
         "sourceMap": true,

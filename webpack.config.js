@@ -6,10 +6,12 @@ const output = 'dist/';
 
 module.exports = {
     mode: 'development',
-    entry: path.resolve(__dirname, input),
+    entry: {
+        todo: path.resolve(__dirname, 'examples/todo/index.ts')
+    },
     devtool: 'cheap-module-eval-source-map',
     output: {
-        filename: 'quark.js',
+        filename: '[name].js',
         path: path.resolve(__dirname, output)
     },
     module: {
@@ -26,6 +28,9 @@ module.exports = {
         ]
     },
     resolve: {
+        alias: {
+            cortex: __dirname
+        },
         extensions: [
             '.ts',
             '.tsx',

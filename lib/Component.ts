@@ -70,27 +70,27 @@ export default class Component<StateType = any> extends HTMLElementProxy {
         this.dispatchEvent(new CustomEvent('componentrender'));
     }
 
-    protected handleWidgetConnect(event: CustomEvent): void {
+    protected handleComponentConnect(event: CustomEvent): void {
         return; // override
     }
 
-    protected handleWidgetCreate(event: CustomEvent): void {
+    protected handleComponentCreate(event: CustomEvent): void {
         return; // override
     }
 
-    protected handleWidgetDisconnect(event: CustomEvent): void {
+    protected handleComponentDisconnect(event: CustomEvent): void {
         return; // override
     }
 
-    protected handleWidgetReady(event: CustomEvent): void {
+    protected handleComponentReady(event: CustomEvent): void {
         return; // override
     }
 
-    protected handleWidgetRender(event: CustomEvent): void {
+    protected handleComponentRender(event: CustomEvent): void {
         return; // override
     }
 
-    protected handleWidgetUpdate(event: CustomEvent): void {
+    protected handleComponentUpdate(event: CustomEvent): void {
         return; // override
     }
 
@@ -99,12 +99,12 @@ export default class Component<StateType = any> extends HTMLElementProxy {
 
         this.attachShadow({ mode: 'open' });
 
-        this.addEventListener('componentconnect', (event: CustomEvent) => this.handleWidgetConnect(event));
-        this.addEventListener('componentcreate', (event: CustomEvent) => this.handleWidgetCreate(event));
-        this.addEventListener('componentdisconnect', (event: CustomEvent) => this.handleWidgetDisconnect(event));
-        this.addEventListener('componentready', (event: CustomEvent) => this.handleWidgetReady(event));
-        this.addEventListener('componentrender', (event: CustomEvent) => this.handleWidgetRender(event));
-        this.addEventListener('componentupdate', (event: CustomEvent) => this.handleWidgetUpdate(event));
+        this.addEventListener('componentconnect', (event: CustomEvent) => this.handleComponentConnect(event));
+        this.addEventListener('componentcreate', (event: CustomEvent) => this.handleComponentCreate(event));
+        this.addEventListener('componentdisconnect', (event: CustomEvent) => this.handleComponentDisconnect(event));
+        this.addEventListener('componentready', (event: CustomEvent) => this.handleComponentReady(event));
+        this.addEventListener('componentrender', (event: CustomEvent) => this.handleComponentRender(event));
+        this.addEventListener('componentupdate', (event: CustomEvent) => this.handleComponentUpdate(event));
 
         this.dispatchEvent(new CustomEvent('componentcreate'));
     }
