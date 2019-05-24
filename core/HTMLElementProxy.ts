@@ -1,11 +1,7 @@
 export default new Proxy(HTMLElement, {
 
     construct: (element, args, widget): object => {
-        let tag = widget.name.replace(/([A-Z])/g, x => `-${ x.toLowerCase() }`).replace(/^-/, '');
-
-        if (!tag.includes('-')) {
-            tag = `${ tag }-widget`;
-        }
+        const tag = `${ widget.name.replace(/([A-Z])/g, x => `-${ x.toLowerCase() }`).replace(/^-/, '') }-component`;
 
         if (!window.customElements.get(tag)) {
             window.customElements.define(tag, widget);

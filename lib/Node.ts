@@ -130,9 +130,6 @@ export default class Node<Type extends InstantiableElement = any> {
             else if (child instanceof Node) {
                 child.connect(this.element);
             }
-            else {
-                console.error('Big OOF. This should never happen.');
-            }
         }
 
         if (host !== this.element.parentNode) {
@@ -190,9 +187,6 @@ export default class Node<Type extends InstantiableElement = any> {
             else if (child instanceof Node) {
                 child.create();
             }
-            else {
-                console.error('Big OOF. This should never happen.');
-            }
         }
     }
 
@@ -206,10 +200,6 @@ export default class Node<Type extends InstantiableElement = any> {
             this.remove();
 
             return;
-        }
-
-        if (!(node instanceof Node)) {
-            console.error('Big OOF. This should never happen.');
         }
 
         if (this.type !== node.type) {

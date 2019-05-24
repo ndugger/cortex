@@ -118,7 +118,6 @@ export default class Component<StateType = any> extends HTMLElementProxy {
     }
 
     public update(props: object = {}): void {
-        Object.assign(this, props);
 
         for (const prop of Object.keys(props)) {
 

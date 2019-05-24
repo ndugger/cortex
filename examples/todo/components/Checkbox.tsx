@@ -1,5 +1,7 @@
 import * as Cortex from 'cortex';
 
+import Icon from './Icon';
+
 interface CheckboxState {
     checked: boolean;
 }
@@ -10,7 +12,7 @@ export default class Checkbox extends Cortex.Component<CheckboxState> {
         checked: false
     };
 
-    protected handleComponentRender(): void {
+    protected handleComponentReady(): void {
         const checked = this.state.get('checked');
 
         if (this.checked !== undefined && this.checked !== checked) {
@@ -18,7 +20,15 @@ export default class Checkbox extends Cortex.Component<CheckboxState> {
         }
     }
 
-    protected handleInputChange(): void {
+    protected handleComponentUpdate(): void {
+        const checked = this.state.get('checked');
+
+        if (this.checked !== undefined && this.checked !== checked) {
+            this.state.set('checked', this.checked);
+        }
+    }
+
+    protected handleClick(): void {
         const checked = this.state.get('checked');
 
         this.state.set('checked', !checked);
@@ -30,17 +40,19 @@ export default class Checkbox extends Cortex.Component<CheckboxState> {
 
     public render(): Cortex.Node[] {
         const checked = this.state.get('checked');
+        const glyph = checked ? 'check_box' : 'check_box_outline_blank';
 
         return [
-            <HTMLInputElement checked={ this.checked || checked } onchange={ () => this.handleInputChange() } type='checkbox'/>
+            <Icon glyph={ glyph } onclick={ () => this.handleClick() } size={ 32 }/>
         ];
     }
 
     public theme(): string {
         return `
-            .${ HTMLInputElement.name } {
-                height: 24px;
-                width: 24px;
+            .${ Icon.name } {
+                color: rgb(10, 161, 211);
+                cursor: default;
+                user-select: none;
             }
         `;
     }

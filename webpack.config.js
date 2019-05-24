@@ -7,7 +7,7 @@ const output = 'dist/';
 module.exports = {
     mode: 'development',
     entry: {
-        todo: path.resolve(__dirname, 'examples/todo/index.ts')
+        todo: path.resolve(__dirname, 'examples/todo/index.tsx')
     },
     devtool: 'cheap-module-eval-source-map',
     output: {

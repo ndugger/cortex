@@ -13,6 +13,7 @@ Just as your cerebral cortex is a thin layer, cortex (library) is a thin layer o
 The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very small.
 
 ### Example
+For more in-depth examples, check out the [examples folder](./examples).
 ```typescript
 import * as Cortex from 'cortex';
 
@@ -169,7 +170,7 @@ The `Store` object has 2 methods, modeled after `Map`: `get` & `set`. The `set` 
 
 ```typescript
 private handleFoo(event: CustomEvent): void {
-    state.set('foo', 'baz');
+    state.set('foo', 'baz')
 }
 
 public render(): Cortex.Node[] {
