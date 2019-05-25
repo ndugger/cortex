@@ -1,74 +1,73 @@
 import * as Cortex from 'cortex';
 
-import Button from './components/Button';
-import Task from './components/Task';
+import Checkbox from './components/Checkbox';
+import List from './components/List';
+import Pane from './components/Pane';
+import PriorityIndicator from './components/PriorityIndicator';
+import Spacer from './components/Spacer';
+import Typography from './components/Typography';
 
-interface Todo {
-    task: string;
+import palette from './utilities/palette';
+
+interface Task {
+    completed: boolean;
+    name: string;
+    priority: 'high' | 'medium' | 'low';
+    when: Date;
 }
 
-const tasks = new Cortex.Store<Todo[]>([]);
-const completed = new Cortex.Store<Todo[]>([]);
+const tasks: Task[] = [ ];
 
-@Cortex.observe(tasks)
-@Cortex.observe(completed)
 class Application extends Cortex.Component {
 
-    private handleAddTaskClick(): void {
-        tasks.add({ task: window.prompt('Enter Task Name:') });
+    public handleAddTask(): void {
+        tasks.push({
+            completed: false,
+            name: window.prompt('Enter Task Name'),
+            priority: 'high',
+            when: new Date()
+        });
+        this.update();
     }
 
-    private handleTaskComplete(index: number): void {
-        const todo = tasks.get(index);
-
-        console.log('complete', todo);
-
-        tasks.delete(todo);
-        completed.add(todo);
-    }
-
-    private handleTaskUndo(index: number): void {
-        const todo = completed.get(index);
-
-        completed.delete(todo);
-        tasks.add(todo);
+    private handleCheckboxChange(task: Task): void {
+        task.completed = !task.completed;
+        this.update();
     }
 
     public render(): Cortex.Node[] {
         return [
             <HTMLElement tag='main'>
-                <HTMLElement tag='nav'>
-                    <Button onclick={ () => this.handleAddTaskClick() }>
-                        Add Task
-                    </Button>
-                </HTMLElement>
-                <HTMLUListElement>
+                <Pane action='Add Task' header='My Tasks' onaction={ () => this.handleAddTask() } subheader='May 25, 2019' >
 
-                    { Array.from(tasks.entries()).map(([ index, value ]) => (
-                        <HTMLLIElement>
-                            <Task oncomplete={ () => this.handleTaskComplete(index) }>
+                    { (tasks.length === 0) ? (
+                        <HTMLDivElement style={ { padding: '24px', textAlign: 'center' } }>
+                            <Typography textContent='You Have Nothing To Do Today' variant='content'/>
+                        </HTMLDivElement>
+                    ) : '' }
 
-                                { value.task }
+                    <List>
 
-                            </Task>
-                        </HTMLLIElement>
-                    )) }
+                        { tasks.sort(task => task.completed ? 1 : -1).map(task => (
+                            <List.Item>
+                                <PriorityIndicator level={ task.priority }/>
+                                <Spacer width={ 16 }/>
+                                <HTMLDivElement style={ { opacity: task.completed ? '0.66' : '1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }>
+                                    <Typography bold={ !task.completed } decoration={ task.completed && 'line-through' } textContent={ task.name } variant='content'/>
+                                </HTMLDivElement>
+                                <HTMLDivElement style={ { flexGrow: '1' } }>
+                                    <Spacer width={ 16 }/>
+                                </HTMLDivElement>
+                                <HTMLDivElement style={ { flexShrink: '0' } }>
+                                    <Typography textContent='May 25, 2019' variant='subheader'/>
+                                </HTMLDivElement>
+                                <Spacer width={ 16 }/>
+                                <Checkbox checked={ task.completed } onchange={ () => this.handleCheckboxChange(task) }/>
+                            </List.Item>
+                        )) }
 
-                </HTMLUListElement>
-                <HTMLHRElement/>
-                <HTMLUListElement>
-
-                    { Array.from(completed.entries()).map(([ index, value ]) => (
-                        <HTMLLIElement>
-                            <Task onundo={ () => this.handleTaskUndo(index) }>
-
-                                { value.task }
-
-                            </Task>
-                        </HTMLLIElement>
-                    )) }
-
-                </HTMLUListElement>
+                    </List>
+                </Pane>
             </HTMLElement>
         ];
     }
@@ -76,14 +75,20 @@ class Application extends Cortex.Component {
     public theme(): string {
         return `
             :host {
-                display: block;
-                margin: auto;
-                width: 800px;
+                background: rgb(${ palette.blue });
+                display: flex;
+                height: 100%;
+                justify-content: center;
+                user-select: none;
+                width: 100%;
             }
 
-            nav.${ HTMLElement.name } {
-                display: flex;
-                justify-content: flex-end;
+            main.${ HTMLElement.name } {
+                padding: 32px;
+            }
+
+            .${ Pane.name } {
+                width: 600px;
             }
         `;
     }

@@ -2,6 +2,8 @@ import * as Cortex from 'cortex';
 
 import Icon from './Icon';
 
+import palette from '../utilities/palette';
+
 interface CheckboxState {
     checked: boolean;
 }
@@ -40,10 +42,10 @@ export default class Checkbox extends Cortex.Component<CheckboxState> {
 
     public render(): Cortex.Node[] {
         const checked = this.state.get('checked');
-        const glyph = checked ? 'check_box' : 'check_box_outline_blank';
+        const glyph = checked ? 'check_circle' : 'radio_button_unchecked';
 
         return [
-            <Icon glyph={ glyph } onclick={ () => this.handleClick() } size={ 32 }/>
+            <Icon attributes={ { checked } } glyph={ glyph } onclick={ () => this.handleClick() } size={ 24 }/>
         ];
     }
 
@@ -54,9 +56,13 @@ export default class Checkbox extends Cortex.Component<CheckboxState> {
             }
 
             .${ Icon.name } {
-                color: blue;
+                color: rgba(${ palette.black }, 0.4);
                 cursor: default;
                 user-select: none;
+            }
+
+            .${ Icon.name }[ checked ] {
+                color: rgb(${ palette.green });
             }
         `;
     }
