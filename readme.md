@@ -178,21 +178,26 @@ interface ExampleState {
 
 export default class Example extends Cortex.Component<ExampleState> {
 
-    protected initialState = {
+    private state = new Cortex.Store<ExampleState>({
         foo: 'bar'
+    });
+
+    protected handleComponentConnect(): void {
+        this.state.observe(this);
     }
 }
 ```
 
-The `Store` object has 2 methods, modeled after `Map`: `get` & `set`. The `set` method will trigger an update on every component that observes that store.
+The `Store` is actually just a Proxy. Treat it exactly how you would treat the
+type of the data it contains: `array`, `object`, etc.
 
 ```typescript
 private handleFoo(event: CustomEvent): void {
-    state.set('foo', 'baz')
+    this.state.foo = 'baz'
 }
 
 public render(): Cortex.Node[] {
-    const foo = state.get('foo')
+    const { foo } = this.state
 
     return [
         <HTMLSpanElement textContent={ foo }/>
