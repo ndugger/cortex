@@ -8,44 +8,44 @@ interface CheckboxState {
     checked: boolean;
 }
 
-export default class Checkbox extends Cortex.Component<CheckboxState> {
+export default class Checkbox extends Cortex.Component {
 
-    protected initialState = {
+    private state = new Cortex.Store<CheckboxState>({
         checked: false
-    };
-
-    protected handleComponentReady(): void {
-        const checked = this.state.get('checked');
-
-        if (this.checked !== undefined && this.checked !== checked) {
-            this.state.set('checked', this.checked);
-        }
-    }
-
-    protected handleComponentUpdate(): void {
-        const checked = this.state.get('checked');
-
-        if (this.checked !== undefined && this.checked !== checked) {
-            this.state.set('checked', this.checked);
-        }
-    }
-
-    protected handleClick(): void {
-        const checked = this.state.get('checked');
-
-        this.state.set('checked', !checked);
-        this.dispatchEvent(new Event('change'));
-    }
+    });
 
     public checked: boolean;
     public onchange: (event: Event) => void;
 
+    protected handleComponentConnect(): void {
+        this.state.observe(this);
+    }
+
+    protected handleComponentReady(): void {
+
+        if (this.checked !== this.state.checked) {
+            this.state.checked = this.checked;
+        }
+    }
+
+    protected handleComponentUpdate(): void {
+
+        if (this.checked !== this.state.checked) {
+            this.state.checked = this.checked;
+        }
+    }
+
+    protected handleCheckboxChange(): void {
+        this.state.checked = !this.state.checked;
+        this.dispatchEvent(new Event('change'));
+    }
+
     public render(): Cortex.Node[] {
-        const checked = this.state.get('checked');
+        const { checked } = this.state;
         const glyph = checked ? 'check_circle' : 'radio_button_unchecked';
 
         return [
-            <Icon attributes={ { checked } } glyph={ glyph } onclick={ () => this.handleClick() } size={ 24 }/>
+            <Icon attributes={ { checked } } glyph={ glyph } onclick={ () => this.handleCheckboxChange() } size={ 24 }/>
         ];
     }
 

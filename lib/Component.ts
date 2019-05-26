@@ -2,14 +2,10 @@ import HTMLElementProxy from '../core/HTMLElementProxy';
 import { diffTree } from '../core/Utilities';
 
 import Node from './Node';
-import Store from './Store';
 
-export default class Component<StateType = any> extends HTMLElementProxy {
+export default class Component extends HTMLElementProxy {
 
     public nodes: Node[];
-
-    protected initialState: StateType;
-    protected state: Store<StateType>;
 
     public oncomponentconnect: (event: Event) => void;
     public oncomponentcreate: (event: Event) => void;
@@ -19,11 +15,6 @@ export default class Component<StateType = any> extends HTMLElementProxy {
     public oncomponentupdate: (event: Event) => void;
 
     private connectedCallback(): void {
-
-        if (this.initialState !== undefined) {
-            this.state = new Store<StateType>(this.initialState);
-            this.state.observe(this);
-        }
 
         this.dispatchEvent(new CustomEvent('componentconnect'));
 
@@ -121,10 +112,10 @@ export default class Component<StateType = any> extends HTMLElementProxy {
             }
         }
 
+        this.dispatchEvent(new CustomEvent('componentupdate'));
+
         window.requestAnimationFrame(() => {
             this.renderedCallback();
         });
-
-        this.dispatchEvent(new CustomEvent('componentupdate'));
     }
 }

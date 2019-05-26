@@ -7,9 +7,7 @@ export function diffTree(existing: Node[], incoming: Node[]): Node[] {
     }
 
     if (existing.length >= incoming.length) {
-        const x = existing.map((node, index) => node.diff(incoming[ index ]));
-
-        return x.filter(Boolean) as Node[];
+        return existing.map((node, index) => node.diff(incoming[ index ])).filter(Boolean) as Node[];
     }
     else {
         return incoming.map((node, index) => {

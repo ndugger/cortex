@@ -32,7 +32,7 @@ export default class Node<Type extends InstantiableElement = any> {
     private type: Type;
 
     private constructor(type: Type, properties: Properties = null, children: Node[] = []) {
-        this.children = children.flat().map(child => child instanceof Node ? child : Node.create(Text, { textContent: child }));
+        this.children = children.flat().filter(Boolean).map(child => child instanceof Node ? child : Node.create(Text, { textContent: child }));
         this.element = null;
         this.properties = properties;
         this.type = type;

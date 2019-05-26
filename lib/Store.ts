@@ -1,10 +1,16 @@
 import Component from './Component';
 
-export function observe(store: Store): <SubscriberType>(subscriber: SubscriberType) => SubscriberType {
+interface StoreProxy<Type> {
+    new<Data>(data: Data): Type & {
+        [ Key in keyof Data ]: Data[ Key ];
+    };
+}
+
+export function observe(store: InternalStore<any>): <Subscriber>(subscriber: Subscriber) => Subscriber {
     return subscriber => new Proxy(subscriber as any, {
 
-        construct: (widget, args, extension) => {
-            const instance = Reflect.construct(widget, args, extension);
+        construct<Target extends Component>(target: Target, args: any[], base: typeof Component) {
+            const instance = Reflect.construct(target as any, args, base);
 
             store.observe(instance);
 
@@ -13,92 +19,95 @@ export function observe(store: Store): <SubscriberType>(subscriber: SubscriberTy
     });
 }
 
-export default class Store<DataType = any> {
+export class InternalStore<Data> {
 
-    private batch: boolean;
-    private data: DataType;
+    private data: Data;
     private observers: Component[];
 
-    public constructor(initial: DataType = {} as DataType) {
-        this.batch = false
-        this.data = initial;
+    public constructor(data: any) {
+        this.data = data;
         this.observers = [];
-    }
-
-    public entries(): IterableIterator<any> {
-        return Object.entries(this.data)[ Symbol.iterator ]();
-    }
-
-    public add(value: DataType[ keyof DataType ]): void {
-
-        if (!Array.isArray(this.data)) {
-            throw new Error('Store#add can only be used for array-based state');
-        }
-
-        this.data.push(value);
-
-        if (!this.batch) {
-            window.requestAnimationFrame(() => {
-                this.batch = false;
-
-                for (const observer of this.observers) {
-                    observer.update();
-                }
-            });
-        }
-
-        this.batch = true;
-    }
-
-    public delete(item: keyof DataType | DataType[ keyof DataType ]): void {
-
-        if (Array.isArray(this.data)) {
-            this.data.splice(this.data.indexOf(item), 1);
-        }
-        else {
-            delete this.data[ item as keyof DataType ];
-        }
-
-        if (!this.batch) {
-            window.requestAnimationFrame(() => {
-                this.batch = false;
-
-                for (const observer of this.observers) {
-                    observer.update();
-                }
-            });
-        }
-
-        this.batch = true;
-    }
-
-    public get(key: keyof DataType): DataType[ keyof DataType ] {
-        return this.data[ key ];
-    }
-
-    public set(key: keyof DataType, value: DataType[ keyof DataType ]): void {
-        this.data[ key ] = value;
-
-        if (!this.batch) {
-            window.requestAnimationFrame(() => {
-                this.batch = false;
-
-                for (const observer of this.observers) {
-                    observer.update();
-                }
-            });
-        }
-
-        this.batch = true;
     }
 
     public observe<ComponentType extends Component>(instance: ComponentType): void {
         instance.addEventListener('componentconnect', () => {
             if (!this.observers.includes(instance)) this.observers.push(instance);
         });
-
         instance.addEventListener('componentdisconnect', () => {
             this.observers.splice(this.observers.indexOf(instance), 1);
         });
+
+        if (instance.parentNode && !this.observers.includes(instance)) {
+            this.observers.push(instance);
+        }
+    }
+
+    public update() {
+        for (const observer of this.observers) {
+            observer.update();
+        }
     }
 }
+
+export default new Proxy(InternalStore, {
+
+    construct<Data>(target: typeof InternalStore, args: [ Data ]): InternalStore<Data> & Data {
+        return new Proxy(Reflect.construct(target, args), {
+
+            get<Target extends InternalStore<Data>>(target: Target, property: keyof Target): Target[ keyof Target ] {
+                const actualTarget = (property in target) ? target : Reflect.get(target, 'data');
+                const value = Reflect.get(actualTarget, property);
+
+                if (typeof value === 'function') {
+                    return new Proxy(value, {
+
+                        apply(method: (...args: any[]) => any, _: any, args: any[]): any {
+                            const value = Reflect.apply(method, actualTarget, args);
+
+                            if (property !== 'update') switch (true) {
+
+                                case Array.isArray(actualTarget): {
+
+                                    if ([ 'concat', 'pop', 'push', 'splice' ].includes(property as string)) {
+                                        target.update();
+                                    }
+
+                                    break;
+                                }
+                                case actualTarget instanceof Map: {
+
+                                    if ([ 'clear', 'delete', 'set' ].includes(property as string)) {
+                                        target.update();
+                                    }
+
+                                    break;
+                                }
+                                case actualTarget instanceof Set: {
+
+                                    if ([ 'add', 'clear', 'delete' ].includes(property as string)) {
+                                        target.update();
+                                    }
+
+                                    break;
+                                }
+                            }
+
+                            return value;
+                        }
+                    });
+                }
+
+                return value;
+            },
+
+            set<Target extends InternalStore<Data>>(target: Target, property: keyof Target, value: Target[ keyof Target ]): boolean {
+                const actualTarget = (property in target) ? target : Reflect.get(target, 'data');
+
+                Reflect.set(actualTarget, property, value);
+                target.update();
+
+                return true;
+            }
+        });
+    }
+}) as StoreProxy<InternalStore<any>>

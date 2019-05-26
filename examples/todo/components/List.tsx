@@ -2,7 +2,7 @@ import * as Cortex from 'cortex';
 
 import ListItem from './ListItem';
 
-export default class List extends Cortex.Component<ListItem> {
+export default class List extends Cortex.Component {
 
     public static Item = ListItem;
 
