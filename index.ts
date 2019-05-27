@@ -1,6 +1,6 @@
-import Node from './lib/Node';
-import Store, { observe } from './lib/Store';
-import Component from './lib/Component';
+import Node from './library/Node';
+import Store, { observe } from './library/Store';
+import Component from './library/Component';
 
 type Properties = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>> & {
     attributes?: {

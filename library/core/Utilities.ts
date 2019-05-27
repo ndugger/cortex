@@ -1,4 +1,4 @@
-import Node from '../lib/Node';
+import Node from '../Node';
 
 export function diffTree(existing: Node[], incoming: Node[]): Node[] {
 

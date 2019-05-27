@@ -1,6 +1,6 @@
-import * as Constants from '../core/Constants';
-
 import Component from './Component';
+
+import * as Constants from './core/Constants';
 
 type InstantiableElement = typeof Text | (Partial<(HTMLElement | SVGElement)> & {
     new(data?: string): HTMLElement | SVGElement;
