@@ -18,6 +18,7 @@ class Application extends Cortex.Component {
                 display: flex;
                 justify-content: center;
                 height: 100%;
+                user-select: none;
                 width: 100%;
             }
         `;
