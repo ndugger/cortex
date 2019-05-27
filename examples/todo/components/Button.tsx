@@ -23,6 +23,7 @@ export default class Button extends Cortex.Component {
                 border: none;
                 border-radius: 4px;
                 color: rgb(${ palette.white });
+                outline: none;
                 padding: 4px 16px;
                 transition: opacity .12s ease;
             }

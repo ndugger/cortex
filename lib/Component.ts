@@ -36,8 +36,7 @@ export default class Component extends HTMLElementProxy {
     }
 
     private renderedCallback(): void {
-        const style = this.theme();
-        const tree = diffTree(this.nodes, this.render());
+        const tree = diffTree(this.nodes, this.render().filter(Boolean));
         const existing = Array.from(this.shadowRoot.children);
         const incoming = tree.map(node => Node.getElement(node));
 
@@ -48,9 +47,7 @@ export default class Component extends HTMLElementProxy {
             }
         }
 
-        if (style) {
-            Node.create(HTMLStyleElement, { textContent: style }).connect(this.shadowRoot);
-        }
+        Node.create(HTMLStyleElement, { textContent: this.theme() }).connect(this.shadowRoot);
 
         this.nodes = tree;
 

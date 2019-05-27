@@ -4,5 +4,5 @@ export default {
     green: [ 140, 224, 4 ],
     red: [ 244, 31, 60 ],
     white: [ 255, 255, 255 ],
-    yellow: [ 239, 229, 31 ]
+    yellow: [ 245, 187, 24 ]
 }

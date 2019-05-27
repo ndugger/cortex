@@ -12,12 +12,17 @@ export function diffTree(existing: Node[], incoming: Node[]): Node[] {
     else {
         return incoming.map((node, index) => {
 
+            if (!node) {
+                return;
+            }
+
             if (index + 1 > existing.length) {
                 node.create();
 
                 return node;
             }
             else {
+                console.log('existing?', existing.length, incoming.length);
                 return existing[ index ].diff(node) as Node;
             }
         }).filter(Boolean);

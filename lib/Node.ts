@@ -206,6 +206,8 @@ export default class Node<Type extends InstantiableElement = any> {
             this.remove();
             node.create();
 
+            console.log('types do not match');
+
             return node;
         }
 
