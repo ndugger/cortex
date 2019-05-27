@@ -10,11 +10,11 @@ export function observe(store: InternalStore<any>): <Subscriber>(subscriber: Sub
     return subscriber => new Proxy(subscriber as any, {
 
         construct<Target extends Component>(target: Target, args: any[], base: typeof Component) {
-            const instance = Reflect.construct(target as any, args, base);
+            const component = Reflect.construct(target as any, args, base);
 
-            store.observe(instance);
+            store.connect(component);
 
-            return instance;
+            return component;
         }
     });
 }
@@ -29,7 +29,7 @@ export class InternalStore<Data> {
         this.observers = [];
     }
 
-    public observe<ComponentType extends Component>(instance: ComponentType): void {
+    public connect<ComponentType extends Component>(instance: ComponentType): void {
         instance.addEventListener('componentconnect', () => {
             if (!this.observers.includes(instance)) this.observers.push(instance);
         });

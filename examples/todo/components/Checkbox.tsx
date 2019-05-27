@@ -18,7 +18,7 @@ export default class Checkbox extends Cortex.Component {
     public onchange: (event: Event) => void;
 
     protected handleComponentConnect(): void {
-        this.state.observe(this);
+        this.state.connect(this);
     }
 
     protected handleComponentReady(): void {

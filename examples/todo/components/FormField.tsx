@@ -17,7 +17,7 @@ export default class FormField<Type = any> extends Cortex.Component {
 
     public static Option = FormFieldOption;
 
-    public state = new Cortex.Store<FormFieldState>({
+    private state = new Cortex.Store<FormFieldState>({
         focused: false,
         value: null
     });
@@ -47,7 +47,7 @@ export default class FormField<Type = any> extends Cortex.Component {
     }
 
     protected handleComponentConnect(): void {
-        this.state.observe(this);
+        this.state.connect(this);
 
         if (this.type === 'select') {
             const options = Array.from(this.childNodes) as FormFieldOption[];

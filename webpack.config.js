@@ -4,11 +4,14 @@ const env = process.env;
 const input = 'tests/sandbox.spec.tsx';
 const output = 'dist/';
 
+const examples = [
+    'todo',
+    'video_player'
+];
+
 module.exports = {
     mode: 'development',
-    entry: {
-        todo: path.resolve(__dirname, 'examples/todo/index.tsx')
-    },
+    entry: examples.reduce((entry, example) => Object.assign({ [ example ]: path.resolve(__dirname, `examples/${ example }/index.tsx`) }), { }),
     devtool: 'cheap-module-eval-source-map',
     output: {
         filename: '[name].js',

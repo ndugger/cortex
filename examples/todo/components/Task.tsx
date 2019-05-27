@@ -7,13 +7,7 @@ import PriorityIndicator from './PriorityIndicator';
 import Spacer from './Spacer';
 import Typography from './Typography';
 
-const taskWhenDateFormat = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric'
-});
+import dateFormats from '../utilities/dateFormats';
 
 export default class Task extends Cortex.Component implements TaskInterface {
 
@@ -46,7 +40,7 @@ export default class Task extends Cortex.Component implements TaskInterface {
                     <Spacer width={ 16 }/>
                 </HTMLDivElement>
                 <HTMLDivElement style={ { flexShrink: '0' } }>
-                    <Typography textContent={ taskWhenDateFormat.format(this.when) } variant='subheader'/>
+                    <Typography textContent={ dateFormats.task.format(this.when) } variant='subheader'/>
                 </HTMLDivElement>
                 <Spacer width={ 16 }/>
                 <Checkbox checked={ this.completed } onchange={ () => this.handleCheckboxChange() }/>

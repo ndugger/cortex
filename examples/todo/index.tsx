@@ -12,24 +12,17 @@ import Typography from './components/Typography';
 
 import tasks from './stores/tasks';
 
+import dateFormats from './utilities/dateFormats';
 import palette from './utilities/palette';
 
 interface ApplicationState {
     displayAddTaskForm: boolean;
 }
 
-const todayDateFormat = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-})
-
-const today = todayDateFormat.format(new Date());
-
 @Cortex.observe(tasks)
 class Application extends Cortex.Component {
 
-    public state = new Cortex.Store<ApplicationState>({
+    private state = new Cortex.Store<ApplicationState>({
         displayAddTaskForm: false
     });
 
@@ -45,9 +38,9 @@ class Application extends Cortex.Component {
         tasks.splice(tasks.indexOf(task), 1, { ...task, completed: false });
     }
 
-    private handleSubmitButtonClick(event: Event): void {
-        const name = (this.shadowRoot.getElementById('task_name') as FormField).state.value;
-        const priority = (this.shadowRoot.getElementById('task_priority') as FormField).state.value;
+    private handleSubmitButtonClick(): void {
+        const name = Reflect.get(this.shadowRoot.getElementById('task_name'), 'state').value;
+        const priority = Reflect.get(this.shadowRoot.getElementById('task_priority'), 'state').value;
 
         tasks.push({
             completed: false,
@@ -64,10 +57,12 @@ class Application extends Cortex.Component {
     }
 
     protected handleComponentConnect(): void {
-        this.state.observe(this);
+        this.state.connect(this);
     }
 
     public render(): Cortex.Node[] {
+        const today = dateFormats.today.format(new Date());
+
         return [
             <HTMLElement tag='main'>
                 <Pane action='Add Task' header='My Tasks' onaction={ () => this.handleAddTask() } subheader={ today } style={ { width: '600px' } }>
@@ -110,7 +105,7 @@ class Application extends Cortex.Component {
                                 </Form.Field>
                                 <Spacer height={ 16 }/>
                                 <HTMLDivElement style={ { textAlign: 'center' } }>
-                                    <Button onclick={ e => this.handleSubmitButtonClick(e) }>
+                                    <Button onclick={ () => this.handleSubmitButtonClick() }>
                                          <Typography textContent='Add Task' variant='content'/>
                                     </Button>
                                 </HTMLDivElement>
