@@ -183,7 +183,7 @@ export default class Example extends Cortex.Component<ExampleState> {
     });
 
     protected handleComponentConnect(): void {
-        this.state.observe(this);
+        this.state.connect(this);
     }
 }
 ```
@@ -197,10 +197,8 @@ private handleFoo(event: CustomEvent): void {
 }
 
 public render(): Cortex.Node[] {
-    const { foo } = this.state
-
     return [
-        <HTMLSpanElement textContent={ foo }/>
+        <HTMLSpanElement textContent={ this.state.foo }/>
     ]
 }
 ```
