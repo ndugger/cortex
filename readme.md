@@ -15,7 +15,7 @@ The main goal is to keep the orchestration to a minimum, and rely heavily on alr
 ### Example
 For more in-depth examples, check out the [examples folder](./examples).
 ```typescript
-import * as Cortex from 'cortex';
+import * as Cortex from 'cortex'
 
 class Example extends Cortex.Component {
 
@@ -56,7 +56,7 @@ document.body.append(example)
 The `Component` class acts as proxy to the `HTMLElement` class that also automatically registers the custom element, and adds lifecycle capabilities.
 
 ```typescript
-import * as Cortex from 'cortex';
+import * as Cortex from 'cortex'
 
 export default class Example extends Cortex.Component {
 
@@ -155,7 +155,7 @@ Dispatched every time the component's state changes.
 Cortex ships with some basic state management built in. You can either have separate stores that components may observe, or you may define an interface for a component's instance's state.
 
 ```typescript
-import * as Cortex from 'cortex';
+import * as Cortex from 'cortex'
 
 interface State {
     foo: string
