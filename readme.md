@@ -180,10 +180,10 @@ export default class Example extends Cortex.Component<ExampleState> {
 
     private state = new Cortex.Store<ExampleState>({
         foo: 'bar'
-    });
+    })
 
     protected handleComponentConnect(): void {
-        this.state.connect(this);
+        this.state.connect(this)
     }
 }
 ```
