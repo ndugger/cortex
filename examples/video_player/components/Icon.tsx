@@ -17,11 +17,10 @@ export default class Icon extends Cortex.Component {
         return `
             :host {
                 display: contents;
-                height: ${ this.size }px;
-                width: ${ this.size }px;
             }
 
             .${ HTMLSpanElement.name } {
+                color: inherit;
                 direction: ltr;
                 font-family: 'Material Icons';
                 font-feature-settings: 'liga';
@@ -31,6 +30,7 @@ export default class Icon extends Cortex.Component {
                 display: inline-block;
                 letter-spacing: normal;
                 line-height: 1;
+                opacity: inherit;
                 text-rendering: optimizeLegibility;
                 text-transform: none;
                 white-space: nowrap;
