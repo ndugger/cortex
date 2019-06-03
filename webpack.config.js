@@ -5,13 +5,16 @@ const input = 'tests/sandbox.spec.tsx';
 const output = 'dist/';
 
 const examples = [
+    'presentation',
     'todo',
     'video_player'
 ];
 
 module.exports = {
     mode: 'development',
-    entry: examples.reduce((entry, example) => Object.assign({ [ example ]: path.resolve(__dirname, `examples/${ example }/index.tsx`) }), { }),
+    entry: examples.reduce((entry, example) => Object.assign(entry, {
+        [ example ]: path.resolve(__dirname, `examples/${ example }/index.tsx`)
+    }), { }),
     devtool: 'cheap-module-eval-source-map',
     output: {
         filename: '[name].js',

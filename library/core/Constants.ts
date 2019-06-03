@@ -1,5 +1,6 @@
 export const HTML_CLASS_NAME_LOOKUP = {
     [ HTMLAnchorElement.name ]: 'a',
+    [ HTMLImageElement.name ]: 'img',
     [ HTMLOListElement.name ]: 'ol',
     [ HTMLParagraphElement.name ]: 'p',
     [ HTMLUListElement.name ]: 'ul'
