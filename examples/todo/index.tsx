@@ -2,7 +2,6 @@ import * as Cortex from 'cortex';
 
 import Button from './components/Button';
 import Form from './components/Form';
-import FormField from './components/FormField';
 import Lightbox from './components/Lightbox';
 import List from './components/List';
 import Pane from './components/Pane';
@@ -19,7 +18,7 @@ interface ApplicationState {
     displayAddTaskForm: boolean;
 }
 
-@Cortex.observe(tasks)
+@Cortex.subscribe(tasks)
 class Application extends Cortex.Component {
 
     private state = new Cortex.Store<ApplicationState>({

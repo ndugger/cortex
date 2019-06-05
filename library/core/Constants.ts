@@ -3,6 +3,7 @@ export const HTML_CLASS_NAME_LOOKUP = {
     [ HTMLImageElement.name ]: 'img',
     [ HTMLOListElement.name ]: 'ol',
     [ HTMLParagraphElement.name ]: 'p',
+    [ HTMLQuoteElement.name ]: 'q',
     [ HTMLUListElement.name ]: 'ul'
 };
 

@@ -1,24 +1,60 @@
 import * as Cortex from 'cortex';
 
+import Logo from '../components/Logo';
 import Presentation from '../components/Presentation';
+import Variable from '../components/Variable';
+
+import { blue } from '../utilities/palette';
 
 export default class IntroSlide extends Cortex.Component {
 
     public render(): Cortex.Node[] {
         return [
-            <Presentation.Image src='assets/web_components_logo.png' style={ { position: 'absolute', right: '-16px', top: '20px' } } width={ 200 }/>,
+            <Logo/>,
             <Presentation.Layout direction='vertical' grow={ 1 }>
                 <Presentation.Heading level={ 2 }>
-                    What are "native web components"?
+                    What are "Native Web Components"?
                 </Presentation.Heading>
                 <Presentation.List>
                     <Presentation.List.Item>
-                        Custom Elements
+                        <Presentation.Text strike>
+                            HTML Imports
+                        </Presentation.Text>
                     </Presentation.List.Item>
                     <Presentation.List.Item>
-                        Shadow DOM
+                        <Presentation.Text>
+                            <Variable textContent='<template/>'/> Element
+                        </Presentation.Text>
+                        <Presentation.List sub>
+                            <Presentation.List.Item>
+                                <Presentation.Text>
+                                    Useful in situations not covered by this presentation
+                                </Presentation.Text>
+                            </Presentation.List.Item>
+                        </Presentation.List>
+                    </Presentation.List.Item>
+                    <Presentation.List.Item>
+                        <Presentation.Text color={ `rgb(${ blue })` } display height={ 2.05 }>
+                            Custom Elements
+                        </Presentation.Text>
+                    </Presentation.List.Item>
+                    <Presentation.List.Item>
+                        <Presentation.Text color={ `rgb(${ blue })` } display height={ 2.05 }>
+                            Shadow DOM
+                        </Presentation.Text>
                     </Presentation.List.Item>
                 </Presentation.List>
+                <Presentation.Layout align='center' grow={ 1 } padding={ 80 }>
+                    <Presentation.Quote src='WebComponents.org'>
+                        <Presentation.Text size={ 1.5 }>
+                            Web components are a set of web platform APIs that allow
+                            you to create new custom, reusable, encapsulated HTML
+                            tags to use in web pages and web apps. Custom components
+                            and widgets, built on the Web Component standards,
+                            will work across modern browsers.
+                        </Presentation.Text>
+                    </Presentation.Quote>
+                </Presentation.Layout>
             </Presentation.Layout>
         ];
     }

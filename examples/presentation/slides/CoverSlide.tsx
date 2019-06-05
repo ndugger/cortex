@@ -1,6 +1,7 @@
 import * as Cortex from 'cortex';
 
 import Presentation from '../components/Presentation';
+import { blue } from '../utilities/palette';
 
 export default class CoverSlide extends Cortex.Component {
 
@@ -10,11 +11,11 @@ export default class CoverSlide extends Cortex.Component {
                 <Presentation.Heading level={ 1 }>
                     Native Web Components
                 </Presentation.Heading>
-                <Presentation.Heading color='rgba(41, 123, 190, 1)' level={ 3 }>
+                <Presentation.Heading color={ `rgb(${ blue })` } level={ 3 }>
                     Custom Elements & Shadow DOM
                 </Presentation.Heading>
                 <Presentation.Layout align='center' grow={ 1 } justify='center'>
-                    <Presentation.Image src='assets/web_components_logo.png' width={ 400 }/>
+                    <Presentation.Image src='assets/web_components_logo.png' width={ 440 }/>
                 </Presentation.Layout>
                 <Presentation.Layout justify='end'>
                     <Presentation.Heading level={ 3 }>

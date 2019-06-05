@@ -1,10 +1,13 @@
 import * as Cortex from 'cortex';
 
+import { black, green, white } from '../utilities/palette';
+
 import Icon from './Icon';
 import PresentationHeading from './PresentationHeading';
 import PresentationImage from './PresentationImage';
 import PresentationLayout from './PresentationLayout';
 import PresentationList from './PresentationList';
+import PresentationQuote from './PresentationQuote';
 import PresentationSlide from './PresentationSlide';
 import PresentationText from './PresentationText';
 
@@ -18,6 +21,7 @@ export default class Presentation extends Cortex.Component {
     public static Image = PresentationImage;
     public static Layout = PresentationLayout;
     public static List = PresentationList;
+    public static Quote = PresentationQuote;
     public static Slide = PresentationSlide;
     public static Text = PresentationText;
 
@@ -96,7 +100,7 @@ export default class Presentation extends Cortex.Component {
     public theme(): string {
         return `
             :host {
-                background: rgba(0, 0, 0, 1);
+                background: rgb(${ black });
                 cursor: default;
                 display: block;
                 height: 100%;
@@ -113,7 +117,7 @@ export default class Presentation extends Cortex.Component {
                     rgba(246, 246, 246, 0.85) 100%
                 );
                 border-radius: 12px;
-                color: rgba(0, 0, 0, 1);
+                color: rgb(${ black });
                 display: block;
                 height: calc(100% - 60px);
                 position: relative;
@@ -122,9 +126,9 @@ export default class Presentation extends Cortex.Component {
 
             nav {
                 align-items: center;
-                background: rgba(0, 0, 0, 1);
+                background: rgb(${ black });
                 box-sizing: border-box;
-                color: rgba(255, 255, 255, 1);
+                color: rgb(${ white });
                 display: flex;
                 font-family: Oswald;
                 height: 60px;
@@ -133,7 +137,7 @@ export default class Presentation extends Cortex.Component {
             }
 
             nav .${ Icon.name }:hover {
-                color: rgba(206, 255, 62, 1);
+                color: rgb(${ green });
             }
 
             #help {

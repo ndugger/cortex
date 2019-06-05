@@ -6,7 +6,10 @@ interface StoreProxy<Type> {
     };
 }
 
-export function observe(store: InternalStore<any>): <Subscriber>(subscriber: Subscriber) => Subscriber {
+const dataSymbol = Symbol('data');
+const subscribersSymbol = Symbol('subscribers');
+
+export function subscribe(store: Store): <Subscriber>(subscriber: Subscriber) => Subscriber {
     return subscriber => new Proxy(subscriber as any, {
 
         construct<Target extends Component>(target: Target, args: any[], base: typeof Component) {
@@ -19,44 +22,48 @@ export function observe(store: InternalStore<any>): <Subscriber>(subscriber: Sub
     });
 }
 
-export class InternalStore<Data> {
+export class Store {
 
-    private data: Data;
-    private observers: Component[];
+    private [ dataSymbol ]: unknown;
+    private [ subscribersSymbol ]: Component[];
 
     public constructor(data: any) {
-        this.data = data;
-        this.observers = [];
+        this[ dataSymbol ] = data;
+        this[ subscribersSymbol ] = [];
     }
 
     public connect<ComponentType extends Component>(instance: ComponentType): void {
         instance.addEventListener('componentconnect', () => {
-            if (!this.observers.includes(instance)) this.observers.push(instance);
+            if (!this[ subscribersSymbol ].includes(instance)) this[ subscribersSymbol ].push(instance);
         });
         instance.addEventListener('componentdisconnect', () => {
-            this.observers.splice(this.observers.indexOf(instance), 1);
+            this[ subscribersSymbol ].splice(this[ subscribersSymbol ].indexOf(instance), 1);
         });
 
-        if (instance.parentNode && !this.observers.includes(instance)) {
-            this.observers.push(instance);
+        if (instance.parentNode && !this[ subscribersSymbol ].includes(instance)) {
+            this[ subscribersSymbol ].push(instance);
         }
     }
 
     public update() {
-        for (const observer of this.observers) {
+        for (const observer of this[ subscribersSymbol ]) {
             observer.update();
         }
     }
 }
 
-export default new Proxy(InternalStore, {
+export default new Proxy<StoreProxy<Store>>(Store as StoreProxy<Store>, {
 
-    construct<Data>(target: typeof InternalStore, args: [ Data ]): InternalStore<Data> & Data {
+    construct<Data>(target: typeof Store, args: [ Data ]): Store & Data {
         return new Proxy(Reflect.construct(target, args), {
 
-            get<Target extends InternalStore<Data>>(target: Target, property: keyof Target): Target[ keyof Target ] {
-                const actualTarget = (property in target) ? target : Reflect.get(target, 'data');
+            get<Target extends Store>(target: Target, property: keyof Target): Target[ keyof Target ] {
+                const actualTarget = (property in target) ? target : Reflect.get(target, dataSymbol);
                 const value = Reflect.get(actualTarget, property);
+
+                if (property === 'update') {
+                    return Reflect.apply(value, actualTarget, []);
+                }
 
                 if (typeof value === 'function') {
                     return new Proxy(value, {
@@ -64,7 +71,7 @@ export default new Proxy(InternalStore, {
                         apply(method: (...args: any[]) => any, _: any, args: any[]): any {
                             const value = Reflect.apply(method, actualTarget, args);
 
-                            if (property !== 'update') switch (true) {
+                            switch (true) {
 
                                 case Array.isArray(actualTarget): {
 
@@ -100,8 +107,8 @@ export default new Proxy(InternalStore, {
                 return value;
             },
 
-            set<Target extends InternalStore<Data>>(target: Target, property: keyof Target, value: Target[ keyof Target ]): boolean {
-                const actualTarget = (property in target) ? target : Reflect.get(target, 'data');
+            set<Target extends Store>(target: Target, property: keyof Target, value: Target[ keyof Target ]): boolean {
+                const actualTarget = (property in target) ? target : Reflect.get(target, dataSymbol);
 
                 Reflect.set(actualTarget, property, value);
                 target.update();
@@ -110,4 +117,4 @@ export default new Proxy(InternalStore, {
             }
         });
     }
-}) as StoreProxy<InternalStore<any>>
+});

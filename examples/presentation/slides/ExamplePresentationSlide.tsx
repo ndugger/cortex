@@ -1,12 +1,13 @@
 import * as Cortex from 'cortex';
 
+import Logo from '../components/Logo';
 import Presentation from '../components/Presentation';
 
 export default class ExamplePresentationSlide extends Cortex.Component {
 
     public render(): Cortex.Node[] {
         return [
-            <Presentation.Image src='assets/web_components_logo.png' style={ { position: 'absolute', right: '-16px', top: '20px' } } width={ 200 }/>,
+            <Logo/>,
             <Presentation.Layout direction='vertical' grow={ 1 }>
                 <Presentation.Heading level={ 2 }>
                     Example: Presentation

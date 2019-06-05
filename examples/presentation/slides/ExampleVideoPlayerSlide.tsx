@@ -1,19 +1,21 @@
 import * as Cortex from 'cortex';
 
+import Logo from '../components/Logo';
 import Presentation from '../components/Presentation';
+import Variable from '../components/Variable';
 
 export default class ExampleVideoPlayerSlide extends Cortex.Component {
 
     public render(): Cortex.Node[] {
         return [
-            <Presentation.Image src='assets/web_components_logo.png' style={ { position: 'absolute', right: '-16px', top: '20px' } } width={ 200 }/>,
+            <Logo/>,
             <Presentation.Layout direction='vertical' grow={ 1 }>
                 <Presentation.Heading level={ 2 }>
                     Example: Video Player
                 </Presentation.Heading>
                 <Presentation.Text>
-                    Built on top of the <HTMLElement tag='code'>HTMLVideoElement</HTMLElement>,
-                    it uses web components to render the controls and manage user interactions.
+                    Built on top of the <Variable textContent='HTMLVideoElement'/>,
+                    it uses web components to render custom controls and manage user interactions.
                 </Presentation.Text>
                 <HTMLIFrameElement frameBorder='0' src='../video_player/index.html'/>
             </Presentation.Layout>

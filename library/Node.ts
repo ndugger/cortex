@@ -6,7 +6,7 @@ type InstantiableElement = typeof Text | (Partial<(HTMLElement | SVGElement)> & 
     new(data?: string): HTMLElement | SVGElement;
 });
 
-type Properties = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>> & {
+export type Properties = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>> & {
     attributes?: {
         [ K: string ]: any
     };

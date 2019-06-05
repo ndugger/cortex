@@ -7,12 +7,14 @@ import ExamplePresentationSlide from './slides/ExamplePresentationSlide';
 import ExampleTodoSlide from './slides/ExampleTodoSlide';
 import ExampleVideoPlayerSlide from './slides/ExampleVideoPlayerSlide';
 import IntroSlide from './slides/IntroSlide';
+import TimelineSlide from './slides/TimelineSlide';
 
 class PresentationExample extends Cortex.Component {
 
     private slides = [
         { component: CoverSlide },
         { component: IntroSlide },
+        { component: TimelineSlide },
         { component: ExampleTodoSlide },
         { component: ExampleVideoPlayerSlide },
         { component: ExamplePresentationSlide }

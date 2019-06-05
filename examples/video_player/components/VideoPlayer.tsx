@@ -137,7 +137,7 @@ export default class VideoPlayer extends Cortex.Component {
                             <Spacer width={ 16 }/>
                             <HTMLSpanElement textContent={ this.formatTime('duration') }/>
                             <Spacer width={ 16 }/>
-                            <Icon glyph='fullscreen' onclick={ () => this.toggleFullscreen() }/>
+                            <Icon glyph={ this.state.fullscreen ? 'fullscreen_exit' : 'fullscreen' } onclick={ () => this.toggleFullscreen() }/>
                         </HTMLDivElement>
                     </HTMLDivElement>
                     <Icon glyph='play_circle_filled' size={ 80 } hidden={ !this.state.paused }/>

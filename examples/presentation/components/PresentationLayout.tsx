@@ -10,6 +10,7 @@ export default class PresentationLayout extends Cortex.Component {
     public direction: PresentationLayoutDirection;
     public justify: PresentationLayoutJustification;
     public grow: number;
+    public padding: number;
     public shrink: number;
 
     public render(): Cortex.Node[] {
@@ -27,6 +28,7 @@ export default class PresentationLayout extends Cortex.Component {
                 flex-direction: ${ this.direction === 'vertical' ? 'column' : 'row' };
                 flex-shrink: ${ this.shrink || 0 };
                 justify-content: ${ this.justify ? this.justify === 'center' ? 'center' : `flex-${ this.justify || 'start' }` : 'unset' };
+                padding: ${ this.padding || 0 }px;
             }
         `;
     }
