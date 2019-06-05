@@ -17,15 +17,25 @@ export default class TimelineSlide extends Cortex.Component {
                 </Presentation.Heading>
                 <Presentation.Layout align='center' grow={ 1 }>
                     <HTMLDivElement id='timeline'>
-                        <Timeline range={ [ 2010, 2020 ] }>
+                        <Timeline range={ [ 2011, 2020 ] }>
                             <Timeline.Event month={ 4 } year={ 2012 }>
                                 <Presentation.Text size={ 1.33 }>
-                                    Shadow DOM V0 Defined
+                                    Shadow DOM Proposed
                                 </Presentation.Text>
                             </Timeline.Event>
                             <Timeline.Event month={ 4 } year={ 2013 }>
                                 <Presentation.Text size={ 1.33 }>
-                                    Custom Elements V0 Defined
+                                    Custom Elements Proposed
+                                </Presentation.Text>
+                            </Timeline.Event>
+                            <Timeline.Event month={ 9 } year={ 2015 }>
+                                <Presentation.Text size={ 1.33 }>
+                                    Shadow DOM V1 Defined
+                                </Presentation.Text>
+                            </Timeline.Event>
+                            <Timeline.Event month={ 7 } year={ 2016 }>
+                                <Presentation.Text size={ 1.33 }>
+                                    Custom Elements V1 Defined
                                 </Presentation.Text>
                             </Timeline.Event>
                         </Timeline>

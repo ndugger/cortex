@@ -27,14 +27,14 @@ export class Store {
     private [ dataSymbol ]: unknown;
     private [ subscribersSymbol ]: Component[];
 
-    public constructor(data: any) {
+    public constructor(data: unknown) {
         this[ dataSymbol ] = data;
         this[ subscribersSymbol ] = [];
     }
 
     public connect<ComponentType extends Component>(instance: ComponentType): void {
         instance.addEventListener('componentconnect', () => {
-            if (!this[ subscribersSymbol ].includes(instance)) this[ subscribersSymbol ].push(instance);
+            !this[ subscribersSymbol ].includes(instance) && this[ subscribersSymbol ].push(instance);
         });
         instance.addEventListener('componentdisconnect', () => {
             this[ subscribersSymbol ].splice(this[ subscribersSymbol ].indexOf(instance), 1);
