@@ -1,6 +1,6 @@
 import Node from './Node';
 
-import HTMLElementProxy from './core/HTMLElementProxy';
+import HTMLElementProxy from './HTMLElementProxy';
 import { diffTree } from './core/utilities';
 
 export default class Component extends HTMLElementProxy {

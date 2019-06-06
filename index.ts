@@ -1,6 +1,7 @@
+import Component from './library/Component';
+import Fragment from './library/Fragment';
 import Node, { Properties } from './library/Node';
 import Store, { subscribe } from './library/Store';
-import Component from './library/Component';
 
 declare global {
 
@@ -20,4 +21,4 @@ declare global {
     }
 }
 
-export { Node, Store, Component, subscribe };
+export { Component, Fragment, Node, Store, subscribe };

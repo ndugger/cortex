@@ -1,4 +1,4 @@
-import { tag } from './utilities';
+import { tag } from './core/utilities';
 
 export default new Proxy(HTMLElement, {
 

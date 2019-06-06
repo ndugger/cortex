@@ -1,4 +1,3 @@
-import Component from '../Component';
 import Node from '../Node';
 
 export function diffTree(existing: Node[], incoming: Node[]): Node[] {
