@@ -1,13 +1,13 @@
-import Node from '../Node';
+import CortexNode from '../CortexNode';
 
-export function diffTree(existing: Node[], incoming: Node[]): Node[] {
+export function diffTree(existing: CortexNode[], incoming: CortexNode[]): CortexNode[] {
 
     if (!existing) {
         return incoming.filter(Boolean);
     }
 
     if (existing.length >= incoming.length) {
-        return existing.map((node, index) => node.diff(incoming[ index ])).filter(Boolean) as Node[];
+        return existing.map((node, index) => node.diff(incoming[ index ])).filter(Boolean) as CortexNode[];
     }
     else {
         return incoming.map((node, index) => {
@@ -23,7 +23,7 @@ export function diffTree(existing: Node[], incoming: Node[]): Node[] {
             }
             else {
                 console.log('existing?', existing.length, incoming.length);
-                return existing[ index ].diff(node) as Node;
+                return existing[ index ].diff(node) as CortexNode;
             }
         }).filter(Boolean);
     }

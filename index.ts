@@ -1,7 +1,7 @@
-import Component from './library/Component';
-import Fragment from './library/Fragment';
-import Node, { Properties } from './library/Node';
-import Store, { subscribe } from './library/Store';
+import Component from './library/CortexComponent';
+import Fragment from './library/CortexFragment';
+import Node, { Properties } from './library/CortexNode';
+import Store, { subscribe } from './library/CortexStore';
 
 declare global {
 
