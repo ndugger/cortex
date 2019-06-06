@@ -3,8 +3,8 @@ import Fragment from './Fragment';
 
 import * as Constants from './core/constants';
 
-type InstantiableElement = typeof Text | (Partial<(HTMLElement | SVGElement | Fragment)> & {
-    new(data?: string): HTMLElement | SVGElement | DocumentFragment;
+type InstantiableElement = typeof Text | (Partial<(HTMLElement | SVGElement)> & {
+    new(data?: string): HTMLElement | SVGElement;
 });
 
 export type Properties = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>> & {
@@ -39,7 +39,7 @@ export default class Node<Type extends InstantiableElement = any> {
         this.type = type;
     }
 
-    public connect(host: ShadowRoot | Element | DocumentFragment): void {
+    public connect(host: ShadowRoot | Element): void {
 
         if (this.element === null) {
             this.create();
