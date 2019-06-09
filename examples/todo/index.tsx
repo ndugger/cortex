@@ -27,6 +27,14 @@ class ExampleFragment extends Cortex.Fragment {
             </HTMLElement>
         ];
     }
+
+    public theme(): string {
+        return `
+            h1 {
+                color: red;
+            }
+        `;
+    }
 }
 
 @Cortex.subscribe(tasks)
@@ -77,6 +85,8 @@ class Application extends Cortex.Component {
             <ExampleFragment/>,
             <HTMLElement tag='main'>
                 <Pane action='Add Task' header='My Tasks' onaction={ () => this.handleAddTask() } subheader={ today } style={ { width: '600px' } }>
+
+                    <ExampleFragment/>
 
                     { (tasks.length === 0) && (
                         <HTMLDivElement id='ATTENTION_M8' style={ { padding: '24px', textAlign: 'center' } }>

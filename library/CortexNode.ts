@@ -1,5 +1,6 @@
 import CortexComponent from './CortexComponent';
 import CortexFragment from './CortexFragment';
+import CortexTree from './CortexTree';
 
 const HTML_CLASS_NAME_LOOKUP = {
     [ HTMLAnchorElement.name ]: 'a',
@@ -36,13 +37,13 @@ export default class CortexNode<Type extends InstantiableElement = any> {
         return node ? node.dom : null;
     }
 
-    private children: CortexNode[];
+    private children: CortexTree;
     private dom: Element;
     private properties: Properties;
     private type: Type;
 
     private constructor(type: Type, properties: Properties = null, children: CortexNode[] = []) {
-        this.children = children.flat().map(child => child instanceof CortexNode ? child : child ? CortexNode.create(Text, { textContent: child }) : null);
+        this.children = CortexTree.from(children.flat().map(child => child instanceof CortexNode ? child : child ? CortexNode.create(Text, { textContent: child }) : null));
         this.dom = null;
         this.properties = properties;
         this.type = type;
@@ -219,13 +220,15 @@ export default class CortexNode<Type extends InstantiableElement = any> {
 
         if (this.children.length >= node.children.length) {
             return Object.assign(this, {
-                children: this.children.map((child, index) => child ? child.diff(node.children[ index ]) : node.children[ index ] || null),
+                children: CortexTree.from(this.children.map((child, index) => {
+                    return child ? child.diff(node.children[ index ]) : node.children[ index ] || null;
+                })),
                 properties: node.properties
             });
         }
         else {
             return Object.assign(this, {
-                children: node.children.map((child, index) => {
+                children: CortexTree.from(node.children.map((child, index) => {
 
                     if (index + 1 > this.children.length) {
                         return child || null;
@@ -233,7 +236,7 @@ export default class CortexNode<Type extends InstantiableElement = any> {
                     else {
                         return this.children[ index ] ? this.children[ index ].diff(child) : child || null;
                     }
-                }),
+                })),
                 properties: node.properties
             });
         }

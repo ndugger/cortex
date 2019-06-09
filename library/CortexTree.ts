@@ -26,9 +26,13 @@ export default class CortexTree extends Array<CortexNode> {
             if (node && isFragment(Reflect.get(node, 'type'))) {
                 node.create();
 
-                for (const x of (CortexNode.getNode(node) as CortexFragment).render()) {
+                const fragment = CortexNode.getNode(node) as CortexFragment;
+
+                for (const x of fragment.render()) {
                     self.push(x || null);
                 }
+
+                self.push(CortexNode.create(HTMLStyleElement, { textContent: fragment.theme() }));
             }
             else {
                 self.push(node || null);
