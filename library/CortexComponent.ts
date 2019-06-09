@@ -1,11 +1,12 @@
 import CortexHTMLElement from './CortexHTMLElement';
 import CortexNode from './CortexNode';
+import CortexTree from './CortexTree';
 
-import { diffTree } from './core/utilities';
+const treeSymbol = Symbol('tree');
 
 export default class CortexComponent extends CortexHTMLElement {
 
-    public nodes: CortexNode[];
+    private [ treeSymbol ]: CortexTree;
 
     public oncomponentconnect: (event: Event) => void;
     public oncomponentcreate: (event: Event) => void;
@@ -36,22 +37,22 @@ export default class CortexComponent extends CortexHTMLElement {
     }
 
     private renderedCallback(): void {
-        const tree = diffTree(this.nodes, this.render().filter(Boolean));
-        const existing = Array.from(this.shadowRoot.children);
-        const incoming = tree.map(node => CortexNode.getElement(node));
+        const style = CortexNode.create(HTMLStyleElement, { textContent: this.theme() });
+        const tree = CortexTree.from(this.render().concat(style));
 
-        for (const child of existing) {
-
-            if (!incoming.includes(child)) {
-                child.remove();
-            }
+        if (!this[ treeSymbol ]) {
+            this[ treeSymbol ] = tree;
+        }
+        else {
+            this[ treeSymbol ] = this[ treeSymbol ].diff(tree);
         }
 
-        CortexNode.create(HTMLStyleElement, { textContent: this.theme() }).connect(this.shadowRoot);
+        for (const node of this[ treeSymbol ]) if (node) {
 
-        this.nodes = tree;
+            if (!CortexNode.getNode(node)) {
+                node.create();
+            }
 
-        for (const node of this.nodes) {
             node.connect(this.shadowRoot);
         }
 

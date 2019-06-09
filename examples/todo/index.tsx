@@ -18,6 +18,17 @@ interface ApplicationState {
     displayAddTaskForm: boolean;
 }
 
+class ExampleFragment extends Cortex.Fragment {
+
+    public render(): Cortex.Node[] {
+        return [
+            <HTMLElement tag='h1'>
+                Example Fragment
+            </HTMLElement>
+        ];
+    }
+}
+
 @Cortex.subscribe(tasks)
 class Application extends Cortex.Component {
 
@@ -63,11 +74,12 @@ class Application extends Cortex.Component {
         const today = dateFormats.today.format(new Date());
 
         return [
+            <ExampleFragment/>,
             <HTMLElement tag='main'>
                 <Pane action='Add Task' header='My Tasks' onaction={ () => this.handleAddTask() } subheader={ today } style={ { width: '600px' } }>
 
                     { (tasks.length === 0) && (
-                        <HTMLDivElement style={ { padding: '24px', textAlign: 'center' } }>
+                        <HTMLDivElement id='ATTENTION_M8' style={ { padding: '24px', textAlign: 'center' } }>
                             <Typography textContent='You Have Nothing To Do Today' variant='content'/>
                         </HTMLDivElement>
                     ) }
