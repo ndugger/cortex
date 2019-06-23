@@ -82,11 +82,8 @@ class Application extends Cortex.Component {
         const today = dateFormats.today.format(new Date());
 
         return [
-            <ExampleFragment/>,
             <HTMLElement tag='main'>
                 <Pane action='Add Task' header='My Tasks' onaction={ () => this.handleAddTask() } subheader={ today } style={ { width: '600px' } }>
-
-                    <ExampleFragment/>
 
                     { (tasks.length === 0) && (
                         <HTMLDivElement id='ATTENTION_M8' style={ { padding: '24px', textAlign: 'center' } }>

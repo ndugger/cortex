@@ -1,7 +1,11 @@
-import Component from './library/CortexComponent';
-import Fragment from './library/CortexFragment';
-import Node, { Properties } from './library/CortexNode';
-import Store, { subscribe } from './library/CortexStore';
+import Component from './library/Component';
+import Fragment from './library/Fragment';
+import Store, { subscribe } from './library/Store';
+import render from './library/core/render';
+import VirtualElement from './library/interfaces/VirtualElement';
+import Properties from './library/interfaces/Properties';
+
+type Node = VirtualElement;
 
 declare global {
 
@@ -21,4 +25,4 @@ declare global {
     }
 }
 
-export { Component, Fragment, Node, Store, subscribe };
+export { Component, Fragment, Node, Store, render, subscribe };

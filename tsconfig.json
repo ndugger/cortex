@@ -3,7 +3,7 @@
         "baseUrl": ".",
         "experimentalDecorators": true,
         "jsx": "react",
-        "jsxFactory": "Cortex.Node.create",
+        "jsxFactory": "Cortex.render",
         "lib": [
             "dom",
             "esnext"

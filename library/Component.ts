@@ -1,12 +1,29 @@
-import CortexHTMLElement from './CortexHTMLElement';
-import CortexNode from './CortexNode';
-import CortexTree from './CortexTree';
+import connect from './core/connect';
+import create from './core/create';
+import diff from './core/diff';
+import render from './core/render';
+import tag from './core/tag';
 
-const treeSymbol = Symbol('tree');
+import VirtualElement from './interfaces/VirtualElement';
 
-export default class CortexComponent extends CortexHTMLElement {
+const htmlElementProxy = new Proxy(HTMLElement, {
 
-    private [ treeSymbol ]: CortexTree;
+    construct: (element, args, component): object => {
+        const componentTag = tag(component);
+
+        if (!window.customElements.get(componentTag)) {
+            window.customElements.define(componentTag, component);
+        }
+
+        return Reflect.construct(element, args, component);
+    }
+});
+
+const cache = Symbol('cache');
+
+export default class Component extends htmlElementProxy {
+
+    private [ cache ]: VirtualElement[];
 
     public oncomponentconnect: (event: Event) => void;
     public oncomponentcreate: (event: Event) => void;
@@ -16,14 +33,13 @@ export default class CortexComponent extends CortexHTMLElement {
     public oncomponentupdate: (event: Event) => void;
 
     private connectedCallback(): void {
-
         this.dispatchEvent(new CustomEvent('componentconnect'));
 
         window.requestAnimationFrame(() => {
             this.renderedCallback();
 
             if (!this.classList.contains(this.constructor.name)) {
-                this.className = this.constructor.name + (this.className ? ' ' : '') + this.className;
+                this.classList.add(this.constructor.name);
             }
 
             window.requestAnimationFrame(() => {
@@ -37,23 +53,23 @@ export default class CortexComponent extends CortexHTMLElement {
     }
 
     private renderedCallback(): void {
-        const style = CortexNode.create(HTMLStyleElement, { textContent: this.theme() });
-        const tree = CortexTree.from(this.render().concat(style));
+        const style = render(HTMLStyleElement, { textContent: this.theme() });
+        const tree = this.render().concat(style);
 
-        if (!this[ treeSymbol ]) {
-            this[ treeSymbol ] = tree;
+        if (!this[ cache ]) {
+            this[ cache ] = tree;
         }
         else {
-            this[ treeSymbol ] = this[ treeSymbol ].diff(tree);
+            this[ cache ] = diff(this[ cache ], tree);
         }
 
-        for (const node of this[ treeSymbol ]) if (node) {
+        for (const element of this[ cache ]) if (element) {
 
-            if (!CortexNode.getNode(node)) {
-                node.create();
+            if (!element.node) {
+                element.node = create(element);
             }
 
-            node.connect(this.shadowRoot);
+            connect(element, this.shadowRoot);
         }
 
         this.dispatchEvent(new CustomEvent('componentrender'));
@@ -86,7 +102,7 @@ export default class CortexComponent extends CortexHTMLElement {
         this.dispatchEvent(new CustomEvent('componentcreate'));
     }
 
-    public render(): CortexNode[] {
+    public render(): VirtualElement[] {
         return [];
     }
 

@@ -1,4 +1,4 @@
-import CortexComponent from './CortexComponent';
+import Component from './Component';
 
 interface StoreProxy<Type> {
     new<Data>(data: Data): Type & {
@@ -12,7 +12,7 @@ const subscribersSymbol = Symbol('subscribers');
 export function subscribe(store: CortexStore): <Subscriber>(subscriber: Subscriber) => Subscriber {
     return subscriber => new Proxy(subscriber as any, {
 
-        construct<Target extends CortexComponent>(target: Target, args: any[], base: typeof CortexComponent) {
+        construct<Target extends Component>(target: Target, args: any[], base: typeof Component) {
             const component = Reflect.construct(target as any, args, base);
 
             store.connect(component);
@@ -25,14 +25,14 @@ export function subscribe(store: CortexStore): <Subscriber>(subscriber: Subscrib
 export class CortexStore {
 
     private [ dataSymbol ]: unknown;
-    private [ subscribersSymbol ]: CortexComponent[];
+    private [ subscribersSymbol ]: Component[];
 
     public constructor(data: unknown) {
         this[ dataSymbol ] = data;
         this[ subscribersSymbol ] = [];
     }
 
-    public connect<ComponentType extends CortexComponent>(instance: ComponentType): void {
+    public connect<ComponentType extends Component>(instance: ComponentType): void {
         instance.addEventListener('componentconnect', () => {
             !this[ subscribersSymbol ].includes(instance) && this[ subscribersSymbol ].push(instance);
         });
