@@ -151,7 +151,10 @@ protected handleComponentUpdate(event: CustomEvent): void
 ```
 Dispatched every time the component's state changes.
 
-### State Management
+### State Management (OUTDATED)
+
+**TODO: Rewrite this section to reflect code changes**
+
 Cortex ships with some basic state management built in. You can either have separate stores that components may subscribe to, or you may define an interface for a component's instance's state, and connect it anytime during that component's lifecycle.
 
 ```typescript

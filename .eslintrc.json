@@ -1,0 +1,17 @@
+{
+    "parser":  "@typescript-eslint/parser",
+    "extends":  [
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parserOptions":  {
+        "ecmaVersion":  2018,
+        "sourceType":  "module"
+    },
+    "rules":  {
+        "semi": "off",
+        "@typescript-eslint/semi": "error",
+        "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-namespace": "off"
+    }
+}

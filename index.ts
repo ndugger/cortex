@@ -1,28 +1,28 @@
-import Component from './library/Component';
-import Fragment from './library/Fragment';
-import Store, { subscribe } from './library/Store';
-import render from './library/core/render';
-import VirtualElement from './library/interfaces/VirtualElement';
-import Properties from './library/interfaces/Properties';
+import Component from './lib/Component';
+import Fragment from './lib/Fragment';
+import Store from './lib/Store';
 
-type Node = VirtualElement;
+import render from './lib/core/render';
+
+import Element from './lib/interfaces/Element';
+import Properties from './lib/interfaces/Properties';
 
 declare global {
 
     interface Element {
-        __props__: Properties & {
+        JSX_PROPERTY_TYPES_DO_NOT_USE: Properties & {
             [ Key in keyof this ]?: Partial<this[ Key ]>;
         };
     }
 
     namespace JSX {
 
-        interface IntrinsicElements { }
+        interface IntrinsicElements {}
 
         interface ElementAttributesProperty {
-            __props__: typeof Element.prototype.__props__;
+            JSX_PROPERTY_TYPES_DO_NOT_USE: typeof Element.prototype.JSX_PROPERTY_TYPES_DO_NOT_USE;
         }
     }
 }
 
-export { Component, Fragment, Node, Store, render, subscribe };
+export { Component, Element, Fragment, Store, render };
