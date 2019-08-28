@@ -1,5 +1,4 @@
 import Component from '../Component';
-
 import Element from '../interfaces/Element';
 
 import create from './create';
