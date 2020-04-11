@@ -1,8 +1,10 @@
 import { render } from './lib/core/render';
+
 import { Component } from './lib/Component';
+import { Inject } from './lib/Inject';
+
 import { Element } from './lib/interfaces/Element';
 import { Properties } from './lib/interfaces/Properties';
-import { Use } from './lib/Use';
 
 declare global {
 
@@ -22,4 +24,4 @@ declare global {
     }
 }
 
-export { Component, Element, Use, render };
+export { Component, Element, Inject, render };

@@ -4,7 +4,7 @@ import { Component } from './Component';
 
 export const registry: Map<new() => Component, unknown[]> = new Map();
 
-export function Use<Keys extends unknown[]>(...keys: Keys): (host: new() => Component) => new() => Component {
+export function Inject<Keys extends [...any[]]>(...keys: Keys): (host: new() => Component) => new() => Component {
 
     return host => {
 
@@ -18,6 +18,6 @@ export function Use<Keys extends unknown[]>(...keys: Keys): (host: new() => Comp
     }
 }
 
-Use.assign = function assign(key: unknown, value: unknown): void {
+Inject.setDependency = function setDependency(key: unknown, value: unknown): void {
     dependencies.set(key, value);
 }

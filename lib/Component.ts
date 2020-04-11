@@ -116,11 +116,11 @@ export class Component extends HTMLElementProxy {
         this.dispatchEvent(new Event('componentcreate'));
     }
 
-    public render<Dependencies extends unknown[]>(...dependencies: Dependencies): Element[] {
+    public render<Dependencies extends [...any[]]>(...dependencies: Dependencies): Element[] {
         return [];
     }
 
-    public theme<Dependencies extends unknown[]>(...dependencies: Dependencies): string {
+    public theme<Dependencies extends [...any[]]>(...dependencies: Dependencies): string {
         return '';
     }
 
