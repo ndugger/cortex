@@ -1,7 +1,7 @@
-import Element from '../interfaces/Element';
-import Properties from '../interfaces/Properties';
+import { Element } from '../interfaces/Element';
+import { Properties } from '../interfaces/Properties';
 
-export default function render<Constructor extends HTMLElement | SVGElement>(constructor: { new(): Constructor }, properties: Properties<Constructor>, ...children: Element[]): Element<Constructor> {
+export function render<Constructor extends HTMLElement | SVGElement>(constructor: { new(): Constructor }, properties: Properties<Constructor>, ...children: Element[]): Element<Constructor> {
     return {
         children: children.flat().map(child => {
 

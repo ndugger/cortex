@@ -1,11 +1,8 @@
-import Component from './lib/Component';
-import Fragment from './lib/Fragment';
-import Store from './lib/Store';
-
-import render from './lib/core/render';
-
-import Element from './lib/interfaces/Element';
-import Properties from './lib/interfaces/Properties';
+import { render } from './lib/core/render';
+import { Component } from './lib/Component';
+import { Element } from './lib/interfaces/Element';
+import { Properties } from './lib/interfaces/Properties';
+import { Use } from './lib/Use';
 
 declare global {
 
@@ -25,4 +22,4 @@ declare global {
     }
 }
 
-export { Component, Element, Fragment, Store, render };
+export { Component, Element, Use, render };

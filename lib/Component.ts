@@ -1,10 +1,11 @@
-import connect from './core/connect';
-import create from './core/create';
-import diff from './core/diff';
-import render from './core/render';
-import tag from './core/tag';
+import { connect } from './core/connect';
+import { create } from './core/create';
+import { depend } from './core/depend';
+import { diff } from './core/diff';
+import { render } from './core/render';
+import { tag } from './core/tag';
 
-import Element from './interfaces/Element';
+import { Element } from './interfaces/Element';
 
 const HTMLElementProxy = new Proxy(HTMLElement, {
 
@@ -21,7 +22,7 @@ const HTMLElementProxy = new Proxy(HTMLElement, {
 
 const cache = Symbol('cache');
 
-export default class Component extends HTMLElementProxy {
+export class Component extends HTMLElementProxy {
 
     private [ cache ]: Element[];
 
@@ -33,7 +34,7 @@ export default class Component extends HTMLElementProxy {
     public oncomponentupdate: (event: Event) => void;
     
     private connectedCallback(): void {
-        this.dispatchEvent(new CustomEvent('componentconnect'));
+        this.dispatchEvent(new Event('componentconnect'));
 
         window.requestAnimationFrame(() => {
             this.renderedCallback();
@@ -43,18 +44,19 @@ export default class Component extends HTMLElementProxy {
             }
 
             window.requestAnimationFrame(() => {
-                this.dispatchEvent(new CustomEvent('componentready'));
+                this.dispatchEvent(new Event('componentready'));
             });
         });
     }
 
     private disconnectedCallback(): void {
-        this.dispatchEvent(new CustomEvent('componentdisconnect'));
+        this.dispatchEvent(new Event('componentdisconnect'));
     }
 
     private renderedCallback(): void {
-        const style = render(HTMLStyleElement, { textContent: this.theme() });
-        const tree = this.render().concat(style);
+        const dependencies = depend(this.constructor as new() => Component);
+        const style = render(HTMLStyleElement, { textContent: this.theme(...dependencies) });
+        const tree = this.render(...dependencies).concat(style);
 
         if (!this[ cache ]) {
             this[ cache ] = tree;
@@ -72,30 +74,30 @@ export default class Component extends HTMLElementProxy {
             connect(element, this.shadowRoot);
         }
 
-        this.dispatchEvent(new CustomEvent('componentrender'));
+        this.dispatchEvent(new Event('componentrender'));
     }
 
-    protected handleComponentConnect(event: CustomEvent): void {
+    protected handleComponentConnect(event: Event): void {
         event; // override
     }
 
-    protected handleComponentCreate(event: CustomEvent): void {
+    protected handleComponentCreate(event: Event): void {
         event; // override
     }
 
-    protected handleComponentDisconnect(event: CustomEvent): void {
+    protected handleComponentDisconnect(event: Event): void {
         event; // override
     }
 
-    protected handleComponentReady(event: CustomEvent): void {
+    protected handleComponentReady(event: Event): void {
         event; // override
     }
 
-    protected handleComponentRender(event: CustomEvent): void {
+    protected handleComponentRender(event: Event): void {
         event; // override
     }
 
-    protected handleComponentUpdate(event: CustomEvent): void {
+    protected handleComponentUpdate(event: Event): void {
         event; // override
     }
 
@@ -104,21 +106,21 @@ export default class Component extends HTMLElementProxy {
 
         this.attachShadow({ mode: 'open' });
 
-        this.addEventListener('componentconnect', (event: CustomEvent) => this.handleComponentConnect(event));
-        this.addEventListener('componentcreate', (event: CustomEvent) => this.handleComponentCreate(event));
-        this.addEventListener('componentdisconnect', (event: CustomEvent) => this.handleComponentDisconnect(event));
-        this.addEventListener('componentready', (event: CustomEvent) => this.handleComponentReady(event));
-        this.addEventListener('componentrender', (event: CustomEvent) => this.handleComponentRender(event));
-        this.addEventListener('componentupdate', (event: CustomEvent) => this.handleComponentUpdate(event));
+        this.addEventListener('componentconnect', (event: Event) => this.handleComponentConnect(event));
+        this.addEventListener('componentcreate', (event: Event) => this.handleComponentCreate(event));
+        this.addEventListener('componentdisconnect', (event: Event) => this.handleComponentDisconnect(event));
+        this.addEventListener('componentready', (event: Event) => this.handleComponentReady(event));
+        this.addEventListener('componentrender', (event: Event) => this.handleComponentRender(event));
+        this.addEventListener('componentupdate', (event: Event) => this.handleComponentUpdate(event));
 
-        this.dispatchEvent(new CustomEvent('componentcreate'));
+        this.dispatchEvent(new Event('componentcreate'));
     }
 
-    public render(): Element[] {
+    public render<Dependencies extends unknown[]>(...dependencies: Dependencies): Element[] {
         return [];
     }
 
-    public theme(): string {
+    public theme<Dependencies extends unknown[]>(...dependencies: Dependencies): string {
         return '';
     }
 
@@ -138,7 +140,7 @@ export default class Component extends HTMLElementProxy {
             }
         }
 
-        this.dispatchEvent(new CustomEvent('componentupdate'));
+        this.dispatchEvent(new Event('componentupdate'));
 
         window.requestAnimationFrame(() => {
             this.renderedCallback();

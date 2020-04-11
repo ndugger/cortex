@@ -1,4 +1,4 @@
-export default function tag(component: any): string {
+export function tag(component: any): string {
 
     if ('tag' in component) {
         return component.tag;

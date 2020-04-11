@@ -8,12 +8,11 @@ Lightweight Web Component Framework
 
 > the thin outer layer of the cerebrum (the cerebral cortex ), composed of folded gray matter and playing an important role in consciousness.
 
-Just as your cerebral cortex is a thin layer, cortex (library) is a thin layer on top of "native" web components. It helps orchestrate state management, diffing, and lifecycle triggers, like rendering and updating.
+Cortex (library) is a thin layer on top of "native" web components. It helps orchestrate diffing, and lifecycle triggers like rendering, and updating.
 
-The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very small.
+The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like plain CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very tiny.
 
 ### Example
-For more in-depth examples, check out the [examples folder](./examples).
 ```typescript
 import * as Cortex from 'cortex'
 
@@ -23,7 +22,7 @@ class Example extends Cortex.Component {
         alert('button was clicked!')
     }
 
-    public render(): Cortex.Node[] {
+    public render(): Cortex.Element[] {
         return [
             <HTMLButtonElement onclick={ e => this.handleClick(e) }>
                 <HTMLSlotElement/>
@@ -66,7 +65,7 @@ export default class Example extends Cortex.Component {
 There are two public methods that you can/should override: `render` & `theme`. The `render` method returns an array of `Cortex.Node`s (which is a virtual representation of that component's tree). The `theme` method returns a string containing the CSS for that component.
 
 ```typescript
-public render(): Cortex.Node[] {
+public render(): Cortex.Element[] {
     return []
 }
 
@@ -78,7 +77,7 @@ public theme(): string {
 Cortex also supports JSX, so within the render method, you can markup your components very similarly to React.
 
 ```typescript
-public render(): Cortex.Node[] {
+public render(): Cortex.Element[] {
     return [
         <HTMLButtonElement/>
     ]
@@ -96,7 +95,7 @@ This means that `<HTMLButtonElement/>` becomes `<button class='HTMLButtonElement
 This also contributes to styling your components, because you can now target your elements via their actual class name.
 
 ```typescript
-public theme(): Cortex.Node[] {
+public theme(): Cortex.Element[] {
     return `
         .${ HTMLButtonElement.name } {
 
@@ -151,58 +150,36 @@ protected handleComponentUpdate(event: CustomEvent): void
 ```
 Dispatched every time the component's state changes.
 
-### State Management (OUTDATED)
-
-**TODO: Rewrite this section to reflect code changes**
-
-Cortex ships with some basic state management built in. You can either have separate stores that components may subscribe to, or you may define an interface for a component's instance's state, and connect it anytime during that component's lifecycle.
+### State Management
+State management is missing from Cortex, as that level of control is up to you. As it stands, you may update fields on a component and initiate a manual update with the `update()` method.
 
 ```typescript
-import * as Cortex from 'cortex'
+class Root extends Cortex.Component {
 
-interface State {
-    foo: string
-}
+    public foo: boolean;
 
-const state = new Cortex.Store<State>({
-    foo: 'bar'
-})
-
-@Cortex.subscribe(state)
-export default class Example extends Cortex.Component {
-
-}
-```
-
-```typescript
-interface ExampleState {
-    foo: string
-}
-
-export default class Example extends Cortex.Component<ExampleState> {
-
-    private state = new Cortex.Store<ExampleState>({
-        foo: 'bar'
-    })
-
-    protected handleComponentConnect(): void {
-        this.state.connect(this)
+    protected handleComponentReady(): void {
+        this.update({ foo: true })
     }
 }
 ```
 
-The `Store` is actually just a Proxy. Treat it exactly how you would treat the
-type of the data it contains: `array`, `object`, etc.
+### Render Injection
+Cortex components may require dependencies at render-time. This is what we refer to as "render injection", but it's pretty much just dependency injection on a method, also known as method injection.
 
 ```typescript
-private handleFoo(event: CustomEvent): void {
-    this.state.foo = 'baz'
-}
+Cortex.Use.assign(MyObject, new MyObject())
+```
 
-public render(): Cortex.Node[] {
-    return [
-        <HTMLSpanElement textContent={ this.state.foo }/>
-    ]
+```typescript
+@Cortex.Use(MyObject)
+class Root extends Cortex.Component {
+
+    public render(my: MyObject): Cortex.Element[] {
+        return [
+            <HTMLInputElement type={ my.type }/>
+        ]
+    }
 }
 ```
 

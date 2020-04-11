@@ -1,4 +1,4 @@
-import Element from '../interfaces/Element';
+import { Element } from '../interfaces/Element';
 
 const HTML_CLASS_NAME_LOOKUP = {
     [ HTMLAnchorElement.name ]: 'a',
@@ -11,13 +11,19 @@ const HTML_CLASS_NAME_LOOKUP = {
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-export default function create<Constructor extends HTMLElement | SVGElement>(element: Element<Constructor>): Constructor {
+export function create<Constructor extends HTMLElement | SVGElement>(element: Element<Constructor>): Constructor {
 
+    /**
+     * Invalid element.
+     */
     if (!element.constructor) {
-        return null;
+        return undefined;
     }
 
-    if ((element.constructor as unknown === HTMLElement || element.constructor as unknown === SVGElement) && !('tag' in element.properties)) {
+    /**
+     * If incoming element's class is base HTML or SVG element, read tag from properties.
+     */
+    if ((element.constructor === HTMLElement || element.constructor === SVGElement) && !('tag' in element.properties)) {
         throw new Error(`Unable to create generic ${ element.constructor.name }: missing 'tag' from properties`);
     }
 

@@ -1,6 +1,6 @@
-import Element from '../interfaces/Element';
+import { Element } from '../interfaces/Element';
 
-export default function diff(existing: Element[], incoming: Element[]): Element[] {
+export function diff(existing: Element[], incoming: Element[]): Element[] {
 
     if (existing.length >= incoming.length) {
         return existing.map((element, index) => {
