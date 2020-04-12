@@ -2,7 +2,7 @@
     "name": "cortex",
     "version": "1.0.0",
     "description": "Lightweight Web Component Framework",
-    "main": "index.js",
+    "main": "pkg/index.js",
     "scripts": {
         "build": "webpack",
         "test": "jest"
