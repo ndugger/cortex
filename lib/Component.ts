@@ -106,6 +106,8 @@ export class Component extends HTMLElementProxy {
     public constructor() {
         super();
 
+        this[ context ] = new Map();
+
         this.attachShadow({ mode: 'open' });
 
         this.addEventListener('componentconnect', (event: Event) => this.handleComponentConnect(event));
