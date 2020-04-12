@@ -7,6 +7,8 @@ import { Component, context } from '../Component';
  */
 export function depend(root: Node, key: unknown): unknown {
 
+    console.log(root);
+
     /**
      * If we reach the top, return undefined.
      */
