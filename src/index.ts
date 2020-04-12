@@ -1,15 +1,15 @@
-import { render } from './lib/core/render';
+import { render } from './core/render';
 
-import { Component } from './lib/Component';
+import { Component } from './Component';
 
-import { Element } from './lib/interfaces/Element';
-import { Properties } from './lib/interfaces/Properties';
+import { Element } from './interfaces/Element';
+import { Properties } from './interfaces/Properties';
 
 declare global {
 
     interface Element {
         JSX_PROPERTY_TYPES_DO_NOT_USE: Properties & {
-            [ Key in keyof this ]?: Partial<this[ Key ]>;
+            [ Key in keyof this ]?: this[ Key ] extends object ? Partial<this[ Key ]> : this[ Key ];
         };
     }
 

@@ -1,24 +1,12 @@
 const path = require('path');
-const env = process.env;
-
-const input = 'tests/sandbox.spec.tsx';
-const output = 'dist/';
-
-const examples = [
-    'presentation',
-    'todo',
-    'video_player'
-];
 
 module.exports = {
-    mode: 'development',
-    entry: examples.reduce((entry, example) => Object.assign(entry, {
-        [ example ]: path.resolve(__dirname, `examples/${ example }/index.tsx`)
-    }), { }),
-    devtool: 'cheap-module-eval-source-map',
+    mode: 'production',
+    entry: path.resolve(__dirname, 'src', 'index.ts'),
+    // devtool: 'cheap-module-eval-source-map',
     output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, output)
+        filename: 'index.js',
+        path: path.resolve(__dirname, 'pkg')
     },
     module: {
         rules: [

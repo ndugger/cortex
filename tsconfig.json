@@ -1,18 +1,18 @@
 {
     "compilerOptions": {
         "baseUrl": ".",
+        "declaration": true,
         "experimentalDecorators": true,
-        "jsx": "react",
-        "jsxFactory": "Cortex.render",
         "lib": [
             "dom",
             "esnext"
         ],
         "module": "es6",
         "moduleResolution": "node",
+        "outDir": "pkg",
         "paths": {
             "*": [ "*" ],
-            "cortex": [ "." ]
+            "cortex": [ "./src/" ]
         },
         "removeComments": true,
         "sourceMap": true,
