@@ -167,10 +167,12 @@ class Root extends Cortex.Component {
 ### Context
 Cortex components may hook into localized data in the form of context. This context is local to the DOM tree in which it lives. You may set a context in any component at any level, but it will only be available to child components of that parent.
 
+*This API is subject to change in order to make it more type safe.*
+
 ```typescript
 class Root extends Cortex.Component {
 
-    public render(my: MyObject): Cortex.Element[] {
+    public render(): Cortex.Element[] {
         const name = this.getContext('hello')
         const date = this.getContext(Date)
 
