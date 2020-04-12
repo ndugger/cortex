@@ -1,6 +1,6 @@
 import { Component, context } from '../Component';
 export function depend(root, key) {
-    if (!root || !root.parentNode) {
+    if (!root) {
         return;
     }
     if (root instanceof ShadowRoot) {

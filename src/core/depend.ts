@@ -10,7 +10,7 @@ export function depend(root: Node, key: unknown): unknown {
     /**
      * If we reach the top, return undefined.
      */
-    if (!root || !root.parentNode) {
+    if (!root) {
         return;
     }
 
