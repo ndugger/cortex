@@ -80,13 +80,7 @@ export class Component extends HTMLElementProxy {
         event;
     }
     getContext(key) {
-        if (!this[context].has(key)) {
-            const found = depend(this, key);
-            if (found) {
-                return found;
-            }
-        }
-        return this[context].get(key);
+        return depend(this, key);
     }
     setContext(key, value) {
         this[context].set(key, value);
