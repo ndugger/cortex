@@ -1,7 +1,7 @@
 import { Component } from '../Component';
 import { Element } from '../interfaces/Element';
 
-import create from './create';
+import { create } from './create';
 
 export function connect<Constructor extends HTMLElement | SVGElement>(element: Element<Constructor>, host: HTMLElement | SVGElement | ShadowRoot): void {
 
