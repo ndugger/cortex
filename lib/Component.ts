@@ -20,11 +20,14 @@ const HTMLElementProxy = new Proxy(HTMLElement, {
     }
 });
 
-const cache = Symbol('cache');
+export const cache = Symbol('cache');
+
+export const context = Symbol('context');
 
 export class Component extends HTMLElementProxy {
 
-    private [ cache ]: Element[];
+    public [ cache ]: Element[];
+    public [ context ]: Map<unknown, unknown>;
 
     public oncomponentconnect: (event: Event) => void;
     public oncomponentcreate: (event: Event) => void;
@@ -54,9 +57,8 @@ export class Component extends HTMLElementProxy {
     }
 
     private renderedCallback(): void {
-        const dependencies = depend(this.constructor as new() => Component);
-        const style = render(HTMLStyleElement, { textContent: this.theme(...dependencies) });
-        const tree = this.render(...dependencies).concat(style);
+        const style = render(HTMLStyleElement, { textContent: this.theme() });
+        const tree = this.render().concat(style);
 
         if (!this[ cache ]) {
             this[ cache ] = tree;
@@ -116,11 +118,35 @@ export class Component extends HTMLElementProxy {
         this.dispatchEvent(new Event('componentcreate'));
     }
 
-    public render<Dependencies extends [...any[]]>(...dependencies: Dependencies): Element[] {
+    /**
+     * Retrieves an object from context.
+     * @param key Object which acts as the key of the stored value.
+     */
+    public getContext<Context = unknown>(key: any): Context {
+
+        /**
+         * If context not directly available on current component, climb up the tree until it is found or returns undefined.
+         */
+        if (!this[ context ].has(key)) {
+            const found = depend(this, key);
+
+            if (found) {
+                return found as Context;
+            }
+        }
+
+        return this[ context ].get(key) as Context;
+    }
+
+    public setContext(key: any, value: any): void {
+        this[ context ].set(key, value);
+    }
+
+    public render(): Element[] {
         return [];
     }
 
-    public theme<Dependencies extends [...any[]]>(...dependencies: Dependencies): string {
+    public theme(): string {
         return '';
     }
 

@@ -1,7 +1,6 @@
 import { render } from './lib/core/render';
 
 import { Component } from './lib/Component';
-import { Inject } from './lib/Inject';
 
 import { Element } from './lib/interfaces/Element';
 import { Properties } from './lib/interfaces/Properties';
@@ -24,4 +23,4 @@ declare global {
     }
 }
 
-export { Component, Element, Inject, render };
+export { Component, Element, render };

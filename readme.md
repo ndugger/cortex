@@ -164,23 +164,33 @@ class Root extends Cortex.Component {
 }
 ```
 
-### Render Injection
-Cortex components may require dependencies at render-time. This is what we refer to as "render injection", but it's pretty much just dependency injection on a method, also known as method injection.
+### Context
+Cortex components may hook into localized data in the form of context. This context is local to the DOM tree in which it lives. You may set a context in any component at any level, but it will only be available to child components of that parent.
 
 ```typescript
-Cortex.Use.assign(MyObject, new MyObject())
-```
-
-```typescript
-@Cortex.Use(MyObject)
 class Root extends Cortex.Component {
 
     public render(my: MyObject): Cortex.Element[] {
+        const name = this.getContext('hello')
+        const date = this.getContext(Date)
+
         return [
-            <HTMLInputElement type={ my.type }/>
+            <HTMLElement tag='strong'>
+                hello { name }
+            </HTMLElement>,
+            <HTMLElement tag='em'>
+                { JSON.stringify(date) }
+            </HTMLElement>
         ]
     }
 }
+```
+
+```typescript
+const root = new Root()
+
+root.setContext('hello', 'world')
+root.setContext(Date, new Date())
 ```
 
 ### SVG Support
