@@ -121,23 +121,11 @@ export class Component extends HTMLElementProxy {
     }
 
     /**
-     * Retrieves an object from context.
+     * Retrieves a dependency from context.
      * @param key Object which acts as the key of the stored value.
      */
     public getContext<Context = unknown>(key: any): Context {
-
-        /**
-         * If context not directly available on current component, climb up the tree until it is found or returns undefined.
-         */
-        if (!this[ context ].has(key)) {
-            const found = depend(this, key);
-
-            if (found) {
-                return found as Context;
-            }
-        }
-
-        return this[ context ].get(key) as Context;
+        return depend(this, key) as Context;
     }
 
     public setContext(key: any, value: any): void {

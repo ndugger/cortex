@@ -7,8 +7,6 @@ import { Component, context } from '../Component';
  */
 export function depend(root: Node, key: unknown): unknown {
 
-    console.log(root);
-
     /**
      * If we reach the top, return undefined.
      */
@@ -17,18 +15,25 @@ export function depend(root: Node, key: unknown): unknown {
     }
 
     /**
+     * If we've reached the top of a shadow tree, try the host next.
+     */
+    if (root instanceof ShadowRoot) {
+        return depend(root.host, key);
+    }
+
+    /**
      * If parent is a component, check the context.
      */
-    if (root.parentNode instanceof Component) {
+    if (root instanceof Component) {
 
         /**
          * Go up a level if parent's context does not contain key.
          */
-        if (!root.parentNode[ context ].has(key)) {
+        if (!root[ context ].has(key)) {
             return depend(root.parentNode, key);
         }
 
-        return root.parentNode[ context ].get(key);
+        return root[ context ].get(key);
     }
 
     /**
