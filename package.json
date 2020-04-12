@@ -4,7 +4,7 @@
     "description": "Lightweight Web Component Framework",
     "main": "pkg/index.js",
     "scripts": {
-        "build": "webpack",
+        "build": "tsc",
         "test": "jest"
     },
     "repository": {
