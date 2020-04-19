@@ -8,9 +8,15 @@ const HTML_CLASS_NAME_LOOKUP = {
 };
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 export function create(element) {
+    /**
+     * Invalid element.
+     */
     if (!element.constructor) {
         return undefined;
     }
+    /**
+     * If incoming element's class is base HTML or SVG element, read tag from properties.
+     */
     if ((element.constructor === HTMLElement || element.constructor === SVGElement) && !('tag' in element.properties)) {
         throw new Error(`Unable to create generic ${element.constructor.name}: missing 'tag' from properties`);
     }

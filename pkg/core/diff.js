@@ -5,10 +5,11 @@ export function diff(existing, incoming) {
                 return incoming[index] || null;
             }
             if (!incoming[index]) {
-                element.node.parentNode.removeChild(element.node);
+                element.node.remove();
                 return null;
             }
             if (element.constructor !== incoming[index].constructor) {
+                element.node.remove();
                 return incoming[index] || null;
             }
             return Object.assign(element, {
@@ -22,10 +23,11 @@ export function diff(existing, incoming) {
             return element || null;
         }
         if (!element) {
-            existing[index].node.parentNode.removeChild(existing[index].node);
+            existing[index].node.remove();
             return null;
         }
         if (existing[index].constructor !== element.constructor) {
+            existing[index].node.remove();
             return element || null;
         }
         return Object.assign(existing[index], {

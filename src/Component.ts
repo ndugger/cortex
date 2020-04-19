@@ -21,13 +21,14 @@ const HTMLElementProxy = new Proxy(HTMLElement, {
 });
 
 export const cache = Symbol('cache');
-
 export const context = Symbol('context');
+export const dirty = Symbol('dirty');
 
 export class Component extends HTMLElementProxy {
 
     public [ cache ]: Element[];
     public [ context ]: Map<unknown, unknown>;
+    public [ dirty ]: boolean;
 
     public oncomponentconnect: (event: Event) => void;
     public oncomponentcreate: (event: Event) => void;
@@ -128,8 +129,22 @@ export class Component extends HTMLElementProxy {
         return depend(this, key) as Context;
     }
 
+    /**
+     * Removes a dependency from context.
+     * @param key Object which acts as the key of the stored value.
+     */
+    public removeContext(key: any): void {
+        this[ context ].delete(key);
+    }
+
+    /**
+     * Registers an object in context and updates component.
+     * @param key 
+     * @param value 
+     */
     public setContext(key: any, value: any): void {
         this[ context ].set(key, value);
+        this.update({ foo: 'bar' });
     }
 
     public render(): Element[] {
@@ -141,11 +156,12 @@ export class Component extends HTMLElementProxy {
     }
 
     public update(props: object = {}): void {
+        this[ dirty ] = true;
 
         for (const prop of Object.keys(props)) {
 
             if (this[ prop ] === props[ prop ]) {
-                break;
+                continue;
             }
 
             if (this[ prop ] && typeof this[ prop ] === 'object') {
@@ -155,10 +171,16 @@ export class Component extends HTMLElementProxy {
                 this[ prop ] = props[ prop ];
             }
         }
-
-        this.dispatchEvent(new Event('componentupdate'));
-
+        
         window.requestAnimationFrame(() => {
+
+            if (!this[ dirty ]) {
+                return;
+            }
+
+            this[ dirty ] = false;
+    
+            this.dispatchEvent(new Event('componentupdate'));
             this.renderedCallback();
         });
     }

@@ -15,6 +15,7 @@ const HTMLElementProxy = new Proxy(HTMLElement, {
 });
 export const cache = Symbol('cache');
 export const context = Symbol('context');
+export const dirty = Symbol('dirty');
 export class Component extends HTMLElementProxy {
     constructor() {
         super();
@@ -62,28 +63,45 @@ export class Component extends HTMLElementProxy {
         this.dispatchEvent(new Event('componentrender'));
     }
     handleComponentConnect(event) {
-        event;
+        event; // override
     }
     handleComponentCreate(event) {
-        event;
+        event; // override
     }
     handleComponentDisconnect(event) {
-        event;
+        event; // override
     }
     handleComponentReady(event) {
-        event;
+        event; // override
     }
     handleComponentRender(event) {
-        event;
+        event; // override
     }
     handleComponentUpdate(event) {
-        event;
+        event; // override
     }
+    /**
+     * Retrieves a dependency from context.
+     * @param key Object which acts as the key of the stored value.
+     */
     getContext(key) {
         return depend(this, key);
     }
+    /**
+     * Removes a dependency from context.
+     * @param key Object which acts as the key of the stored value.
+     */
+    removeContext(key) {
+        this[context].delete(key);
+    }
+    /**
+     * Registers an object in context and updates component.
+     * @param key
+     * @param value
+     */
     setContext(key, value) {
         this[context].set(key, value);
+        this.update({ foo: 'bar' });
     }
     render() {
         return [];
@@ -92,19 +110,24 @@ export class Component extends HTMLElementProxy {
         return '';
     }
     update(props = {}) {
-        for (const prop of Object.keys(props)) {
-            if (this[prop] === props[prop]) {
-                break;
-            }
-            if (this[prop] && typeof this[prop] === 'object') {
-                Object.assign(this[prop], props[prop]);
-            }
-            else {
-                this[prop] = props[prop];
-            }
-        }
-        this.dispatchEvent(new Event('componentupdate'));
+        this[dirty] = true;
         window.requestAnimationFrame(() => {
+            for (const prop of Object.keys(props)) {
+                if (this[prop] === props[prop]) {
+                    continue;
+                }
+                if (this[prop] && typeof this[prop] === 'object') {
+                    Object.assign(this[prop], props[prop]);
+                }
+                else {
+                    this[prop] = props[prop];
+                }
+            }
+            if (!this[dirty]) {
+                return;
+            }
+            this[dirty] = false;
+            this.dispatchEvent(new Event('componentupdate'));
             this.renderedCallback();
         });
     }

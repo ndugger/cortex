@@ -10,11 +10,12 @@ export function diff(existing: Element[], incoming: Element[]): Element[] {
             }
 
             if (!incoming[ index ]) {
-                element.node.parentNode.removeChild(element.node);
+                element.node.remove();
                 return null;
             }
 
             if (element.constructor !== incoming[ index ].constructor) {
+                element.node.remove();
                 return incoming[ index ] || null;
             }
 
@@ -32,11 +33,12 @@ export function diff(existing: Element[], incoming: Element[]): Element[] {
         }
 
         if (!element) {
-            existing[ index ].node.parentNode.removeChild(existing[ index ].node);
+            existing[ index ].node.remove(); 
             return null;
         }
 
         if (existing[ index ].constructor !== element.constructor) {
+            existing[ index ].node.remove(); 
             return element || null;
         }
 
