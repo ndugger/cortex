@@ -4,4 +4,4 @@ import { Context } from '../Context';
  * @param root Node from where to search
  * @param key Key used to retrieve object from context
  */
-export declare function depend<Dependency extends Context>(root: Node, key: new () => Dependency): Dependency | void;
+export declare function depend<Dependency extends Context>(root: Node, key: new () => Dependency): Dependency | undefined;

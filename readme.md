@@ -57,7 +57,7 @@ The `Component` class acts as proxy to the `HTMLElement` class that also automat
 ```typescript
 import * as Cortex from 'cortex'
 
-export default class Example extends Cortex.Component {
+export class Example extends Cortex.Component {
 
 }
 ```

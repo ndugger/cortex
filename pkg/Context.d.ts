@@ -5,3 +5,10 @@ export declare class Context<Data extends object = {}> extends Component {
     render(): Element[];
     theme(): string;
 }
+export declare namespace Context {
+    /**
+     * Error interface used for context runtime errors
+     */
+    class RuntimeError extends Error {
+    }
+}

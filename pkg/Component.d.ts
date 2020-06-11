@@ -46,12 +46,15 @@ export declare class Component extends CustomElement {
      * Retrieves a dependency from context.
      * @param key Object which acts as the key of the stored value.
      */
-    getContext<Key extends Context>(key: new () => Key): Key | void;
+    getContext<Key extends Context>(key: new () => Key): Key['value'];
     render(): Element[];
     theme(): string;
     update(props?: object, immediate?: boolean): Promise<void>;
 }
 export declare namespace Component {
+    /**
+     * Event interface used for component lifecycle triggers
+     */
     class LifecycleEvent extends Event {
     }
 }

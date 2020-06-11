@@ -12,4 +12,12 @@ export class Context extends Component {
         `;
     }
 }
+(function (Context) {
+    /**
+     * Error interface used for context runtime errors
+     */
+    class RuntimeError extends Error {
+    }
+    Context.RuntimeError = RuntimeError;
+})(Context || (Context = {}));
 //# sourceMappingURL=Context.js.map

@@ -18,3 +18,13 @@ export class Context<Data extends object = {}> extends Component {
         `;
     }
 }
+
+export namespace Context {
+
+    /**
+     * Error interface used for context runtime errors
+     */
+    export class RuntimeError extends Error {
+        
+    }
+}

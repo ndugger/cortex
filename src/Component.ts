@@ -133,7 +133,7 @@ export class Component extends CustomElement {
             window.customElements.define(componentTag, this.constructor as new() => Component);
         }
 
-        this.addEventListener('componentconnect', (event: Component.LifecycleEvent) => this.handleComponentConnect(event));
+        this.addEventListener('componentconnect', (event: Component.LifecycleEvent) => {this.handleComponentConnect(event)});
         this.addEventListener('componentcreate', (event: Component.LifecycleEvent) => this.handleComponentCreate(event));
         this.addEventListener('componentdisconnect', (event: Component.LifecycleEvent) => this.handleComponentDisconnect(event));
         this.addEventListener('componentready', (event: Component.LifecycleEvent) => this.handleComponentReady(event));
@@ -148,8 +148,14 @@ export class Component extends CustomElement {
      * Retrieves a dependency from context.
      * @param key Object which acts as the key of the stored value.
      */
-    public getContext<Key extends Context>(key: new() => Key): Key | void {
-        return depend(this, key);
+    public getContext<Key extends Context>(key: new() => Key): Key[ 'value' ] {
+        const dependency = depend(this, key);
+
+        if (!dependency) {
+            throw new Context.RuntimeError(`Missing context: ${ key.name }`);
+        }
+
+        return dependency.value
     }
 
     public render(): Element[] {
@@ -178,8 +184,17 @@ export class Component extends CustomElement {
         }
 
         if (immediate) {
+            this[ dirty ] = false;
+            
             this.dispatchEvent(new Component.LifecycleEvent('componentupdate'));
-            return Promise.resolve();
+            
+            try {
+                this.renderedCallback();
+                return Promise.resolve();
+            }
+            catch (error) {
+                return Promise.reject(error);
+            }
         }
         
         return new Promise((resolve, reject) => {
@@ -207,6 +222,9 @@ export class Component extends CustomElement {
 
 export namespace Component {
 
+    /**
+     * Event interface used for component lifecycle triggers
+     */
     export class LifecycleEvent extends Event {
         
     }

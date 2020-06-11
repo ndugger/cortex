@@ -4,6 +4,7 @@ import { depend } from './core/depend';
 import { diff } from './core/diff';
 import { render } from './core/render';
 import { tag } from './core/tag';
+import { Context } from './Context';
 export const cache = Symbol('cache');
 export const dirty = Symbol('dirty');
 /**
@@ -30,7 +31,7 @@ export class Component extends CustomElement {
         if (!window.customElements.get(componentTag)) {
             window.customElements.define(componentTag, this.constructor);
         }
-        this.addEventListener('componentconnect', (event) => this.handleComponentConnect(event));
+        this.addEventListener('componentconnect', (event) => { this.handleComponentConnect(event); });
         this.addEventListener('componentcreate', (event) => this.handleComponentCreate(event));
         this.addEventListener('componentdisconnect', (event) => this.handleComponentDisconnect(event));
         this.addEventListener('componentready', (event) => this.handleComponentReady(event));
@@ -108,7 +109,11 @@ export class Component extends CustomElement {
      * @param key Object which acts as the key of the stored value.
      */
     getContext(key) {
-        return depend(this, key);
+        const dependency = depend(this, key);
+        if (!dependency) {
+            throw new Context.RuntimeError(`Missing context: ${key.name}`);
+        }
+        return dependency.value;
     }
     render() {
         return []; // override
@@ -130,8 +135,15 @@ export class Component extends CustomElement {
             }
         }
         if (immediate) {
+            this[dirty] = false;
             this.dispatchEvent(new Component.LifecycleEvent('componentupdate'));
-            return Promise.resolve();
+            try {
+                this.renderedCallback();
+                return Promise.resolve();
+            }
+            catch (error) {
+                return Promise.reject(error);
+            }
         }
         return new Promise((resolve, reject) => {
             window.requestAnimationFrame(() => {
@@ -152,6 +164,9 @@ export class Component extends CustomElement {
     }
 }
 (function (Component) {
+    /**
+     * Event interface used for component lifecycle triggers
+     */
     class LifecycleEvent extends Event {
     }
     Component.LifecycleEvent = LifecycleEvent;
