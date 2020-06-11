@@ -1,43 +1,35 @@
-import { Component, context } from '../Component';
+import { Context } from '../Context';
 
 /**
- * Traverses up the DOM tree to find context which a component may depend on.
- * @param root Node from where to search.
- * @param key Key used to retrieve object from context.
+ * Traverses up the DOM tree to find context which a component may depend on
+ * @param root Node from where to search
+ * @param key Key used to retrieve object from context
  */
-export function depend(root: Node, key: unknown): unknown {
+export function depend<Dependency extends Context>(root: Node, key: new() => Dependency): Dependency | void {
 
     /**
-     * If we reach the top, return undefined.
+     * If we reach the top, return undefined
      */
     if (!root) {
         return;
     }
 
     /**
-     * If we've reached the top of a shadow tree, try the host next.
+     * If context found, return
+     */
+    if (root instanceof Context && root.constructor === key) {
+        return root as Dependency;
+    }
+
+    /**
+     * If we've reached the top of a shadow's tree, try the host next
      */
     if (root instanceof ShadowRoot) {
         return depend(root.host, key);
     }
 
     /**
-     * If parent is a component, check the context.
-     */
-    if (root instanceof Component) {
-
-        /**
-         * Go up a level if parent's context does not contain key.
-         */
-        if (!root[ context ].has(key)) {
-            return depend(root.parentNode, key);
-        }
-
-        return root[ context ].get(key);
-    }
-
-    /**
-     * Go up a level.
+     * Go up a level
      */
     return depend(root.parentNode, key);
 }

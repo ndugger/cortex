@@ -5,8 +5,6 @@ type ElementMinusAttributes = Partial<Pick<Element, Exclude<keyof Element, 'attr
 type TypedProperties<Constructor extends Node> =
     Constructor extends Component ?
         ElementMinusAttributes & { [ Key in keyof Constructor ]: Constructor[ Key ] } :
-    // Constructor extends Fragment ?
-    //     { [ Key in keyof Constructor ]: Constructor[ Key ] } :
     Constructor extends HTMLElement ?
         Partial<Constructor> :
     Constructor extends SVGElement ?

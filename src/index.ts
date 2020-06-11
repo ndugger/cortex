@@ -1,6 +1,7 @@
 import { render } from './core/render';
 
 import { Component } from './Component';
+import { Context } from './Context';
 
 import { Element } from './interfaces/Element';
 import { Properties } from './interfaces/Properties';
@@ -23,4 +24,4 @@ declare global {
     }
 }
 
-export { Component, Element, render };
+export { Component, Context, Element, render };

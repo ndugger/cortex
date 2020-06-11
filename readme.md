@@ -62,7 +62,7 @@ export default class Example extends Cortex.Component {
 }
 ```
 
-There are two public methods that you can/should override: `render` & `theme`. The `render` method returns an array of `Cortex.Node`s (which is a virtual representation of that component's tree). The `theme` method returns a string containing the CSS for that component.
+There are two public methods that you can/should override: `render` & `theme`. The `render` method returns an array of `Cortex.Element`s (which is a virtual representation of that component's tree). The `theme` method returns a string containing the CSS for that component.
 
 ```typescript
 public render(): Cortex.Element[] {
@@ -165,23 +165,32 @@ class Root extends Cortex.Component {
 ```
 
 ### Context
-Cortex components may hook into localized data in the form of context. This context is local to the DOM tree in which it lives. You may set a context in any component at any level, but it will only be available to child components of that parent.
-
-*This API is subject to change in order to make it more type safe.*
+Cortex components may hook into data stores in the form of context. This context is local to the DOM tree in which it resides.
 
 ```typescript
-class Root extends Cortex.Component {
+interface App {
+    name: string
+}
+
+class AppContext extends Cortex.Context<App> {
+    value = {
+        name: 'default_value'
+    }
+}
+```
+
+```typescript
+class Page extends Cortex.Component {
 
     public render(): Cortex.Element[] {
-        const name = this.getContext('hello')
-        const date = this.getContext(Date)
+        const app = this.getContext(AppContext)
 
         return [
             <HTMLElement tag='strong'>
                 hello { name }
             </HTMLElement>,
             <HTMLElement tag='em'>
-                { JSON.stringify(date) }
+                welcome to { app?.value?.name }
             </HTMLElement>
         ]
     }
@@ -189,11 +198,21 @@ class Root extends Cortex.Component {
 ```
 
 ```typescript
-const root = new Root()
+class Root extends Cortex.Component {
 
-root.setContext('hello', 'world')
-root.setContext(Date, new Date())
+    public render(): Cortex.Element[] {
+        const app = { 
+            name: 'demo' 
+        }
+
+        return [
+            <AppContext value={ app }>
+                <Page/>
+            </AppContext>
+        ]
+    }
+}
 ```
 
 ### SVG Support
-WIP
+WIP... had this working at one point, will revist in near future

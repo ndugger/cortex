@@ -1,49 +1,58 @@
 import { Element } from './interfaces/Element';
-declare const HTMLElementProxy: {
+import { Context } from './Context';
+export declare const cache: unique symbol;
+export declare const dirty: unique symbol;
+/**
+ * Proxy used to capture custom element lifecycle before any consturctors are called
+ * in order to enable automatic registration upon initialization
+ * Trust me, it makes sense
+ */
+declare const CustomElement: {
     new (): HTMLElement;
     prototype: HTMLElement;
 };
-export declare const cache: unique symbol;
-export declare const context: unique symbol;
-export declare const dirty: unique symbol;
-export declare class Component extends HTMLElementProxy {
-    [cache]: Element[];
-    [context]: Map<unknown, unknown>;
-    [dirty]: boolean;
-    oncomponentconnect: (event: Event) => void;
-    oncomponentcreate: (event: Event) => void;
-    oncomponentdisconnect: (event: Event) => void;
-    oncomponentready: (event: Event) => void;
-    oncomponentrender: (event: Event) => void;
-    oncomponentupdate: (event: Event) => void;
+/**
+ * Base component class from which all custom components must extend
+ */
+export declare class Component extends CustomElement {
+    protected [cache]: Element[];
+    protected [dirty]: boolean;
+    oncomponentconnect: (event: Component.LifecycleEvent) => void;
+    oncomponentcreate: (event: Component.LifecycleEvent) => void;
+    oncomponentdisconnect: (event: Component.LifecycleEvent) => void;
+    oncomponentready: (event: Component.LifecycleEvent) => void;
+    oncomponentrender: (event: Component.LifecycleEvent) => void;
+    oncomponentupdate: (event: Component.LifecycleEvent) => void;
+    /**
+     * Part of custom elements API: called when element mounts to a DOM
+     */
     private connectedCallback;
+    /**
+     * Part of custom elements API: called when element is removed from its DOM
+     */
     private disconnectedCallback;
+    /**
+     * Custom lifecycle hook: called when element is ready or updated
+     */
     private renderedCallback;
-    protected handleComponentConnect(event: Event): void;
-    protected handleComponentCreate(event: Event): void;
-    protected handleComponentDisconnect(event: Event): void;
-    protected handleComponentReady(event: Event): void;
-    protected handleComponentRender(event: Event): void;
-    protected handleComponentUpdate(event: Event): void;
+    protected handleComponentConnect(event: Component.LifecycleEvent): void;
+    protected handleComponentCreate(event: Component.LifecycleEvent): void;
+    protected handleComponentDisconnect(event: Component.LifecycleEvent): void;
+    protected handleComponentReady(event: Component.LifecycleEvent): void;
+    protected handleComponentRender(event: Component.LifecycleEvent): void;
+    protected handleComponentUpdate(event: Component.LifecycleEvent): void;
     constructor();
     /**
      * Retrieves a dependency from context.
      * @param key Object which acts as the key of the stored value.
      */
-    getContext<Context = unknown>(key: any): Context;
-    /**
-     * Removes a dependency from context.
-     * @param key Object which acts as the key of the stored value.
-     */
-    removeContext(key: any): void;
-    /**
-     * Registers an object in context and updates component.
-     * @param key
-     * @param value
-     */
-    setContext(key: any, value: any): void;
+    getContext<Key extends Context>(key: new () => Key): Key | void;
     render(): Element[];
     theme(): string;
-    update(props?: object): void;
+    update(props?: object, immediate?: boolean): Promise<void>;
+}
+export declare namespace Component {
+    class LifecycleEvent extends Event {
+    }
 }
 export {};

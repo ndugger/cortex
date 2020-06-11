@@ -4,7 +4,14 @@ import { depend } from './core/depend';
 import { diff } from './core/diff';
 import { render } from './core/render';
 import { tag } from './core/tag';
-const HTMLElementProxy = new Proxy(HTMLElement, {
+export const cache = Symbol('cache');
+export const dirty = Symbol('dirty');
+/**
+ * Proxy used to capture custom element lifecycle before any consturctors are called
+ * in order to enable automatic registration upon initialization
+ * Trust me, it makes sense
+ */
+const CustomElement = new Proxy(HTMLElement, {
     construct: (element, args, component) => {
         const componentTag = tag(component);
         if (!window.customElements.get(componentTag)) {
@@ -13,37 +20,51 @@ const HTMLElementProxy = new Proxy(HTMLElement, {
         return Reflect.construct(element, args, component);
     }
 });
-export const cache = Symbol('cache');
-export const context = Symbol('context');
-export const dirty = Symbol('dirty');
-export class Component extends HTMLElementProxy {
+/**
+ * Base component class from which all custom components must extend
+ */
+export class Component extends CustomElement {
     constructor() {
         super();
-        this[context] = new Map();
-        this.attachShadow({ mode: 'open' });
+        const componentTag = tag(this.constructor);
+        if (!window.customElements.get(componentTag)) {
+            window.customElements.define(componentTag, this.constructor);
+        }
         this.addEventListener('componentconnect', (event) => this.handleComponentConnect(event));
         this.addEventListener('componentcreate', (event) => this.handleComponentCreate(event));
         this.addEventListener('componentdisconnect', (event) => this.handleComponentDisconnect(event));
         this.addEventListener('componentready', (event) => this.handleComponentReady(event));
         this.addEventListener('componentrender', (event) => this.handleComponentRender(event));
         this.addEventListener('componentupdate', (event) => this.handleComponentUpdate(event));
-        this.dispatchEvent(new Event('componentcreate'));
+        this.attachShadow({ mode: 'open' });
+        this.dispatchEvent(new Component.LifecycleEvent('componentcreate'));
     }
+    /**
+     * Part of custom elements API: called when element mounts to a DOM
+     */
     connectedCallback() {
-        this.dispatchEvent(new Event('componentconnect'));
         window.requestAnimationFrame(() => {
+            this.dispatchEvent(new Component.LifecycleEvent('componentconnect'));
             this.renderedCallback();
             if (!this.classList.contains(this.constructor.name)) {
                 this.classList.add(this.constructor.name);
             }
             window.requestAnimationFrame(() => {
-                this.dispatchEvent(new Event('componentready'));
+                this.dispatchEvent(new Component.LifecycleEvent('componentready'));
             });
         });
     }
+    /**
+     * Part of custom elements API: called when element is removed from its DOM
+     */
     disconnectedCallback() {
-        this.dispatchEvent(new Event('componentdisconnect'));
+        window.requestAnimationFrame(() => {
+            this.dispatchEvent(new Component.LifecycleEvent('componentdisconnect'));
+        });
     }
+    /**
+     * Custom lifecycle hook: called when element is ready or updated
+     */
     renderedCallback() {
         const style = render(HTMLStyleElement, { textContent: this.theme() });
         const tree = this.render().concat(style);
@@ -60,7 +81,9 @@ export class Component extends HTMLElementProxy {
                 }
                 connect(element, this.shadowRoot);
             }
-        this.dispatchEvent(new Event('componentrender'));
+        window.requestAnimationFrame(() => {
+            this.dispatchEvent(new Component.LifecycleEvent('componentrender'));
+        });
     }
     handleComponentConnect(event) {
         event; // override
@@ -87,49 +110,50 @@ export class Component extends HTMLElementProxy {
     getContext(key) {
         return depend(this, key);
     }
-    /**
-     * Removes a dependency from context.
-     * @param key Object which acts as the key of the stored value.
-     */
-    removeContext(key) {
-        this[context].delete(key);
-    }
-    /**
-     * Registers an object in context and updates component.
-     * @param key
-     * @param value
-     */
-    setContext(key, value) {
-        this[context].set(key, value);
-        this.update({ foo: 'bar' });
-    }
     render() {
-        return [];
+        return []; // override
     }
     theme() {
-        return '';
+        return ''; // override
     }
-    update(props = {}) {
+    update(props = {}, immediate = false) {
         this[dirty] = true;
-        window.requestAnimationFrame(() => {
-            for (const prop of Object.keys(props)) {
-                if (this[prop] === props[prop]) {
-                    continue;
-                }
-                if (this[prop] && typeof this[prop] === 'object') {
-                    Object.assign(this[prop], props[prop]);
-                }
-                else {
-                    this[prop] = props[prop];
-                }
+        for (const prop of Object.keys(props)) {
+            if (this[prop] === props[prop]) {
+                continue;
             }
-            if (!this[dirty]) {
-                return;
+            if (this[prop] && typeof this[prop] === 'object') {
+                Object.assign(this[prop], props[prop]);
             }
-            this[dirty] = false;
-            this.dispatchEvent(new Event('componentupdate'));
-            this.renderedCallback();
+            else {
+                this[prop] = props[prop];
+            }
+        }
+        if (immediate) {
+            this.dispatchEvent(new Component.LifecycleEvent('componentupdate'));
+            return Promise.resolve();
+        }
+        return new Promise((resolve, reject) => {
+            window.requestAnimationFrame(() => {
+                if (!this[dirty]) {
+                    return;
+                }
+                this[dirty] = false;
+                this.dispatchEvent(new Component.LifecycleEvent('componentupdate'));
+                try {
+                    this.renderedCallback();
+                    resolve();
+                }
+                catch (error) {
+                    reject(error);
+                }
+            });
         });
     }
 }
+(function (Component) {
+    class LifecycleEvent extends Event {
+    }
+    Component.LifecycleEvent = LifecycleEvent;
+})(Component || (Component = {}));
 //# sourceMappingURL=Component.js.map
