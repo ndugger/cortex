@@ -182,15 +182,17 @@ class AppContext extends Cortex.Context<App> {
 ```typescript
 class Page extends Cortex.Component {
 
+    public name?: string;
+
     public render(): Cortex.Element[] {
         const app = this.getContext(AppContext)
 
         return [
             <HTMLElement tag='strong'>
-                hello { name }
+                hello { this?.name }
             </HTMLElement>,
             <HTMLElement tag='em'>
-                welcome to { app?.value?.name }
+                welcome to { app?.name }
             </HTMLElement>
         ]
     }
