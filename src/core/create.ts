@@ -1,4 +1,4 @@
-import { Element } from '../interfaces/Element';
+import { Element } from '../Element';
 
 const HTML_CLASS_NAME_LOOKUP = {
     [ HTMLAnchorElement.name ]: 'a',
@@ -11,13 +11,17 @@ const HTML_CLASS_NAME_LOOKUP = {
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-export function create<Constructor extends HTMLElement | SVGElement>(element: Element<Constructor>): Constructor {
+export function create<Constructor extends globalThis.Element>(element: Element<Constructor>): Constructor {
 
     /**
      * Invalid element.
      */
     if (!element.constructor) {
         return undefined;
+    }
+
+    if (element.constructor === HTMLElement) {
+        element
     }
 
     /**
@@ -32,7 +36,7 @@ export function create<Constructor extends HTMLElement | SVGElement>(element: El
     if (element.constructor.name.endsWith('Element') && element.constructor.name in window) {
 
         if (element.constructor.name in HTML_CLASS_NAME_LOOKUP) {
-            node = window.document.createElement(element.properties.tag) as Constructor;
+            node = window.document.createElement(HTML_CLASS_NAME_LOOKUP[ element.constructor.name ]) as Constructor;
         }
         else if (element.constructor as unknown === HTMLElement) {
             node = window.document.createElement(element.properties.tag) as Constructor;

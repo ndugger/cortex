@@ -1,5 +1,5 @@
 import { Component } from '../Component';
-import { Element } from '../interfaces/Element';
+import { Element } from '../Element';
 
 import { create } from './create';
 

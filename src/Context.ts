@@ -1,5 +1,5 @@
 import { Component } from './Component';
-import { Element } from './interfaces/Element'
+import { Element } from './Element'
 import { render } from './core/render';
 
 export class Context<Data extends object = {}> extends Component {
