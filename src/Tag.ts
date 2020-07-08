@@ -1,17 +1,20 @@
 import { Component } from './Component'
 
-export const name = Symbol('name')
+const tags: Map<new() => Component, string> = new Map()
 
 export function Tag<Type extends new() => Component>(type: Type): (tag: string) => Type {
-    return tag => Object.assign(type, { [ name ]: tag })
+    return tag => {
+        tags.set(type, tag)
+        return type
+    }
 }
 
 export namespace Tag {
 
     export function of<Type extends new() => Component>(type: Type): string {
         
-        if (name in type) {
-            return type[ name ]
+        if (tags.has(type)) {
+            return tags.get(type)
         }
     
         if (!type.name) {

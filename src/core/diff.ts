@@ -17,23 +17,23 @@ export function diff(existing: Element[], incoming: Element[]): Element[] {
              * If there is no existing element at this index, add incoming
              */
             if (!element) {
-                return incoming[ index ] ?? null;
+                return incoming[ index ]
             }
 
             /**
              * If there is no incoming element at this index, the element was removed
              */
             if (!incoming[ index ]) {
-                element.node.remove();
-                return null;
+                element.node.parentNode.removeChild(element.node)
+                return undefined
             }
 
             /**
              * If constructors are different, replace existing element with incoming
              */
             if (element.constructor !== incoming[ index ].constructor) {
-                element.node.remove();
-                return incoming[ index ] ?? null;
+                element.node.parentNode.removeChild(element.node)
+                return incoming[ index ]
             }
 
             /**
@@ -42,8 +42,8 @@ export function diff(existing: Element[], incoming: Element[]): Element[] {
             return Object.assign(element, {
                 children: diff(element.children, incoming[ index ].children),
                 properties: incoming[ index ].properties
-            });
-        });
+            })
+        })
     }
 
     return incoming.map((element, index) => {
@@ -52,23 +52,23 @@ export function diff(existing: Element[], incoming: Element[]): Element[] {
          * If there is no existing element at this index, add incoming
          */
         if (!existing[ index ]) {
-            return element ?? null;
+            return element
         }
 
         /**
          * If there is no incoming element at this index, the element was removed
          */
         if (!element) {
-            existing[ index ].node.remove(); 
-            return null;
+            existing[ index ].node.parentNode.removeChild(existing[ index ].node)
+            return undefined
         }
 
         /**
          * If constructors are different, replace existing element with incoming
          */
         if (existing[ index ].constructor !== element.constructor) {
-            existing[ index ].node.remove(); 
-            return element || null;
+            existing[ index ].node.parentNode.removeChild(existing[ index ].node) 
+            return element
         }
 
         /**
@@ -77,6 +77,6 @@ export function diff(existing: Element[], incoming: Element[]): Element[] {
         return Object.assign(existing[ index ], {
             children: diff(existing[ index ].children, element.children),
             properties: element.properties
-        });
-    });
+        })
+    })
 }

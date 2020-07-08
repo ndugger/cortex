@@ -11,64 +11,60 @@ const HTML_CLASS_NAME_LOOKUP = {
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-export function create<Constructor extends globalThis.Element>(element: Element<Constructor>): Constructor {
+export function create<Constructor extends Node>(element: Element<Constructor>): Node {
 
     /**
      * Invalid element.
      */
-    if (!element.constructor) {
-        return undefined;
-    }
-
-    if (element.constructor === HTMLElement) {
-        element
+    if (!element?.constructor) {
+        return undefined
     }
 
     /**
-     * If incoming element's class is base HTML or SVG element, read tag from properties.
+     * If incoming element's type is base HTML or SVG element, read tag from properties.
      */
-    if ((element.constructor === HTMLElement || element.constructor === SVGElement) && !('tag' in element.properties)) {
-        throw new Error(`Unable to create generic ${ element.constructor.name }: missing 'tag' from properties`);
+    if ((element.constructor as unknown === HTMLElement || element.constructor as unknown === SVGElement) && !element?.properties?.tag) {
+        throw new Error(`Unable to construct generic ${ element.constructor.name }: missing 'tag' from properties`)
     }
 
-    let node: Constructor;
+    let node: Node
 
     if (element.constructor.name.endsWith('Element') && element.constructor.name in window) {
 
         if (element.constructor.name in HTML_CLASS_NAME_LOOKUP) {
-            node = window.document.createElement(HTML_CLASS_NAME_LOOKUP[ element.constructor.name ]) as Constructor;
+            node = window.document.createElement(HTML_CLASS_NAME_LOOKUP[ element.constructor.name ])
         }
         else if (element.constructor as unknown === HTMLElement) {
-            node = window.document.createElement(element.properties.tag) as Constructor;
+            node = window.document.createElement(element.properties.tag)
         }
         else if (element.constructor.name.startsWith('HTML')) {
 
-            if (element.properties && 'tag' in element.properties) {
-                node = window.document.createElement(element.properties.tag) as Constructor;
+            if (element?.properties?.tag) {
+                node = window.document.createElement(element.properties.tag)
             }
 
-            node = window.document.createElement(element.constructor.name.replace(/HTML(.*?)Element/, '$1').toLowerCase()) as Constructor;
+            node = window.document.createElement(element.constructor.name.replace(/HTML(.*?)Element/, '$1').toLowerCase())
         }
         else if (element.constructor as unknown === SVGElement) {
-            node = window.document.createElementNS(SVG_NAMESPACE, element.properties.tag) as Constructor;
+            node = window.document.createElementNS(SVG_NAMESPACE, element.properties.tag)
         }
         else if (element.constructor.name.startsWith('SVG')) {
 
             if (element.properties && 'tag' in element.properties) {
-                node = window.document.createElementNS(SVG_NAMESPACE, element.properties.tag) as Constructor;
+                node = window.document.createElementNS(SVG_NAMESPACE, element.properties.tag)
             }
 
-            node = window.document.createElementNS(SVG_NAMESPACE, element.constructor.name.replace(/SVG(.*?)Element/, '$1').replace(/^(FE|SVG|.)/, match => match.toLowerCase())) as Constructor;
+            node = window.document.createElementNS(SVG_NAMESPACE, element.constructor.name.replace(/SVG(.*?)Element/, '$1').replace(/^(FE|SVG|.)/, match => match.toLowerCase()))
         }
     }
     else {
-        node = new element.constructor();
+        node = new element.constructor()
     }
 
     for (const child of element.children) if (child) {
-        child.node = create(child);
-        node.appendChild(child.node);
+        child.node = create(child)
+        node.appendChild(child.node)
     }
 
-    return node;
+    return node
 }

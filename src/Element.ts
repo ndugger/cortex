@@ -1,19 +1,20 @@
-import { Component } from './Component';
+import { Component } from './Component'
+import { Fragment } from './Fragment'
 
 /**
  * Represents a virtual library element
  */
-export interface Element<Constructor extends HTMLElement | SVGElement = HTMLElement | SVGElement> {
+export interface Element<Props extends object = Node> {
 
     /**
      * Child elements
      */
-    children: Element[]
+    children: Element.Child[]
     
     /**
      * Component constructor
      */
-    constructor: new() => Constructor
+    constructor: Component.Any<Props>
 
     /**
      * Default property values
@@ -25,44 +26,55 @@ export interface Element<Constructor extends HTMLElement | SVGElement = HTMLElem
     /**
      * Active DOM node
      */
-    node?: HTMLElement | SVGElement
+    node?: Node
 
     /**
      * Incoming property values
      */
-    properties: Element.Properties<Constructor>
+    properties?: Props extends Node ? Element.Properties<Props> : Props
 }
 
 export namespace Element {
 
-    export  type MinusAttributes = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>>;
+    export type Child = Element | number | string
 
-    export  type TypedProperties<Constructor extends Node> =
+    export type MinusAttributes<Constructor extends Node> = 
+        Partial<Pick<Element<Constructor>, Exclude<keyof Element<Constructor>, 'attributes'>>>
+
+    export type TypedProperties<Constructor extends Node> = BaseProperties &
         Constructor extends Component ?
-            MinusAttributes & { [ Key in keyof Constructor ]: Constructor[ Key ] } :
+            MinusAttributes<Constructor> & { [ Key in keyof Constructor ]: Constructor[ Key ] } :
+        Constructor extends Fragment ?
+            Partial<Constructor> :
         Constructor extends HTMLElement ?
             Partial<Constructor> :
         Constructor extends SVGElement ?
             { [ Key in keyof Constructor ]?: string } :
-        Partial<Constructor>;
+        Partial<Constructor>
 
-    export type Properties<Constructor extends Node = Node> = TypedProperties<Constructor> & {
+    export type BaseProperties = {
         attributes?: {
-            [ K: string ]: any;
-        };
+            [ K: string ]: any
+        }
         namespaces?: {
-            [ K: string ]: string;
-        };
-        tag?: string;
+            [ K: string ]: string
+        }
+        tag?: string
     }
+
+    export type Constructor<Type extends Node> = { new(): Type, prototype: Type }
+    export type Properties<Type extends Node> = TypedProperties<Type>
 }
 
+/**
+ * Enable JSX support
+ */
 declare global {
 
     interface Element {
-        JSX_PROPERTY_TYPES_DO_NOT_USE: Element.Properties & {
-            [ Key in keyof this ]?: this[ Key ] extends object ? Partial<this[ Key ]> : this[ Key ];
-        };
+        JSX_PROPERTY_TYPES_DO_NOT_USE: Element.Properties<Node> & {
+            [ Key in keyof this ]?: this[ Key ] extends object ? Partial<this[ Key ]> : this[ Key ]
+        }
     }
 
     namespace JSX {
@@ -70,7 +82,7 @@ declare global {
         interface IntrinsicElements {}
 
         interface ElementAttributesProperty {
-            JSX_PROPERTY_TYPES_DO_NOT_USE: typeof Element.prototype.JSX_PROPERTY_TYPES_DO_NOT_USE;
+            JSX_PROPERTY_TYPES_DO_NOT_USE: typeof Element.prototype.JSX_PROPERTY_TYPES_DO_NOT_USE
         }
     }
 }

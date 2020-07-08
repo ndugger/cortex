@@ -6,6 +6,7 @@ import { render } from './core/render'
 
 import { Context } from './Context'
 import { Element } from './Element'
+import { Fragment } from './Fragment'
 import { Tag } from './Tag'
 
 /**
@@ -41,7 +42,7 @@ const CustomHTMLElement = new Proxy(HTMLElement, {
 /**
  * Base component class from which all custom components must extend
  */
-export class Component extends CustomHTMLElement {
+export class Component extends CustomHTMLElement implements Component.Constructor {
 
     /**
      * Field in which component's template is stored
@@ -191,33 +192,33 @@ export class Component extends CustomHTMLElement {
      * @param immediate Whether or not to attempt an update this frame
      */
     protected update(props: object = {}, immediate = false): Promise<void> {
-        this[ dirty ] = true;
+        this[ dirty ] = true
 
         for (const prop of Object.keys(props)) {
 
             if (this[ prop ] === props[ prop ]) {
-                continue;
+                continue
             }
 
             if (this[ prop ] && typeof this[ prop ] === 'object') {
-                Object.assign(this[ prop ], props[ prop ]);
+                Object.assign(this[ prop ], props[ prop ])
             }
             else {
-                this[ prop ] = props[ prop ];
+                this[ prop ] = props[ prop ]
             }
         }
 
         if (immediate) {
             this[ dirty ] = false;
             
-            this.dispatchEvent(new Component.LifecycleEvent('componentupdate'));
+            this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
             
             try {
                 this.updatedCallback();
                 return Promise.resolve();
             }
             catch (error) {
-                return Promise.reject(error);
+                return Promise.reject(error)
             }
         }
         
@@ -225,18 +226,18 @@ export class Component extends CustomHTMLElement {
             window.requestAnimationFrame(() => {
 
                 if (!this[ dirty ]) {
-                    return;
+                    return
                 }
 
                 this[ dirty ] = false;
-                this.dispatchEvent(new Component.LifecycleEvent('componentupdate'));
+                this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
 
                 try {
-                    this.updatedCallback();
-                    resolve();
+                    this.updatedCallback()
+                    resolve()
                 }
                 catch (error) {
-                    reject(error);
+                    reject(error)
                 }
             });
         });
@@ -245,7 +246,8 @@ export class Component extends CustomHTMLElement {
     /**
      * Attaches lifecycle listeners upon instantiation, initializes shadow root
      */
-    public constructor() { super();
+    public constructor() { 
+        super();
         this.attachShadow({ mode: 'open' });
         this.addEventListener('componentconnect', event => {this.handleComponentConnect(event)});
         this.addEventListener('componentcreate', event => this.handleComponentCreate(event));
@@ -258,6 +260,37 @@ export class Component extends CustomHTMLElement {
 }
 
 export namespace Component {
+
+    export const Factory = render
+
+    export type Any<Props> = Constructor<Node & Props> | Fn<Props>
+
+    /**
+     * Defines an interface which 
+     */
+    export interface Constructor<Type extends Node = Node> { 
+        new(): Type
+    }
+
+    export interface Fn<Props = unknown> {
+        (props?: Partial<Props>, ...children: Element.Child[]): Element[]
+    }
+
+    /**
+     * Decides if a component is a classical component
+     * @param constructor 
+     */
+    export function isConstructor<Props>(constructor: Any<Props>): constructor is Constructor<Node & Props> {
+        return constructor === constructor?.prototype?.constructor
+    }
+
+    /**
+     * Decides if a component is a functional component
+     * @param constructor 
+     */
+    export function isFn<Props>(constructor: Any<Props>): constructor is Fn<Props> {
+        return !isConstructor(constructor)
+    }
 
     /**
      * Event interface used for component lifecycle triggers

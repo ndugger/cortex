@@ -3,18 +3,21 @@
         "baseUrl": ".",
         "declaration": true,
         "experimentalDecorators": true,
+        "jsx": "react",
+        "jsxFactory": "render",
         "lib": [
             "dom",
             "esnext"
         ],
-        "module": "es6",
+        "module": "esnext",
         "moduleResolution": "node",
         "outDir": "pkg",
         "paths": {
-            "*": [ "*" ]
+            
         },
         "sourceMap": true,
-        "target": "es6"
+        "strictNullChecks": true,
+        "target": "esnext"
     },
     "include": [
         "**/*"
