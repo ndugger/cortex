@@ -3,97 +3,139 @@ import { Element } from '../Element';
 
 import { create } from './create';
 
-export function connect<Constructor extends HTMLElement | SVGElement>(element: Element<Constructor>, host: HTMLElement | SVGElement | ShadowRoot): void {
+const XML_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
+
+type Host = Component | HTMLElement | SVGElement | ShadowRoot
+
+export function connect<Constructor extends Node>(element: Element<Constructor>, host: Constructor | Host): void {
 
     if (!element.constructor) {
-        return;
+        return
     }
 
+    /** 
+     * If node hasn't been initialized (unlikely), try again
+     */
     if (!element.node) {
-        element.node = create(element);
+        element.node = create(element)
     }
 
-    if (element.properties) for (const option of Object.keys(element.properties)) {
+    /**
+     * If it still doesn't exist, something is probably wrong
+     */
+    if (!element.node) {
+        return
+    }
 
-        if (option === 'namespaces') for (const [ name, space ] of Object.entries(element.properties[ option ])) {
-            element.node.setAttributeNS('http://www.w3.org/2000/xmlns/', `xmlns:${ name }`, space);
-            continue;
-        }
+    if (Element.isText(element)) {
 
-        if (option === 'attributes') {
+    }
 
-            for (const attribute of Array.from(element.node.attributes)) {
+    if ((Element.isNative(element) || Element.isCustom(element)) && element.properties) {
 
-                if (!(attribute.name in element.properties.attributes) || element.properties.attributes[ attribute.name ] === false) {
-                    element.node.removeAttributeNode(attribute);
+        for (const property of Object.keys(element.properties)) {
+            
+            /** 
+             * Add attribute namespaces to DOM node
+             */
+            if (property === 'namespaces') {
+
+                for (const [ name, space ] of Object.entries(element.properties[ property ] ?? {})) {
+                    element.node?.setAttributeNS(XML_NAMESPACE, `xmlns:${ name }`, space)
                 }
             }
 
-            for (const [ attribute, object ] of Object.entries(element.properties.attributes)) {
+            /** 
+             * Add attributes to DOM node
+             */
+            if (property === 'attributes') {
 
-                if (object === false || object === undefined || object === null) {
-                    continue;
+                for (const attribute of Array.from(element.node?.attributes ?? [])) {
+                    
+                    /**
+                     * Remove extra attributes
+                     */
+                    if (!(attribute.name in (element.properties[ property ] ?? {})) || Reflect.get(element.properties[ property ] ?? {}, attribute.name) === false) {
+                        element.node.removeAttributeNode(attribute);
+                    }
                 }
 
-                if (object === true) {
-                    element.node.setAttribute(attribute, '');
-                    continue;
-                }
+                for (const [ attribute, object ] of Object.entries(element.properties[ property ] ?? {})) {
 
-                if (typeof object === 'object') for (const [ key, value ] of Object.entries(object)) {
-
-                    if (value === false || value === undefined || value === null) {
-                        continue;
+                    /**
+                     * Skip 'nulled' attributes
+                     */
+                    if (object === false || object === undefined || object === null) {
+                        continue
                     }
 
-                    if ('namespaces' in element.properties && attribute in element.properties.namespaces) {
-                        element.node.setAttributeNS(element.properties.namespaces[ attribute ], `${ attribute }:${ key }`, value.toString());
+                    /**
+                     * Apply attributes which are true as ones which are empty
+                     * <HTMLDivElement hidden/>
+                     */
+                    if (object === true) {
+                        element.node?.setAttribute(attribute, '')
                     }
-                    else {
-                        const root = host.querySelector(`xmlns:${ attribute }`);
 
-                        if (root) {
-                            element.node.setAttributeNS(root.getAttribute(`xmlns:${ attribute }`), `${ attribute }:${ key }`, value.toString());
+                    if (typeof object === 'object') for (const [ key, value ] of Object.entries(object)) {
+                        
+                        /**
+                         * Skip 'nulled' attributes
+                         */
+                        if (value === false || value === undefined || value === null) {
+                            continue
+                        }
+    
+                        /**
+                         * 
+                         */
+                        if ('namespaces' in element.properties && attribute in (element.properties?.namespaces ?? {})) {
+                            element.node.setAttributeNS((element.properties?.namespaces ?? {})[ attribute ], `${ attribute }:${ key }`, String(value))
                         }
                         else {
-                            element.node.setAttributeNS(null, key, value.toString());
+                            const root = (host as Host).querySelector(`xmlns:${ attribute }`)
+    
+                            if (root) {
+                                element.node.setAttributeNS(root.getAttribute(`xmlns:${ attribute }`), `${ attribute }:${ key }`, String(value))
+                            }
+                            else {
+                                element.node.setAttributeNS(null, key, String(value))
+                            }
                         }
                     }
-                }
-                else {
-                    element.node.setAttribute(attribute, object as string);
-                }
+                    else {
+                        element.node.setAttribute(attribute, object as string)
+                    }
 
-                continue;
+                    continue
+                }
             }
 
-            continue;
-        }
-
-        if (element.node[ option ] === element.properties[ option ]) {
-            continue;
-        }
-
-        if (element.node[ option ] && typeof element.node[ option ] === 'object' && !Array.isArray(element.properties[ option ])) {
-            Object.assign(element.node[ option ], element.properties[ option ]);
-        }
-        else {
-            element.node[ option ] = element.properties[ option ];
+            if (element.node[ property ] === element.properties[ property ]) {
+                continue;
+            }
+    
+            if (element.node[ property ] && typeof element.node[ property ] === 'object' && !Array.isArray(element.properties[ property ])) {
+                Object.assign(element.node[ property ], element.properties[ property ]);
+            }
+            else {
+                element.node[ property ] = element.properties[ property ];
+            }
         }
     }
 
-    if (element.node instanceof Element && !element.node.classList.contains(element.constructor.name)) {
-        element.node.classList.add(element.constructor.name);
+    if (element.node instanceof globalThis.Element && !element.node.classList.contains(element.constructor.name)) {
+        element.node.classList.add(element.constructor.name)
     }
 
     for (const child of element.children) if (child) {
-        connect(child, element.node);
+        connect(child, element.node)
     }
 
     if (host !== element.node.parentNode) {
-        host.appendChild(element.node);
+        host.appendChild(element.node)
     }
     else if (element.node instanceof Component) {
-        element.node.update();
+        Reflect.apply(Reflect.get(element.node, 'update'), element.node, [])
     }
 }

@@ -1,4 +1,3 @@
-export { render } from './core/render'
 export { Component } from './Component'
 export { Context } from './Context'
 export { Element } from './Element'

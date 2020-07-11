@@ -8,7 +8,7 @@ import { Fragment } from '../Fragment'
  * @param properties Properties to apply or provide
  * @param children Child elements
  */
-export function render<Constructor extends Node>(constructor: Component.Constructor<Constructor>, props?: Element.Properties<Constructor>, ...children: Element.Child[]): Element<Constructor>
+export function render<Constructor extends Node>(constructor: Component.Constructor<Constructor>, props?: Element.TypedProperties<Constructor>, ...children: Element.Child[]): Element<Constructor>
 export function render<Props extends object>(constructor: Component.Fn<Props>, props?: Props, ...children: Element.Child[]): Element<Fragment>
 export function render<Props extends undefined>(constructor: Component.Any<Props>, props?: Props, ...children: Element.Child[]): Element<Node> {
     
@@ -26,20 +26,13 @@ export function render<Props extends undefined>(constructor: Component.Any<Props
              * If attempting to render plain text, convert to Text nodes
              */
             if (typeof child === 'string' || typeof child === 'number') {
-                return {
-                    constructor: Text,
-                    children: [],
-                    default: {},
-                    props: {
-                        textContent: child
-                    }
-                }
+                return render(Text, { textContent: child.toString() })
             }
 
-            return child || null
+            return child || undefined
         }),
         constructor,
-        default: {},
+        defaults: {},
         properties: props
     }
 }

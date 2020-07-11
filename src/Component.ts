@@ -12,12 +12,12 @@ import { Tag } from './Tag'
 /**
  * Symbol which represents a component's element tree
  */
-const cache = Symbol('cache')
+const template = Symbol('cache')
 
 /**
  * Sumbol which represents whether or not there are changes during updates
  */
-const dirty = Symbol('dirty')
+const staged = Symbol('dirty')
 
 /**
  * Proxy used to capture custom element lifecycle before any consturctors are called 
@@ -27,12 +27,13 @@ const dirty = Symbol('dirty')
 const CustomHTMLElement = new Proxy(HTMLElement, {
 
     construct(element, args, component): object {
+        const tag = Tag.of(component)
 
         /**
          * Automatically register custom element prior to instantiation
          */
-        if (!window.customElements.get(Tag.of(component))) {
-            window.customElements.define(Tag.of(component), component)
+        if (!window.customElements.get(tag)) {
+            window.customElements.define(tag, component)
         }
 
         return Reflect.construct(element, args, component)
@@ -42,17 +43,17 @@ const CustomHTMLElement = new Proxy(HTMLElement, {
 /**
  * Base component class from which all custom components must extend
  */
-export class Component extends CustomHTMLElement implements Component.Constructor {
+export class Component extends CustomHTMLElement {
 
     /**
      * Field in which component's template is stored
      */
-    protected [ cache ]: Element[]
+    protected [ template ]: Element.Optional[]
 
     /**
      * Field in which component render state is stored
      */
-    protected [ dirty ]: boolean
+    protected [ staged ]: boolean
     
     /**
      * Part of custom elements API: called when element mounts to a DOM
@@ -89,29 +90,39 @@ export class Component extends CustomHTMLElement implements Component.Constructo
      */
     protected updatedCallback(): void {
         const style = render(HTMLStyleElement, { textContent: this.theme() })
-        const tree = this.render().concat(style)
+        const tree = this.render().concat(style).map(child => {
+
+            /**
+             * If attempting to render plain text, convert to Text nodes
+             */
+            if (typeof child === 'string' || typeof child === 'number') {
+                return render(Text, { textContent: child.toString() })
+            }
+
+            return child || undefined
+        })
 
         /**
          * If first time render, just save new tree
          * Otherwise diff tree recursively
          */
-        if (!this[ cache ]) {
-            this[ cache ] = tree
+        if (!this[ template ]) {
+            this[ template ] = tree
         }
         else {
-            this[ cache ] = diff(this[ cache ], tree)
+            this[ template ] = diff(this[ template ], tree)
         }
 
         /**
          * Wire up any new component elements with DOM elements
          */
-        for (const element of this[ cache ]) if (element) {
+        for (const element of this[ template ]) if (element) {
 
             if (!element.node) {
                 element.node = create(element)
             }
 
-            connect(element, this.shadowRoot)
+            connect(element, this.shadowRoot as ShadowRoot)
         }
 
         window.requestAnimationFrame(() => {
@@ -175,7 +186,7 @@ export class Component extends CustomHTMLElement implements Component.Constructo
     /**
      * Constructs a component's template
      */
-    protected render(): Element[] {
+    protected render(): Element.Child[] {
         return []
     }
 
@@ -192,7 +203,7 @@ export class Component extends CustomHTMLElement implements Component.Constructo
      * @param immediate Whether or not to attempt an update this frame
      */
     protected update(props: object = {}, immediate = false): Promise<void> {
-        this[ dirty ] = true
+        this[ staged ] = true
 
         for (const prop of Object.keys(props)) {
 
@@ -209,7 +220,7 @@ export class Component extends CustomHTMLElement implements Component.Constructo
         }
 
         if (immediate) {
-            this[ dirty ] = false;
+            this[ staged ] = false;
             
             this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
             
@@ -225,11 +236,11 @@ export class Component extends CustomHTMLElement implements Component.Constructo
         return new Promise((resolve, reject) => {
             window.requestAnimationFrame(() => {
 
-                if (!this[ dirty ]) {
+                if (!this[ staged ]) {
                     return
                 }
 
-                this[ dirty ] = false;
+                this[ staged ] = false;
                 this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
 
                 try {
@@ -261,17 +272,26 @@ export class Component extends CustomHTMLElement implements Component.Constructo
 
 export namespace Component {
 
+    /**
+     * JSX component factory
+     */
     export const Factory = render
 
+    /**
+     * Defines any component
+     */
     export type Any<Props> = Constructor<Node & Props> | Fn<Props>
 
     /**
-     * Defines an interface which 
+     * Defines a class-based component
      */
     export interface Constructor<Type extends Node = Node> { 
-        new(): Type
+        new(): Type & Node
     }
 
+    /**
+     * Defines a function-based component
+     */
     export interface Fn<Props = unknown> {
         (props?: Partial<Props>, ...children: Element.Child[]): Element[]
     }

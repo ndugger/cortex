@@ -4,5 +4,5 @@
  * @param incoming 
  */
 export function merge(existing: object, incoming: object): object {
-    return {}
+    return Object.assign({}, existing, incoming)
 }

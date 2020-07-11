@@ -2,6 +2,11 @@ import { render, Component, Portal } from '../src'
 
 class TestPortal extends Portal {
 
+    /**
+     * Foo of test portal
+     */
+    public foo: boolean;
+
     protected theme(): string {
         return `
             :host {
@@ -34,10 +39,20 @@ const TestRootComponentFn: Component.Fn = (props, ...children) => {
     const bar = <TestComponentFn/>;
 
     <TestPortal/>;
+    <HTMLStyleElement/>;
+    <HTMLStyleElement textContent=''/>;
+
+    render(HTMLStyleElement)
+    render(HTMLStyleElement, { textContent: '' })
+    render(TestPortal)
+    render(TestPortal, { foo: true });
+
+    <Text data=''/>;
 
     return [
         <TestComponentFn/>,
-        <TestPortal/>
+        <TestPortal foo/>,
+        'hello'
     ]
 }
 

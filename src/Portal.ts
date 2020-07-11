@@ -4,11 +4,11 @@ import { Component } from './Component'
 import { Element } from './Element'
 import { Fragment } from './Fragment'
 
-const portals: Map<new() => Portal, Portal> = new Map()
+const portals = new Map<Component.Constructor<Portal>, Portal>()
 
 export class Portal extends Component implements Portal.Props {
 
-    public static Mirror: Component.Fn = function (props, ...children) {
+    public static Mirror(props: unknown, ...children: Element.Child[]) {
         return [
             render(Portal.Reflection, { target: this }, ...children)
         ]
@@ -35,13 +35,13 @@ export namespace Portal {
     export interface Props {}
     
     export class Reflection extends Fragment implements Reflection.Props {
-        public target: Element.Constructor<Portal>
+        public target: Component.Constructor<Portal>
     }
 
     export namespace Reflection {
 
         export interface Props {
-            target: Element.Constructor<Portal>
+            target: Component.Constructor<Portal>
         }
     }
 }

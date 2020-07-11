@@ -5,78 +5,45 @@ import { Element } from '../Element';
  * @param existing Existing tree (previous render)
  * @param incoming Incoming tree (next render)
  */
-export function diff(existing: Element[], incoming: Element[]): Element[] {
+export function diff(existing: Element.Optional[], incoming: Element.Optional[]): Element.Optional[] {
+    const outgoing: Element.Optional[] = []
 
-    /**
-     * Iterate over whichever collection is longer
-     */
-    if (existing.length > incoming.length) {
-        return existing.map((element, index) => {
+    for (let index = 0; index < Math.max(existing.length, incoming.length); ++index) {
         
-            /**
-             * If there is no existing element at this index, add incoming
-             */
-            if (!element) {
-                return incoming[ index ]
-            }
-
-            /**
-             * If there is no incoming element at this index, the element was removed
-             */
-            if (!incoming[ index ]) {
-                element.node.parentNode.removeChild(element.node)
-                return undefined
-            }
-
-            /**
-             * If constructors are different, replace existing element with incoming
-             */
-            if (element.constructor !== incoming[ index ].constructor) {
-                element.node.parentNode.removeChild(element.node)
-                return incoming[ index ]
-            }
-
-            /**
-             * If constructors are identical, merge props
-             */
-            return Object.assign(element, {
-                children: diff(element.children, incoming[ index ].children),
-                properties: incoming[ index ].properties
-            })
-        })
-    }
-
-    return incoming.map((element, index) => {
-    
         /**
-         * If there is no existing element at this index, add incoming
+         * If there is no existing element at this index, use incoming element
          */
         if (!existing[ index ]) {
-            return element
+            outgoing.push(incoming[ index ])
+
+            continue
         }
 
         /**
          * If there is no incoming element at this index, the element was removed
          */
-        if (!element) {
-            existing[ index ].node.parentNode.removeChild(existing[ index ].node)
-            return undefined
+        if (!incoming[ index ]) {
+            existing[ index ]?.node?.parentNode?.removeChild(existing[ index ]?.node as Node)
+            outgoing.push(undefined)
+
+            continue
         }
 
         /**
-         * If constructors are different, replace existing element with incoming
+         * If constructors are different, replace existing element with incoming element
+         * Else merge incoming properties and children with existing element
          */
-        if (existing[ index ].constructor !== element.constructor) {
-            existing[ index ].node.parentNode.removeChild(existing[ index ].node) 
-            return element
+        if (existing[ index ]?.constructor !== incoming[ index ]?.constructor) {
+            existing[ index ]?.node?.parentNode?.removeChild(existing[ index ]?.node as Node)
+            outgoing.push(incoming[ index ])
         }
+        else {
+            outgoing.push(Object.assign(existing[ index ], {
+                children: diff(existing[ index ]?.children ?? [], incoming[ index ]?.children ?? []),
+                properties: incoming[ index ]?.properties // TODO properly merge props (consider defaults)
+            }))
+        }
+    }
 
-        /**
-         * If constructors are identical, merge props
-         */
-        return Object.assign(existing[ index ], {
-            children: diff(existing[ index ].children, element.children),
-            properties: element.properties
-        })
-    })
+    return outgoing
 }
