@@ -1,2 +1,2 @@
-import { Element } from '../interfaces/Element';
-export declare function create<Constructor extends HTMLElement | SVGElement>(element: Element<Constructor>): Constructor;
+import { Element } from '../Element';
+export declare function create<Constructor extends Node>(element: Element<Constructor>): Constructor | undefined;

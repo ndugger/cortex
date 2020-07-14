@@ -284,7 +284,7 @@ export namespace Component {
      * Defines a function-based component
      */
     export interface Fn<Props = unknown> {
-        (props?: Partial<Props>, children?: Element.Child[]): Element[]
+        (props: Partial<Props> | undefined, children: Element.Child[]): Element[]
     }
 
     /**

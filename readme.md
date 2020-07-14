@@ -5,13 +5,13 @@ Lightweight Web Component Framework
 Cortex is currently being rewritten to add functional components, fragments, and portals. To install the current working version (`2.0.0`) you may run the following command:
 
 ```
-npm install github:ndugger/cortex#2.0.0
+npm install github:ndugger/cortex#2.0.0 --save
 ```
 
-The current up to date alpha may be installed with the following command:
+The current up to date `3.0.0-alpha` may be installed with the following command:
 
 ```
-npm install github:ndugger/cortex
+npm install github:ndugger/cortex --save
 ```
 
 ### Documentation

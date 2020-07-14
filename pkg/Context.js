@@ -2,7 +2,9 @@ import { Component } from './Component';
 import { render } from './core/render';
 export class Context extends Component {
     render() {
-        return [render(HTMLSlotElement)];
+        return [
+            render(HTMLSlotElement)
+        ];
     }
     theme() {
         return `

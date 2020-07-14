@@ -16,7 +16,7 @@ export function render<Props extends undefined>(constructor: Component.Any<Props
      * If rendering a functional component, return a fragment with the children being the output from the function
      */
     if (Component.isFn(constructor)) {
-        return render(Fragment, undefined, ...constructor(props, ...children))
+        return render(Fragment, undefined, ...constructor(props ?? {}, children))
     }
 
     return {

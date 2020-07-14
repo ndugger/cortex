@@ -26,6 +26,6 @@ export function depend(root, key) {
     /**
      * Go up a level
      */
-    return depend(root.parentNode, key);
+    return depend(root.parentNode ?? undefined, key);
 }
 //# sourceMappingURL=depend.js.map

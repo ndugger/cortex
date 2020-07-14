@@ -1,2 +1,5 @@
-import { Element } from '../interfaces/Element';
-export declare function connect<Constructor extends HTMLElement | SVGElement>(element: Element<Constructor>, host: HTMLElement | SVGElement | ShadowRoot): void;
+import { Component } from '../Component';
+import { Element } from '../Element';
+declare type Host = Component | HTMLElement | SVGElement | ShadowRoot;
+export declare function connect<Constructor extends Node>(element: Element<Constructor>, host: Constructor | Host): void;
+export {};

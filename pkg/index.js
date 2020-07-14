@@ -1,5 +1,7 @@
-import { render } from './core/render';
-import { Component } from './Component';
-import { Context } from './Context';
-export { Component, Context, render };
+export { Component } from './Component';
+export { Context } from './Context';
+export { Element } from './Element';
+export { Fragment } from './Fragment';
+export { Portal } from './Portal';
+export { Tag } from './Tag';
 //# sourceMappingURL=index.js.map
