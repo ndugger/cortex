@@ -56,7 +56,7 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
                      * Remove extra attributes
                      */
                     if (!(attribute.name in (element.properties[ property ] ?? {})) || Reflect.get(element.properties[ property ] ?? {}, attribute.name) === false) {
-                        element.node.removeAttributeNode(attribute);
+                        element.node.removeAttributeNode(attribute)
                     }
                 }
 
@@ -107,7 +107,7 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
                         }
                     }
                     else {
-                        element.node.setAttribute(attribute, object as string)
+                        element.node.setAttribute(attribute, String(object))
                     }
 
                     continue
