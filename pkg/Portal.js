@@ -3,9 +3,9 @@ import { Component } from './Component';
 import { Fragment } from './Fragment';
 const portals = new Map();
 export class Portal extends Component {
-    static Mirror(props, ...children) {
+    static Mirror(props) {
         return [
-            render(Portal.Reflection, { target: this }, ...children)
+            render(Portal.Reflection, { target: this }, ...props.children)
         ];
     }
     render() {

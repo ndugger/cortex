@@ -99,6 +99,9 @@ export declare namespace Component {
      * JSX component factory
      */
     const Factory: typeof render;
+    type PropsWithChildren<Props = unknown> = Partial<Props> & {
+        children: Element.Child[];
+    };
     /**
      * Defines any component
      */
@@ -113,7 +116,7 @@ export declare namespace Component {
      * Defines a function-based component
      */
     interface Fn<Props = unknown> {
-        (props: Partial<Props> | undefined, children: Element.Child[]): Element[];
+        (props: PropsWithChildren<Props>): Element[];
     }
     /**
      * Decides if a node is a Component

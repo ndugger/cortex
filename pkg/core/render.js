@@ -5,7 +5,7 @@ export function render(constructor, props, ...children) {
      * If rendering a functional component, return a fragment with the children being the output from the function
      */
     if (Component.isFn(constructor)) {
-        return render(Fragment, undefined, ...constructor(props ?? {}, children));
+        return render(Fragment, undefined, ...constructor(Object.assign(props ?? {}, { children })));
     }
     return {
         children: children.flat().map(child => {

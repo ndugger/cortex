@@ -2,7 +2,7 @@ import { Component } from './Component';
 import { Element } from './Element';
 import { Fragment } from './Fragment';
 export declare class Portal extends Component implements Portal.Props {
-    static Mirror(props: unknown, ...children: Element.Child[]): Element<Portal.Reflection>[];
+    static Mirror(props: Component.PropsWithChildren): Element<Portal.Reflection>[];
     protected render(): Element[];
     protected theme(): string;
 }
