@@ -2,6 +2,7 @@ import { Component } from '../Component';
 import { Element } from '../Element';
 
 import { create } from './create';
+import { Fragment } from 'src/Fragment';
 
 const XML_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 
@@ -28,10 +29,9 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
     }
 
     if (Element.isText(element)) {
-
+        Object.assign(element.node, element.properties)
     }
-
-    if ((Element.isNative(element) || Element.isCustom(element)) && element.properties) {
+    else if ((Element.isNative(element) || Element.isCustom(element)) && element.properties) {
 
         for (const property of Object.keys(element.properties)) {
             
@@ -77,6 +77,9 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
                         element.node?.setAttribute(attribute, '')
                     }
 
+                    /**
+                     * If attribute is an object, iterate over fields
+                     */
                     if (typeof object === 'object') for (const [ key, value ] of Object.entries(object)) {
                         
                         /**
@@ -87,7 +90,7 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
                         }
     
                         /**
-                         * 
+                         * Apply namespaced attributes
                          */
                         if ('namespaces' in element.properties && attribute in (element.properties?.namespaces ?? {})) {
                             element.node.setAttributeNS((element.properties?.namespaces ?? {})[ attribute ], `${ attribute }:${ key }`, String(value))
@@ -112,30 +115,33 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
             }
 
             if (element.node[ property ] === element.properties[ property ]) {
-                continue;
+                continue
             }
     
             if (element.node[ property ] && typeof element.node[ property ] === 'object' && !Array.isArray(element.properties[ property ])) {
-                Object.assign(element.node[ property ], element.properties[ property ]);
+                Object.assign(element.node[ property ], element.properties[ property ])
             }
             else {
-                element.node[ property ] = element.properties[ property ];
+                element.node[ property ] = element.properties[ property ]
             }
         }
     }
 
-    if (element.node instanceof globalThis.Element && !element.node.classList.contains(element.constructor.name)) {
+    if (Element.isNative(element) && !element.node.classList.contains(element.constructor.name)) {
         element.node.classList.add(element.constructor.name)
     }
 
-    for (const child of element.children) if (child) {
+    if (Fragment.isFragment(element.node)) {
+        element.node.update(element.children)
+    }
+    else for (const child of element.children) if (child) {
         connect(child, element.node)
     }
 
     if (host !== element.node.parentNode) {
         host.appendChild(element.node)
     }
-    else if (element.node instanceof Component) {
-        Reflect.apply(Reflect.get(element.node, 'update'), element.node, [])
+    else if (Component.isComponent(element.node)) {
+        element.node.update()
     }
 }

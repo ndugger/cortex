@@ -1,4 +1,4 @@
-import { render, Component, Portal } from '../src'
+import { Component, Portal } from '../src'
 
 class TestPortal extends Portal {
 
@@ -35,17 +35,17 @@ namespace TestComponentFn {
 }
 
 const TestRootComponentFn: Component.Fn = (props, ...children) => {
-    const foo = render(TestComponentFn)
+    const foo = Component.Factory(TestComponentFn)
     const bar = <TestComponentFn/>;
 
     <TestPortal/>;
     <HTMLStyleElement/>;
     <HTMLStyleElement textContent=''/>;
 
-    render(HTMLStyleElement)
-    render(HTMLStyleElement, { textContent: '' })
-    render(TestPortal)
-    render(TestPortal, { foo: true });
+    Component.Factory(HTMLStyleElement)
+    Component.Factory(HTMLStyleElement, { textContent: '' })
+    Component.Factory(TestPortal)
+    Component.Factory(TestPortal, { foo: true });
 
     <Text data=''/>;
 
