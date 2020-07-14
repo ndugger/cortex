@@ -11,7 +11,7 @@ import { Fragment } from '../Fragment'
 export function render<Constructor extends Node>(constructor: Component.Constructor<Constructor>, props?: Element.TypedProperties<Constructor>, ...children: Element.Child[]): Element<Constructor>
 export function render<Props extends object>(constructor: Component.Fn<Props>, props?: Props, ...children: Element.Child[]): Element<Fragment>
 export function render<Props extends undefined>(constructor: Component.Any<Props>, props?: Props, ...children: Element.Child[]): Element<Node> {
-    
+
     /**
      * If rendering a functional component, return a fragment with the children being the output from the function
      */

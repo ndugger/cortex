@@ -59,5 +59,3 @@ const TestRootComponentFn: Component.Fn = () => {
 <TestRootComponentFn>
     foo bar baz
 </TestRootComponentFn>
-
-
