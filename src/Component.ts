@@ -268,6 +268,10 @@ export namespace Component {
      */
     export const Factory = render
 
+    export type PropsWithChildren<Props = unknown> = Partial<Props> & {
+        children: Element.Child[]
+    }
+
     /**
      * Defines any component
      */
@@ -284,7 +288,7 @@ export namespace Component {
      * Defines a function-based component
      */
     export interface Fn<Props = unknown> {
-        (props?: Partial<Props>, children?: Element.Child[]): Element[]
+        (props: PropsWithChildren<Props>): Element[]
     }
 
     /**

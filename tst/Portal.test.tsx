@@ -19,10 +19,10 @@ class TestPortal extends Portal {
     }
 }
 
-const TestComponentFn: Component.Fn<TestComponentFn.Props> = (props, ...children) => {
+const TestComponentFn: Component.Fn<TestComponentFn.Props> = props => {
     return [
         <TestPortal.Mirror>
-            { ...children }
+            { ...props.children }
         </TestPortal.Mirror>
     ]
 }
@@ -34,7 +34,7 @@ namespace TestComponentFn {
     }
 }
 
-const TestRootComponentFn: Component.Fn = (props, ...children) => {
+const TestRootComponentFn: Component.Fn = () => {
     const foo = Component.Factory(TestComponentFn)
     const bar = <TestComponentFn/>;
 

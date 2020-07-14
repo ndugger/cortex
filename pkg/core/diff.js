@@ -1,39 +1,55 @@
+import { Fragment } from 'src/Fragment';
+import { Component } from 'src/Component';
+/**
+ * Compare existing tree to incoming tree and merge incoming changes
+ * @param existing Existing tree (previous render)
+ * @param incoming Incoming tree (next render)
+ */
 export function diff(existing, incoming) {
-    if (existing.length >= incoming.length) {
-        return existing.map((element, index) => {
-            if (!element) {
-                return incoming[index] || null;
+    const outgoing = [];
+    for (let index = 0; index < Math.max(existing.length, incoming.length); ++index) {
+        const existingElement = existing[index];
+        const incomingElement = incoming[index];
+        /**
+         * If there is no existing element at this index, use incoming element
+         */
+        if (!existingElement) {
+            outgoing.push(incomingElement);
+            continue;
+        }
+        /**
+         * If there is no incoming element at this index, the element was removed
+         */
+        if (!incomingElement) {
+            outgoing.push(undefined);
+            if (Component.isComponent(existingElement.node) || Fragment.isFragment(existingElement.node)) {
+                existingElement.node.remove();
             }
-            if (!incoming[index]) {
-                element.node.remove();
-                return null;
+            else {
+                existingElement.node?.parentNode?.removeChild(existingElement.node);
             }
-            if (element.constructor !== incoming[index].constructor) {
-                element.node.remove();
-                return incoming[index] || null;
+            continue;
+        }
+        /**
+         * If constructors are different, replace existing element with incoming element
+         * Else merge incoming properties and children with existing element
+         */
+        if (existingElement.constructor !== incomingElement.constructor) {
+            outgoing.push(incomingElement);
+            if (Component.isComponent(existingElement.node) || Fragment.isFragment(existingElement.node)) {
+                existingElement.node.remove();
             }
-            return Object.assign(element, {
-                children: diff(element.children, incoming[index].children),
-                properties: incoming[index].properties
-            });
-        });
+            else {
+                existingElement.node?.parentNode?.removeChild(existingElement.node);
+            }
+        }
+        else {
+            outgoing.push(Object.assign(existingElement, {
+                children: diff(existingElement.children, incomingElement.children),
+                properties: incomingElement.properties // TODO properly merge props (consider defaults)
+            }));
+        }
     }
-    return incoming.map((element, index) => {
-        if (!existing[index]) {
-            return element || null;
-        }
-        if (!element) {
-            existing[index].node.remove();
-            return null;
-        }
-        if (existing[index].constructor !== element.constructor) {
-            existing[index].node.remove();
-            return element || null;
-        }
-        return Object.assign(existing[index], {
-            children: diff(existing[index].children, element.children),
-            properties: element.properties
-        });
-    });
+    return outgoing;
 }
 //# sourceMappingURL=diff.js.map

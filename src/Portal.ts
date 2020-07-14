@@ -8,9 +8,9 @@ const portals = new Map<Component.Constructor<Portal>, Portal>()
 
 export class Portal extends Component implements Portal.Props {
 
-    public static Mirror(props: unknown, ...children: Element.Child[]) {
+    public static Mirror(props: Component.PropsWithChildren) {
         return [
-            render(Portal.Reflection, { target: this }, ...children)
+            render(Portal.Reflection, { target: this }, ...props.children)
         ]
     }
 
