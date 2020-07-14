@@ -1,25 +1,23 @@
 {
-    "compilerOptions": {
-        "baseUrl": ".",
-        "declaration": true,
-        "experimentalDecorators": true,
-        "jsx": "react",
-        "jsxFactory": "Component.Factory",
-        "lib": [
-            "dom",
-            "esnext"
-        ],
-        "module": "esnext",
-        "moduleResolution": "node",
-        "outDir": "pkg",
-        "paths": {
-            
-        },
-        "sourceMap": true,
-        "strictNullChecks": true,
-        "target": "esnext"
-    },
-    "include": [
-        "src/**/*"
-    ]
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "jsxFactory": "Component.Factory",
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "pkg",
+    "paths": {},
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "target": "esnext"
+  },
+  "include": [
+    "src/**/*"
+  ]
 }

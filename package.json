@@ -1,29 +1,29 @@
 {
-    "name": "cortex",
-    "version": "3.0.0-alpha",
-    "description": "Lightweight Web Component Framework",
-    "main": "pkg/index.js",
-    "scripts": {
-        "build": "tsc",
-        "test": "jest"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/ndugger/cortex.git"
-    },
-    "author": "Nick Dugger",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/ndugger/cortex/issues"
-    },
-    "homepage": "https://github.com/ndugger/cortex#readme",
-    "devDependencies": {
-        "@types/jest": "^24.0.18",
-        "@typescript-eslint/eslint-plugin": "^2.0.0",
-        "@typescript-eslint/parser": "^2.0.0",
-        "eslint": "^6.2.2",
-        "jest": "^24.9.0",
-        "ts-jest": "^24.0.2",
-        "typescript": "^4.0.0-beta"
-    }
+  "name": "cortex",
+  "version": "3.0.0-alpha",
+  "description": "Lightweight Web Component Framework",
+  "main": "pkg/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ndugger/cortex.git"
+  },
+  "author": "Nick Dugger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ndugger/cortex/issues"
+  },
+  "homepage": "https://github.com/ndugger/cortex#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "eslint": "^6.2.2",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^4.0.0-beta"
+  }
 }
