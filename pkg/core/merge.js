@@ -4,6 +4,6 @@
  * @param incoming
  */
 export function merge(existing, incoming) {
-  return Object.assign({}, existing, incoming);
+    return Object.assign({}, existing, incoming);
 }
 //# sourceMappingURL=merge.js.map
