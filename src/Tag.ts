@@ -1,23 +1,27 @@
 import { Component } from './Component'
 
-export const name = Symbol('name')
+const tags = new Map<Component.Constructor, string>()
+const unknown = 'unknown'
 
-export function Tag<Type extends new() => Component>(type: Type): (tag: string) => Type {
-    return tag => Object.assign(type, { [ name ]: tag })
+export function Tag<Type extends Component.Constructor>(type: Type): (tag: string) => Type {
+    return tag => {
+        tags.set(type, tag)
+        return type
+    }
 }
 
 export namespace Tag {
 
-    export function of<Type extends new() => Component>(type: Type): string {
+    export function of<Type extends Component.Constructor>(type: Type): string {
         
-        if (name in type) {
-            return type[ name ]
+        if (tags.has(type)) {
+            return tags.get(type) ?? unknown
         }
     
         if (!type.name) {
-            return 'unknown';
+            return unknown
         }
     
-        return `${ type.name.replace(/([A-Z])/g, c => `-${ c.toLowerCase() }`).replace(/^-/, '') }-component`;
+        return `${ type.name.replace(/([A-Z])/g, c => `-${ c.toLowerCase() }`).replace(/^-/, '') }-component`
     }
 }

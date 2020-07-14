@@ -1,76 +1,132 @@
-import { Component } from './Component';
+import { Component } from './Component'
+import { Fragment } from './Fragment'
+import { Tag } from './Tag'
 
 /**
  * Represents a virtual library element
  */
-export interface Element<Constructor extends HTMLElement | SVGElement = HTMLElement | SVGElement> {
+export interface Element<Props extends Node = Node> {
 
     /**
      * Child elements
      */
-    children: Element[]
+    children: Element.Optional[]
     
     /**
      * Component constructor
      */
-    constructor: new() => Constructor
+    constructor: Component.Constructor<Props>
 
     /**
      * Default property values
      */
-    default: {
+    defaults: {
         [ key: string ]: unknown
     }
 
     /**
      * Active DOM node
      */
-    node?: HTMLElement | SVGElement
+    node?: Props | undefined
 
     /**
      * Incoming property values
      */
-    properties: Element.Properties<Constructor>
+    properties?: Props extends Node ? Element.TypedProperties<Props> : Props
 }
 
 export namespace Element {
 
-    export  type MinusAttributes = Partial<Pick<Element, Exclude<keyof Element, 'attributes'>>>;
+    /**
+     * Used in situations where undefined is inserted to represent an empty branch
+     */
+    export type Optional = Element | undefined
 
-    export  type TypedProperties<Constructor extends Node> =
-        Constructor extends Component ?
-            MinusAttributes & { [ Key in keyof Constructor ]: Constructor[ Key ] } :
-        Constructor extends HTMLElement ?
+    /**
+     * Allowed child types (numbers and strings are converted into text nodes)
+     */
+    export type Child<Props extends Node = Node> = Element<Props> | number | string | undefined
+
+    /**
+     * Remove existing attributes interface so library can inject a new one
+     */
+    export type MinusAttributes<Constructor extends Node> = Pick<Constructor, Exclude<keyof Constructor, 'attributes'>>
+
+    /**
+     * Extract property types depending on which library, or DOM object is extended
+     */
+    export type TypedProperties<Constructor extends Node> =
+        (Constructor extends Component ?
+            Partial<MinusAttributes<Constructor> & { [ Key in keyof Constructor ]?: Constructor[ Key ] }> :
+        Constructor extends Fragment ?
             Partial<Constructor> :
+        Constructor extends HTMLElement ?
+            Partial<MinusAttributes<Constructor>> :
         Constructor extends SVGElement ?
-            { [ Key in keyof Constructor ]?: string } :
-        Partial<Constructor>;
+            Partial<{ [ Key in keyof Constructor ]: string }> :
+        Constructor extends Node ?
+            Partial<Constructor> : 
+        unknown) & {
+            attributes?: {
+                [ K: string ]: any
+            }
+            namespaces?: {
+                [ K: string ]: string
+            }
+            tag?: string
+        }
 
-    export type Properties<Constructor extends Node = Node> = TypedProperties<Constructor> & {
-        attributes?: {
-            [ K: string ]: any;
-        };
-        namespaces?: {
-            [ K: string ]: string;
-        };
-        tag?: string;
+    /**
+     * Determines if constructor is a custom element
+     * @param element 
+     */
+    export function isCustom(element: Element): element is Element<Component> {
+        return Boolean(window.customElements.get(Tag.of(element.constructor)))
+    }
+
+    /**
+     * Determines if constructor is a built-in element type
+     * @param constructor 
+     */
+    export function isNative(element: Element): element is Element<HTMLElement> | Element<SVGElement>  {
+        return element.constructor.name in globalThis && element.constructor.name.endsWith('Element')
+    }
+
+    /**
+     * Determines if constructor is a text node
+     * @param element 
+     */
+    export function isText(element: Element): element is Element<Text> {
+        return element.constructor === Text
     }
 }
 
+/**
+ * Enable JSX support
+ */
 declare global {
 
     interface Element {
-        JSX_PROPERTY_TYPES_DO_NOT_USE: Element.Properties & {
-            [ Key in keyof this ]?: this[ Key ] extends object ? Partial<this[ Key ]> : this[ Key ];
-        };
+        JSX_PROPERTY_TYPES_DO_NOT_USE: Element.TypedProperties<Node> & {
+            [ key in keyof this ]?: this[ key ] extends object ? Partial<this[ key ]> : this[ key ]
+        }
+    }
+
+    interface Text {
+        JSX_PROPERTY_TYPES_DO_NOT_USE: Element.TypedProperties<Text> 
     }
 
     namespace JSX {
 
-        interface IntrinsicElements {}
+        /**
+         * Intrinsic elements are not supported: use the class instead (ex: HTMLDivElement)
+         */
+        interface IntrinsicElements {
+            [key: string]: never
+        }
 
         interface ElementAttributesProperty {
-            JSX_PROPERTY_TYPES_DO_NOT_USE: typeof Element.prototype.JSX_PROPERTY_TYPES_DO_NOT_USE;
+            JSX_PROPERTY_TYPES_DO_NOT_USE: typeof Element.prototype.JSX_PROPERTY_TYPES_DO_NOT_USE
         }
     }
 }

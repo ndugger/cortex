@@ -1,13 +1,15 @@
-import { Component } from './Component';
+import { Component } from './Component'
 import { Element } from './Element'
-import { render } from './core/render';
+import { render } from './core/render'
 
 export class Context<Data extends object = {}> extends Component {
 
-    public value?: Data;
+    public value?: Data
 
     public render(): Element[] {
-        return [ render(HTMLSlotElement) ];
+        return [ 
+            render(HTMLSlotElement) 
+        ]
     }
 
     public theme(): string {
@@ -15,7 +17,7 @@ export class Context<Data extends object = {}> extends Component {
             :host {
                 display: contents;
             }
-        `;
+        `
     }
 }
 

@@ -5,7 +5,7 @@ import { Context } from '../Context';
  * @param root Node from where to search
  * @param key Key used to retrieve object from context
  */
-export function depend<Dependency extends Context>(root: Node, key: new() => Dependency): Dependency | undefined {
+export function depend<Dependency extends Context>(root: Node | undefined, key: new() => Dependency): Dependency | undefined {
 
     /**
      * If we reach the top, return undefined
@@ -31,5 +31,5 @@ export function depend<Dependency extends Context>(root: Node, key: new() => Dep
     /**
      * Go up a level
      */
-    return depend(root.parentNode, key);
+    return depend(root.parentNode ?? undefined, key);
 }
