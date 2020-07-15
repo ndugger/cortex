@@ -10,7 +10,7 @@ export class Portal extends Component implements Portal.Props {
 
     public static Mirror(props: Component.PropsWithChildren) {
         return [
-            render(Portal.Reflection, { target: this }, ...props.children)
+            render(Portal.Reflection, { target: this }, ...props?.children ?? [])
         ]
     }
 
@@ -33,7 +33,7 @@ export class Portal extends Component implements Portal.Props {
 export namespace Portal {
 
     export interface Props {}
-    
+
     export class Reflection extends Fragment implements Reflection.Props {
         public target: Component.Constructor<Portal>
     }
