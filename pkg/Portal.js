@@ -5,7 +5,7 @@ const portals = new Map();
 export class Portal extends Component {
     static Mirror(props) {
         return [
-            render(Portal.Reflection, { target: this }, ...props.children)
+            render(Portal.Reflection, { target: this }, ...props?.children ?? [])
         ];
     }
     render() {

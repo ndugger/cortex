@@ -269,7 +269,7 @@ export namespace Component {
     export const Factory = render
 
     export type PropsWithChildren<Props = unknown> = Partial<Props> & {
-        children: Element.Child[]
+        children?: Element.Child[]
     }
 
     /**

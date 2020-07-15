@@ -100,7 +100,7 @@ export declare namespace Component {
      */
     const Factory: typeof render;
     type PropsWithChildren<Props = unknown> = Partial<Props> & {
-        children: Element.Child[];
+        children?: Element.Child[];
     };
     /**
      * Defines any component
