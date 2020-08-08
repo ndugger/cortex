@@ -168,7 +168,7 @@ export class Component extends CustomHTMLElement {
     /**
      * Attaches lifecycle listeners upon instantiation, initializes shadow root
      */
-    public constructor() { 
+    public constructor() {
         super()
 
         this.attachShadow({ mode: 'open' })
@@ -228,7 +228,7 @@ export class Component extends CustomHTMLElement {
             this[ flagged ] = false
             
             this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
-            
+
             try {
                 this.updatedCallback()
                 return Promise.resolve()
@@ -237,7 +237,7 @@ export class Component extends CustomHTMLElement {
                 return Promise.reject(error)
             }
         }
-        
+
         return new Promise((resolve, reject) => {
             window.requestAnimationFrame(() => {
 
@@ -274,7 +274,7 @@ export namespace Component {
     /**
      * Defines a class-based component
      */
-    export interface Constructor<Type extends Node = Node> { 
+    export interface Constructor<Type extends Node = Node> {
         new(): Type & Node
     }
 
@@ -287,7 +287,7 @@ export namespace Component {
 
     /**
      * Decides if a node is a Component
-     * @param node 
+     * @param node
      */
     export function isComponent(node: Node | undefined): node is Component {
         return node instanceof Component
@@ -295,7 +295,7 @@ export namespace Component {
 
     /**
      * Decides if a component is a classical component
-     * @param constructor 
+     * @param constructor
      */
     export function isConstructor<Props>(constructor: Any<Props>): constructor is Constructor<Node & Props> {
         return constructor === constructor?.prototype?.constructor
@@ -303,7 +303,7 @@ export namespace Component {
 
     /**
      * Decides if a component is a functional component
-     * @param constructor 
+     * @param constructor
      */
     export function isFn<Props>(constructor: Any<Props>): constructor is Fn<Props> {
         return !isConstructor(constructor)
@@ -313,6 +313,6 @@ export namespace Component {
      * Event interface used for component lifecycle triggers
      */
     export class LifecycleEvent extends Event {
-        
+
     }
 }
