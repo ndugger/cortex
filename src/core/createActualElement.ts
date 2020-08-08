@@ -1,5 +1,5 @@
 import { Element } from '../Element';
-import { Tag } from 'src/Tag';
+import { mapComponentToTag } from './mapComponentToTag';
 
 const HTML_CLASS_NAME_LOOKUP = {
     [ HTMLAnchorElement.name ]: 'a',
@@ -12,7 +12,7 @@ const HTML_CLASS_NAME_LOOKUP = {
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-export function create<Constructor extends Node>(element: Element<Constructor>): Constructor | undefined {
+export function createActualElement<Constructor extends Node>(element: Element<Constructor>): Constructor | undefined {
     let node: Node
 
     if (Element.isNative(element)) {
@@ -28,7 +28,7 @@ export function create<Constructor extends Node>(element: Element<Constructor>):
             node = window.document.createElement(HTML_CLASS_NAME_LOOKUP[ element.constructor.name ])
         }
         else if (element.constructor as unknown === HTMLElement) {
-            node = window.document.createElement(element.properties?.tag ?? Tag.of(HTMLUnknownElement))
+            node = window.document.createElement(element.properties?.tag ?? mapComponentToTag(HTMLUnknownElement))
         }
         else if (element.constructor.name.startsWith('HTML')) {
 
@@ -39,18 +39,18 @@ export function create<Constructor extends Node>(element: Element<Constructor>):
             node = window.document.createElement(element.constructor.name.replace(/HTML(.*?)Element/, '$1').toLowerCase())
         }
         else if (element.constructor as unknown === SVGElement) {
-            node = window.document.createElementNS(SVG_NAMESPACE, element.properties?.tag ?? Tag.of(HTMLUnknownElement))
+            node = window.document.createElementNS(SVG_NAMESPACE, element.properties?.tag ?? mapComponentToTag(HTMLUnknownElement))
         }
         else if (element.constructor.name.startsWith('SVG')) {
 
             if (element.properties && 'tag' in element.properties) {
-                node = window.document.createElementNS(SVG_NAMESPACE, element.properties?.tag ?? Tag.of(HTMLUnknownElement))
+                node = window.document.createElementNS(SVG_NAMESPACE, element.properties?.tag ?? mapComponentToTag(HTMLUnknownElement))
             }
 
             node = window.document.createElementNS(SVG_NAMESPACE, element.constructor.name.replace(/SVG(.*?)Element/, '$1').replace(/^(FE|SVG|.)/, match => match.toLowerCase()))
         }
         else {
-            node = window.document.createElement(Tag.of(HTMLUnknownElement))
+            node = window.document.createElement(mapComponentToTag(HTMLUnknownElement))
         }
     }
     else {
@@ -58,7 +58,7 @@ export function create<Constructor extends Node>(element: Element<Constructor>):
     }
 
     for (const child of element.children) if (child) {
-        child.node = create(child)
+        child.node = createActualElement(child)
 
         if (child.node) {
             node.appendChild(child.node)

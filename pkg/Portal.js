@@ -1,16 +1,16 @@
-import { render } from './core/render';
+import { createVirtualElement } from './core/createVirtualElement';
 import { Component } from './Component';
 import { Fragment } from './Fragment';
 const portals = new Map();
 export class Portal extends Component {
     static Mirror(props) {
         return [
-            render(Portal.Reflection, { target: this }, ...props?.children ?? [])
+            createVirtualElement(Portal.Reflection, { target: this }, ...props?.children ?? [])
         ];
     }
     render() {
         return [
-            render(HTMLSlotElement)
+            createVirtualElement(HTMLSlotElement)
         ];
     }
     theme() {

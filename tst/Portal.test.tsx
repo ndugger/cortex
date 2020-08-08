@@ -1,6 +1,11 @@
-import { Component, Portal } from '../src'
+import { Component, Portal, createVirtualElement, tag } from '../src'
 
-class TestPortal extends Portal {
+@tag('my-custom-test-component')
+class TestComponent extends Component {
+
+}
+
+class TestPortal extends Portal { 
 
     /**
      * Foo of test portal
@@ -19,10 +24,12 @@ class TestPortal extends Portal {
     }
 }
 
-const TestComponentFn: Component.Fn<TestComponentFn.Props> = props => {
+const TestComponentFn: Component.Fn<TestComponentFn.Props> = ({ 
+    children = [] 
+}) => {
     return [
         <TestPortal.Mirror>
-            { ...props.children }
+            { ...children }
         </TestPortal.Mirror>
     ]
 }
@@ -35,17 +42,17 @@ namespace TestComponentFn {
 }
 
 const TestRootComponentFn: Component.Fn = () => {
-    const foo = Component.Factory(TestComponentFn)
+    const foo = createVirtualElement(TestComponentFn)
     const bar = <TestComponentFn/>;
 
     <TestPortal/>;
     <HTMLStyleElement/>;
     <HTMLStyleElement textContent=''/>;
 
-    Component.Factory(HTMLStyleElement)
-    Component.Factory(HTMLStyleElement, { textContent: '' })
-    Component.Factory(TestPortal)
-    Component.Factory(TestPortal, { foo: true });
+    createVirtualElement(HTMLStyleElement)
+    createVirtualElement(HTMLStyleElement, { textContent: '' })
+    createVirtualElement(TestPortal)
+    createVirtualElement(TestPortal, { foo: true });
 
     <Text data=''/>;
 

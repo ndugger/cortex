@@ -1,3 +1,4 @@
+import { createVirtualElement } from './core/createVirtualElement';
 import { Component } from './Component';
 import { Fragment } from './Fragment';
 /**
@@ -56,6 +57,7 @@ export declare namespace Element {
         };
         tag?: string;
     };
+    const create: typeof createVirtualElement;
     /**
      * Determines if constructor is a custom element
      * @param element

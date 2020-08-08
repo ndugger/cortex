@@ -1,7 +1,9 @@
 import { Element } from './Element';
-declare const template: unique symbol;
+import { Component } from './Component';
+declare const cache: unique symbol;
 export declare class Fragment extends DocumentFragment {
-    private [template];
+    private [cache];
+    template: Component.Fn;
     protected render(children: Element.Child[]): Element.Child[];
     remove(): void;
     update(children: Element.Child[]): void;

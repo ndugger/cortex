@@ -5,7 +5,7 @@ import { Context } from '../Context';
  * @param root Node from where to search
  * @param key Key used to retrieve object from context
  */
-export function depend<Dependency extends Context>(root: Node | undefined, key: new() => Dependency): Dependency | undefined {
+export function findParentContext<Dependency extends Context>(root: Node | undefined, key: new() => Dependency): Dependency | undefined {
 
     /**
      * If we reach the top, return undefined
@@ -25,11 +25,11 @@ export function depend<Dependency extends Context>(root: Node | undefined, key: 
      * If we've reached the top of a shadow's tree, try the host next
      */
     if (root instanceof ShadowRoot) {
-        return depend(root.host, key);
+        return findParentContext(root.host, key);
     }
 
     /**
      * Go up a level
      */
-    return depend(root.parentNode ?? undefined, key);
+    return findParentContext(root.parentNode ?? undefined, key);
 }

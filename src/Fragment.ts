@@ -1,50 +1,53 @@
-import { connect } from './core/connect'
-import { create } from './core/create'
-import { diff } from './core/diff'
-import { render } from './core/render'
-import { childToElement } from './util/childToElement'
 import { Element } from './Element'
+import { Component } from './Component'
 
-const template = Symbol('template')
+import { connectElementToHost } from './core/connectElementToHost'
+import { createActualElement } from './core/createActualElement'
+import { mergeTreeChanges } from './core/mergeTreeChanges'
+import { mapChildToElement } from './core/mapChildToElement'
+
+const cache = Symbol('cache')
 
 export class Fragment extends DocumentFragment {
 
-    private [ template ]: Element.Optional[]
+    private [ cache ]: Element.Optional[]
+
+    public template: Component.Fn
 
     protected render(children: Element.Child[]): Element.Child[] {
         return children
     }
 
     public remove(): void {
-        for (const element of this[ template ]) if (element?.node) {
+        for (const element of this[ cache ]) if (element?.node) {
             element.node.parentNode?.removeChild(element.node)
         }
     }
 
     public update(children: Element.Child[]): void {
-        const tree = this.render(children).map(childToElement)
+        const tree = this.render(children).map(mapChildToElement)
 
         /**
          * If first time render, just save new tree
          * Otherwise diff tree recursively
          */
-        if (!this[ template ]) {
-            this[ template ] = tree
+        if (!this[ cache ]) {
+            this[ cache ] = tree
         }
         else {
-            this[ template ] = diff(this[ template ], tree)
+            this[ cache ] = mergeTreeChanges(this[ cache ], tree)
         }
 
         /**
          * Wire up any new component elements with DOM elements
          */
-        for (const element of this[ template ]) if (element) {
+        for (const element of this[ cache ]) if (element) {
 
             if (!element.node) {
-                element.node = create(element)
+                element.node = createActualElement(element)
             }
 
-            connect(element, this)
+            connectElementToHost(element, this)
         }
     }
 }

@@ -1,9 +1,9 @@
+import { createVirtualElement } from './core/createVirtualElement';
 import { Component } from './Component';
-import { render } from './core/render';
 export class Context extends Component {
     render() {
         return [
-            render(HTMLSlotElement)
+            createVirtualElement(HTMLSlotElement)
         ];
     }
     theme() {

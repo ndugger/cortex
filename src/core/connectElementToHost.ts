@@ -1,14 +1,14 @@
 import { Component } from '../Component';
 import { Element } from '../Element';
+import { Fragment } from '../Fragment';
 
-import { create } from './create';
-import { Fragment } from 'src/Fragment';
+import { createActualElement } from './createActualElement';
 
 const XML_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 
 type Host = Component | HTMLElement | SVGElement | ShadowRoot
 
-export function connect<Constructor extends Node>(element: Element<Constructor>, host: Constructor | Host): void {
+export function connectElementToHost<Constructor extends Node>(element: Element<Constructor>, host: Constructor | Host): void {
 
     if (!element.constructor) {
         return
@@ -18,7 +18,7 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
      * If node hasn't been initialized (unlikely), try again
      */
     if (!element.node) {
-        element.node = create(element)
+        element.node = createActualElement(element)
     }
 
     /**
@@ -135,7 +135,7 @@ export function connect<Constructor extends Node>(element: Element<Constructor>,
         element.node.update(element.children)
     }
     else for (const child of element.children) if (child) {
-        connect(child, element.node)
+        connectElementToHost(child, element.node)
     }
 
     if (host !== element.node.parentNode) {

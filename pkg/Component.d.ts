@@ -1,14 +1,13 @@
-import { render } from './core/render';
 import { Context } from './Context';
 import { Element } from './Element';
 /**
- * Symbol which represents a component's element tree
+ * Symbol which represents a component's rendered tree
  */
-declare const template: unique symbol;
+declare const cache: unique symbol;
 /**
- * Sumbol which represents whether or not there are changes during updates
+ * Sumbol which represents whether or not there are changes during update
  */
-declare const staged: unique symbol;
+declare const flagged: unique symbol;
 /**
  * Proxy used in order to register a custom element before it is instantiated for the first time
  */
@@ -23,11 +22,11 @@ export declare class Component extends CustomHTMLElement {
     /**
      * Field in which component's template is stored
      */
-    private [template];
+    private [cache];
     /**
      * Field in which component render status is stored
      */
-    private [staged];
+    private [flagged];
     /**
      * Part of custom elements API: called when element mounts to a DOM
      */
@@ -71,11 +70,6 @@ export declare class Component extends CustomHTMLElement {
      */
     protected handleComponentUpdate(event: Component.LifecycleEvent): void;
     /**
-     * Retrieves a dependency from context.
-     * @param key Object which acts as the key of the stored value.
-     */
-    protected getContext<Dependency extends Context>(dependency: new () => Dependency): Dependency['value'];
-    /**
      * Constructs a component's template
      */
     protected render(): Element.Child[];
@@ -88,6 +82,11 @@ export declare class Component extends CustomHTMLElement {
      */
     constructor();
     /**
+     * Retrieves a dependency from context.
+     * @param dependency Object which acts as the key of the stored value.
+     */
+    getContext<Dependency extends Context>(dependency: new () => Dependency): Dependency['value'];
+    /**
      * Triggers an update
      * @param props Optional properties to update with
      * @param immediate Whether or not to attempt an update this frame
@@ -95,10 +94,6 @@ export declare class Component extends CustomHTMLElement {
     update(props?: object, immediate?: boolean): Promise<void>;
 }
 export declare namespace Component {
-    /**
-     * JSX component factory
-     */
-    const Factory: typeof render;
     type PropsWithChildren<Props = unknown> = Partial<Props> & {
         children?: Element.Child[];
     };

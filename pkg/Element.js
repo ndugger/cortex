@@ -1,12 +1,14 @@
-import { Tag } from './Tag';
+import { createVirtualElement } from './core/createVirtualElement';
+import { mapComponentToTag } from './core/mapComponentToTag';
 export var Element;
 (function (Element) {
+    Element.create = createVirtualElement;
     /**
      * Determines if constructor is a custom element
      * @param element
      */
     function isCustom(element) {
-        return Boolean(window.customElements.get(Tag.of(element.constructor)));
+        return Boolean(window.customElements.get(mapComponentToTag(element.constructor)));
     }
     Element.isCustom = isCustom;
     /**

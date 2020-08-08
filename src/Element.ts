@@ -1,6 +1,8 @@
+import { createVirtualElement } from './core/createVirtualElement'
+import { mapComponentToTag } from './core/mapComponentToTag'
+
 import { Component } from './Component'
 import { Fragment } from './Fragment'
-import { Tag } from './Tag'
 
 /**
  * Represents a virtual library element
@@ -76,12 +78,14 @@ export namespace Element {
             tag?: string
         }
 
+    export const create = createVirtualElement
+
     /**
      * Determines if constructor is a custom element
      * @param element 
      */
     export function isCustom(element: Element): element is Element<Component> {
-        return Boolean(window.customElements.get(Tag.of(element.constructor)))
+        return Boolean(window.customElements.get(mapComponentToTag(element.constructor)))
     }
 
     /**

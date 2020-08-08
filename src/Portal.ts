@@ -1,4 +1,4 @@
-import { render } from './core/render'
+import { createVirtualElement } from './core/createVirtualElement'
 
 import { Component } from './Component'
 import { Element } from './Element'
@@ -10,13 +10,13 @@ export class Portal extends Component implements Portal.Props {
 
     public static Mirror(props: Component.PropsWithChildren) {
         return [
-            render(Portal.Reflection, { target: this }, ...props?.children ?? [])
+            createVirtualElement(Portal.Reflection, { target: this }, ...props?.children ?? [])
         ]
     }
 
     protected render(): Element[] {
         return [
-            render(HTMLSlotElement)
+            createVirtualElement(HTMLSlotElement)
         ]
     }
 

@@ -1,6 +1,7 @@
+import { createVirtualElement } from './core/createVirtualElement'
+
 import { Component } from './Component'
 import { Element } from './Element'
-import { render } from './core/render'
 
 export class Context<Data extends object = {}> extends Component {
 
@@ -8,7 +9,7 @@ export class Context<Data extends object = {}> extends Component {
 
     public render(): Element[] {
         return [ 
-            render(HTMLSlotElement) 
+            createVirtualElement(HTMLSlotElement) 
         ]
     }
 

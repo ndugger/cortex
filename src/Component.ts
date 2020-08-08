@@ -1,24 +1,23 @@
-import { connect } from './core/connect'
-import { create } from './core/create'
-import { depend } from './core/depend'
-import { diff } from './core/diff'
-import { render } from './core/render'
-
-import { childToElement } from './util/childToElement'
+import { connectElementToHost } from './core/connectElementToHost'
+import { createActualElement } from './core/createActualElement'
+import { createVirtualElement } from './core/createVirtualElement'
+import { findParentContext } from './core/findParentContext'
+import { mapChildToElement } from './core/mapChildToElement'
+import { mapComponentToTag } from './core/mapComponentToTag'
+import { mergeTreeChanges } from './core/mergeTreeChanges'
 
 import { Context } from './Context'
 import { Element } from './Element'
-import { Tag } from './Tag'
 
 /**
- * Symbol which represents a component's element tree
+ * Symbol which represents a component's rendered tree
  */
-const template = Symbol('template')
+const cache = Symbol('cache')
 
 /**
- * Sumbol which represents whether or not there are changes during updates
+ * Sumbol which represents whether or not there are changes during update
  */
-const staged = Symbol('staged')
+const flagged = Symbol('flagged')
 
 /**
  * Proxy used in order to register a custom element before it is instantiated for the first time
@@ -26,7 +25,7 @@ const staged = Symbol('staged')
 const CustomHTMLElement = new Proxy(HTMLElement, {
 
     construct(element, args, component): object {
-        const tag = Tag.of(component)
+        const tag = mapComponentToTag(component)
         
         if (!window.customElements.get(tag)) {
             window.customElements.define(tag, component)
@@ -44,12 +43,12 @@ export class Component extends CustomHTMLElement {
     /**
      * Field in which component's template is stored
      */
-    private [ template ]: Element.Optional[]
+    private [ cache ]: Element.Optional[]
 
     /**
      * Field in which component render status is stored
      */
-    private [ staged ]: boolean
+    private [ flagged ]: boolean
     
     /**
      * Part of custom elements API: called when element mounts to a DOM
@@ -85,30 +84,30 @@ export class Component extends CustomHTMLElement {
      * Custom lifecycle hook: called when element is ready or updated
      */
     protected updatedCallback(): void {
-        const style = render(HTMLStyleElement, { textContent: this.theme() })
-        const tree = this.render().concat(style).map(childToElement)
+        const style = createVirtualElement(HTMLStyleElement, { textContent: this.theme() })
+        const tree = this.render().concat(style).map(mapChildToElement)
 
         /**
          * If first time render, just save new tree
          * Otherwise diff tree recursively
          */
-        if (!this[ template ]) {
-            this[ template ] = tree
+        if (!this[ cache ]) {
+            this[ cache ] = tree
         }
         else {
-            this[ template ] = diff(this[ template ], tree)
+            this[ cache ] = mergeTreeChanges(this[ cache ], tree)
         }
 
         /**
          * Wire up any new component elements with DOM elements
          */
-        for (const element of this[ template ]) if (element) {
+        for (const element of this[ cache ]) if (element) {
 
             if (!element.node) {
-                element.node = create(element)
+                element.node = createActualElement(element)
             }
 
-            connect(element, this.shadowRoot as ShadowRoot)
+            connectElementToHost(element, this.shadowRoot as ShadowRoot)
         }
 
         window.requestAnimationFrame(() => {
@@ -153,23 +152,6 @@ export class Component extends CustomHTMLElement {
     protected handleComponentUpdate(event: Component.LifecycleEvent): void {}
 
     /**
-     * Retrieves a dependency from context.
-     * @param key Object which acts as the key of the stored value.
-     */
-    protected getContext<Dependency extends Context>(dependency: new() => Dependency): Dependency[ 'value' ] {
-        const found = depend(this, dependency)
-
-        /**
-         * Since it will be unknown whether you are within the specified context, throw if not found
-         */
-        if (!found) {
-            throw new Context.RuntimeError(`Missing context: ${ dependency.name }`)
-        }
-
-        return found.value
-    }
-
-    /**
      * Constructs a component's template
      */
     protected render(): Element.Child[] {
@@ -191,7 +173,7 @@ export class Component extends CustomHTMLElement {
 
         this.attachShadow({ mode: 'open' })
 
-        this.addEventListener('componentconnect', event => {this.handleComponentConnect(event)})
+        this.addEventListener('componentconnect', event => this.handleComponentConnect(event))
         this.addEventListener('componentcreate', event => this.handleComponentCreate(event))
         this.addEventListener('componentdisconnect', event => this.handleComponentDisconnect(event))
         this.addEventListener('componentready', event => this.handleComponentReady(event))
@@ -204,12 +186,29 @@ export class Component extends CustomHTMLElement {
     }
 
     /**
+     * Retrieves a dependency from context.
+     * @param dependency Object which acts as the key of the stored value.
+     */
+    public getContext<Dependency extends Context>(dependency: new() => Dependency): Dependency[ 'value' ] {
+        const found = findParentContext(this, dependency)
+
+        /**
+         * Since it will be unknown whether you are within the specified context, throw if not found
+         */
+        if (!found) {
+            throw new Context.RuntimeError(`Missing context: ${ dependency.name }`)
+        }
+
+        return found.value
+    }
+
+    /**
      * Triggers an update
      * @param props Optional properties to update with
      * @param immediate Whether or not to attempt an update this frame
      */
     public update(props: object = {}, immediate = false): Promise<void> {
-        this[ staged ] = true
+        this[ flagged ] = true
 
         for (const prop of Object.keys(props)) {
 
@@ -226,7 +225,7 @@ export class Component extends CustomHTMLElement {
         }
 
         if (immediate) {
-            this[ staged ] = false
+            this[ flagged ] = false
             
             this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
             
@@ -242,11 +241,11 @@ export class Component extends CustomHTMLElement {
         return new Promise((resolve, reject) => {
             window.requestAnimationFrame(() => {
 
-                if (!this[ staged ]) {
+                if (!this[ flagged ]) {
                     return
                 }
 
-                this[ staged ] = false;
+                this[ flagged ] = false;
                 this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
 
                 try {
@@ -262,11 +261,6 @@ export class Component extends CustomHTMLElement {
 }
 
 export namespace Component {
-
-    /**
-     * JSX component factory
-     */
-    export const Factory = render
 
     export type PropsWithChildren<Props = unknown> = Partial<Props> & {
         children?: Element.Child[]

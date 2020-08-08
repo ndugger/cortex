@@ -3,6 +3,6 @@
  * @param existing 
  * @param incoming 
  */
-export function merge(existing: object, incoming: object): object {
+export function mergePropertyChanges(existing: object, incoming: object): object {
     return Object.assign({}, existing, incoming)
 }
