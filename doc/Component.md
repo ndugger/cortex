@@ -17,11 +17,7 @@ Components are the bread and butter in Cortex, it's the mechanism used to define
 ```typescript
 import { Component } from 'cortex'
 
-interface Props {
-    name: string
-}
-
-class Example extends Component {
+export class Example extends Component implements Example.Props {
 
     protected render() {
         return [
@@ -37,6 +33,13 @@ class Example extends Component {
                 font-weight: bold;
             }
         `
+    }
+}
+
+export namespace Example {
+    
+    export interface Props {
+        name: string
     }
 }
 ```

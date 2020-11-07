@@ -1,16 +1,6 @@
-import { Component, Portal, createVirtualElement, tag } from '../src'
-
-@tag('my-custom-test-component')
-class TestComponent extends Component {
-
-}
+import { Component, Element, Portal, createElement } from '../src'
 
 class TestPortal extends Portal { 
-
-    /**
-     * Foo of test portal
-     */
-    public foo: boolean;
 
     protected theme(): string {
         return `
@@ -24,16 +14,6 @@ class TestPortal extends Portal {
     }
 }
 
-const TestComponentFn: Component.Fn<TestComponentFn.Props> = ({ 
-    children = [] 
-}) => {
-    return [
-        <TestPortal.Mirror>
-            { ...children }
-        </TestPortal.Mirror>
-    ]
-}
-
 namespace TestComponentFn {
 
     export interface Props {
@@ -42,29 +22,24 @@ namespace TestComponentFn {
 }
 
 const TestRootComponentFn: Component.Fn = () => {
-    const foo = createVirtualElement(TestComponentFn)
-    const bar = <TestComponentFn/>;
-
-    <TestPortal/>;
-    <HTMLStyleElement/>;
-    <HTMLStyleElement textContent=''/>;
-
-    createVirtualElement(HTMLStyleElement)
-    createVirtualElement(HTMLStyleElement, { textContent: '' })
-    createVirtualElement(TestPortal)
-    createVirtualElement(TestPortal, { foo: true });
-
-    <Text data=''/>;
-
     return [
-        <TestComponentFn/>,
-        <TestPortal foo/>,
-        'hello'
+        <TestPortal.Mirror/>,
+        'hello',
+        ' ',
+        <TestPortal>
+            world
+        </TestPortal>
     ]
 }
 
-<TestRootComponentFn>
-    foo bar baz
-</TestRootComponentFn>
+class PortalTest extends Component {
 
+    public render(): Element.Child[] {
+        console.dir(this)
+        return [
+            <TestRootComponentFn/>
+        ]
+    }
+}
 
+document.body.append(new PortalTest())

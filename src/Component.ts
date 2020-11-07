@@ -1,12 +1,11 @@
 import { connectElementToHost } from './core/connectElementToHost'
-import { createActualElement } from './core/createActualElement'
-import { createVirtualElement } from './core/createVirtualElement'
+import { createNativeElement } from './core/createNativeElement'
+import { createElement } from './core/createElement'
 import { findParentContext } from './core/findParentContext'
 import { mapChildToElement } from './core/mapChildToElement'
 import { mapComponentToTag } from './core/mapComponentToTag'
 import { mergeTreeChanges } from './core/mergeTreeChanges'
 
-import { Context } from './Context'
 import { Element } from './Element'
 
 /**
@@ -84,7 +83,7 @@ export class Component extends CustomHTMLElement {
      * Custom lifecycle hook: called when element is ready or updated
      */
     protected updatedCallback(): void {
-        const style = createVirtualElement(HTMLStyleElement, { textContent: this.theme() })
+        const style = createElement(HTMLStyleElement, { textContent: this.theme() })
         const tree = this.render().concat(style).map(mapChildToElement)
 
         /**
@@ -104,7 +103,7 @@ export class Component extends CustomHTMLElement {
         for (const element of this[ cache ]) if (element) {
 
             if (!element.node) {
-                element.node = createActualElement(element)
+                element.node = createNativeElement(element)
             }
 
             connectElementToHost(element, this.shadowRoot as ShadowRoot)
@@ -171,14 +170,14 @@ export class Component extends CustomHTMLElement {
     public constructor() {
         super()
 
-        this.attachShadow({ mode: 'open' })
-
         this.addEventListener('componentconnect', event => this.handleComponentConnect(event))
         this.addEventListener('componentcreate', event => this.handleComponentCreate(event))
         this.addEventListener('componentdisconnect', event => this.handleComponentDisconnect(event))
         this.addEventListener('componentready', event => this.handleComponentReady(event))
         this.addEventListener('componentrender', event => this.handleComponentRender(event))
         this.addEventListener('componentupdate', event => this.handleComponentUpdate(event))
+
+        this.attachShadow({ mode: 'open' })
 
         window.requestAnimationFrame(() => {
             this.dispatchEvent(new Component.LifecycleEvent('componentcreate'))
@@ -189,14 +188,14 @@ export class Component extends CustomHTMLElement {
      * Retrieves a dependency from context.
      * @param dependency Object which acts as the key of the stored value.
      */
-    public getContext<Dependency extends Context>(dependency: new() => Dependency): Dependency[ 'value' ] {
+    public getContext<Dependency extends Component.Context>(dependency: new() => Dependency): Dependency[ 'value' ] {
         const found = findParentContext(this, dependency)
 
         /**
          * Since it will be unknown whether you are within the specified context, throw if not found
          */
         if (!found) {
-            throw new Context.RuntimeError(`Missing context: ${ dependency.name }`)
+            throw new Error(`Missing context: ${ dependency.name }`)
         }
 
         return found.value
@@ -294,11 +293,20 @@ export namespace Component {
     }
 
     /**
-     * Decides if a component is a classical component
+     * Decides if a component is a node constructor
      * @param constructor
      */
     export function isConstructor<Props>(constructor: Any<Props>): constructor is Constructor<Node & Props> {
-        return constructor === constructor?.prototype?.constructor
+
+        if (!constructor || constructor === Object) {
+            return false
+        }
+
+        if (constructor as any === Node) {
+            return true
+        }
+
+        return isConstructor(Object.getPrototypeOf(constructor))
     }
 
     /**
@@ -307,6 +315,28 @@ export namespace Component {
      */
     export function isFn<Props>(constructor: Any<Props>): constructor is Fn<Props> {
         return !isConstructor(constructor)
+    }
+
+    /**
+     * Used to provide contextual state within a given component tree
+     */
+    export class Context<Data extends object = {}> extends Component {
+
+        public value?: Data
+    
+        public render(): Element[] {
+            return [ 
+                createElement(HTMLSlotElement)
+            ]
+        }
+    
+        public theme(): string {
+            return `
+                :host {
+                    display: contents;
+                }
+            `
+        }
     }
 
     /**

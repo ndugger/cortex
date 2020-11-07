@@ -1,4 +1,4 @@
-import { createVirtualElement } from './core/createVirtualElement'
+import { createElement } from './core/createElement'
 import { mapComponentToTag } from './core/mapComponentToTag'
 
 import { Component } from './Component'
@@ -78,7 +78,7 @@ export namespace Element {
             tag?: string
         }
 
-    export const create = createVirtualElement
+    export const create = createElement
 
     /**
      * Determines if constructor is a custom element

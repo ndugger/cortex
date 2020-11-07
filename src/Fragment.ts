@@ -2,7 +2,7 @@ import { Element } from './Element'
 import { Component } from './Component'
 
 import { connectElementToHost } from './core/connectElementToHost'
-import { createActualElement } from './core/createActualElement'
+import { createNativeElement } from './core/createNativeElement'
 import { mergeTreeChanges } from './core/mergeTreeChanges'
 import { mapChildToElement } from './core/mapChildToElement'
 
@@ -12,15 +12,13 @@ export class Fragment extends DocumentFragment {
 
     private [ cache ]: Element.Optional[]
 
-    public template: Component.Fn
-
     protected render(children: Element.Child[]): Element.Child[] {
         return children
     }
 
     public remove(): void {
-        for (const element of this[ cache ]) if (element?.node) {
-            element.node.parentNode?.removeChild(element.node)
+        for (const element of this[ cache ]) {
+            element?.node?.parentNode?.removeChild(element?.node)
         }
     }
 
@@ -44,7 +42,7 @@ export class Fragment extends DocumentFragment {
         for (const element of this[ cache ]) if (element) {
 
             if (!element.node) {
-                element.node = createActualElement(element)
+                element.node = createNativeElement(element)
             }
 
             connectElementToHost(element, this)

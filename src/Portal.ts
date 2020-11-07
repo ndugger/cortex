@@ -1,47 +1,65 @@
-import { createVirtualElement } from './core/createVirtualElement'
+import { createElement } from './core/createElement'
 
 import { Component } from './Component'
 import { Element } from './Element'
 import { Fragment } from './Fragment'
 
 const portals = new Map<Component.Constructor<Portal>, Portal>()
+const mirrors = new Map<Component.Constructor<Portal>, Portal.Reflection[]>()
 
-export class Portal extends Component implements Portal.Props {
+export class Portal extends Fragment {
+    
+    public static get Mirror() {
 
-    public static Mirror(props: Component.PropsWithChildren) {
-        return [
-            createVirtualElement(Portal.Reflection, { target: this }, ...props?.children ?? [])
-        ]
-    }
+        if (!mirrors.has(this)) {
+            mirrors.set(this, [])
+        }
 
-    protected render(): Element[] {
-        return [
-            createVirtualElement(HTMLSlotElement)
+        return () => [
+            createElement(Portal.Reflection, { src: this })
         ]
     }
 
     protected theme(): string {
-        return `
-            :host {
-                display: contents;
-                position: relative;
-            }
-        `
+        return ``
     }
 }
 
 export namespace Portal {
 
-    export interface Props {}
+    export class Reflection extends Component {
 
-    export class Reflection extends Fragment implements Reflection.Props {
-        public target: Component.Constructor<Portal>
-    }
+        public src: Component.Constructor<Portal>
 
-    export namespace Reflection {
+        public constructor() {
+            super()
+            mirrors.get(this.src)?.push(this)
+        }
 
-        export interface Props {
-            target: Component.Constructor<Portal>
+        protected render(): Element[] {
+            return [
+                createElement(HTMLSlotElement)
+            ]
+        }
+
+        protected theme(): string {
+            return this.src.prototype.theme() || `
+                :host {
+                    display: contents;
+                    position: relative;
+                }
+            `
         }
     }
+
+    // export class Reflection extends Fragment implements Reflection.Props {
+    //     public target: Component.Constructor<Portal>
+    // }
+
+    // export namespace Reflection {
+
+    //     export interface Props {
+    //         target: Component.Constructor<Portal>
+    //     }
+    // }
 }

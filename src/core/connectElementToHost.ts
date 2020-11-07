@@ -2,7 +2,7 @@ import { Component } from '../Component';
 import { Element } from '../Element';
 import { Fragment } from '../Fragment';
 
-import { createActualElement } from './createActualElement';
+import { createNativeElement } from './createNativeElement';
 
 const XML_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 
@@ -18,7 +18,7 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
      * If node hasn't been initialized (unlikely), try again
      */
     if (!element.node) {
-        element.node = createActualElement(element)
+        element.node = createNativeElement(element)
     }
 
     /**
@@ -130,7 +130,7 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
     if (Element.isNative(element) && !element.node.classList.contains(element.constructor.name)) {
         element.node.classList.add(element.constructor.name)
     }
-
+    
     if (Fragment.isFragment(element.node)) {
         element.node.update(element.children)
     }
