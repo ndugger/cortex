@@ -1,22 +1,17 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "declaration": true,
-    "jsx": "react",
-    "jsxFactory": "createElement",
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "pkg",
-    "paths": {},
-    "sourceMap": true,
-    "strictNullChecks": true,
-    "target": "es6"
-  },
-  "include": [
-    "src/**/*"
-  ]
+    "compilerOptions": {
+        "baseUrl": ".",
+        "declaration": true,
+        "jsx": "react",
+        "jsxFactory": "createElement",
+        "lib": ["dom", "esnext"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "pkg",
+        "paths": {},
+        "sourceMap": true,
+        "strictNullChecks": true,
+        "target": "es6"
+    },
+    "include": ["src/**/*"]
 }
