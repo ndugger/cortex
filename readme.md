@@ -1,14 +1,11 @@
 # cortex
 Lightweight Web Component Framework
 
-## Attention
-Cortex is currently being rewritten to add functional components, fragments, and portals. To install the current working version (`2.0.0`) you may run the following command:
+Cortex (library) is a thin layer on top of "native" web components. It helps orchestrate diffing, and lifecycle triggers like rendering, and updating.
 
-```
-npm install github:ndugger/cortex#2.0.0 --save
-```
+The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like plain CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very tiny.
 
-The current up to date `3.0.0-alpha` may be installed with the following command:
+See [how to enable JSX](#JSX-Support) below.
 
 ```
 npm install github:ndugger/cortex --save
@@ -22,18 +19,11 @@ npm install github:ndugger/cortex --save
 - [Portal](doc/Portal.md)
 - [Tag](doc/Tag.md)
 
-## 2.0.0 Documentation
+&nbsp;
 
-### Why "cortex"?
-**cor·tex**
+---
 
-/ˈkôrˌteks/
-
-> the thin outer layer of the cerebrum (the cerebral cortex ), composed of folded gray matter and playing an important role in consciousness.
-
-Cortex (library) is a thin layer on top of "native" web components. It helps orchestrate diffing, and lifecycle triggers like rendering, and updating.
-
-The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality, like plain CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very tiny.
+&nbsp;
 
 ### Example
 ```typescript
@@ -69,8 +59,15 @@ example.append(new Text('Hello World'))
 
 document.body.append(example)
 ```
+<p style='display: flex; justify-content: center'>
+    <img src='https://i.imgur.com/6nMCuib.png'/>
+</p>
 
-![](https://i.imgur.com/6nMCuib.png)
+&nbsp;
+
+---
+
+&nbsp;
 
 ### Explanation
 "Native" web components are class-based. You need to extend the base class `HTMLElement` in order for it to be compatible with the DOM.
@@ -78,26 +75,31 @@ document.body.append(example)
 The `Component` class acts as proxy to the `HTMLElement` class that also automatically registers the custom element, and adds lifecycle capabilities.
 
 ```typescript
-import * as Cortex from 'cortex'
+import { Component, Element, createElement } from 'cortex'
 
-export class Example extends Cortex.Component {
-
-}
+export class Example extends Component {}
 ```
 
-There are two public methods that you can/should override: `render` & `theme`. The `render` method returns an array of `Cortex.Element`s (which is a virtual representation of that component's tree). The `theme` method returns a string containing the CSS for that component.
+There are two protected methods that you can/should override: `render` & `theme`. The `render` method returns an array of `Element.Child`s (which is a virtual representation of that component's layout). The `theme` method returns a string containing the CSS for that component.
 
 ```typescript
-public render(): Cortex.Element[] {
+protected render(): Element.Child[] {
     return []
 }
 
-public theme(): string {
+protected theme(): string {
     return ``
 }
 ```
 
-Cortex also supports JSX, so within the render method, you can markup your components very similarly to React.
+&nbsp;
+
+---
+
+&nbsp;
+
+### JSX Support
+Cortex also supports JSX within the render method so you can markup your components very similarly to React.
 
 ```typescript
 public render(): Cortex.Element[] {
@@ -106,6 +108,19 @@ public render(): Cortex.Element[] {
     ]
 }
 ```
+
+In order to enable JSX for cotex, you must add the following to your TypeScript compiler options:
+
+```json
+"jsx": "react",
+"jsxFactory": "createElement",
+```
+
+&nbsp;
+
+---
+
+&nbsp;
 
 **Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class into the JSX; no "literals" allowed, like `div`, `button`, etc.
 
@@ -135,109 +150,11 @@ Since cortex uses shadow DOM under the hood, not only is your CSS properly scope
 </HTMLButtonElement>
 ```
 
-### Lifecycle Methods
+&nbsp;
 
-##### - create
-```typescript
-protected handleComponentCreate(event: CustomEvent): void
-```
-Dispatched when the component's constructor is called.
+---
 
-##### - connect
-```typescript
-protected handleComponentConnect(event: CustomEvent): void
-```
-Dispatched when the component has been attached to the DOM.
-
-##### - disconnect
-```typescript
-protected handleComponentDisconnect(event: CustomEvent): void
-```
-Dispatched when the component has been disconnected from the DOM.
-
-##### - render
-```typescript
-protected handleComponentRender(event: CustomEvent): void
-```
-Dispatched when the component has been rendered.
-
-##### - ready
-```typescript
-protected handleComponentReady(event: CustomEvent): void
-```
-Dispatched after the component has been rendered and is ready to be used.
-
-##### - update
-```typescript
-protected handleComponentUpdate(event: CustomEvent): void
-```
-Dispatched every time the component's state changes.
-
-### State Management
-State management is missing from Cortex, as that level of control is up to you. As it stands, you may update fields on a component and initiate a manual update with the `update()` method.
-
-```typescript
-class Root extends Cortex.Component {
-
-    public foo: boolean;
-
-    protected handleComponentReady(): void {
-        this.update({ foo: true })
-    }
-}
-```
-
-### Context
-Cortex components may hook into data stores in the form of context. This context is local to the DOM tree in which it resides.
-
-```typescript
-interface App {
-    name: string
-}
-
-class AppContext extends Cortex.Context<App> {
-    value = {
-        name: 'default_value'
-    }
-}
-```
-
-```typescript
-class Page extends Cortex.Component {
-
-    public name?: string;
-
-    public render(): Cortex.Element[] {
-        const app = this.getContext(AppContext)
-
-        return [
-            <HTMLElement tag='strong'>
-                hello { this?.name }
-            </HTMLElement>,
-            <HTMLElement tag='em'>
-                welcome to { app?.name }
-            </HTMLElement>
-        ]
-    }
-}
-```
-
-```typescript
-class Root extends Cortex.Component {
-
-    public render(): Cortex.Element[] {
-        const app = { 
-            name: 'demo' 
-        }
-
-        return [
-            <AppContext value={ app }>
-                <Page/>
-            </AppContext>
-        ]
-    }
-}
-```
+&nbsp;
 
 ### SVG Support
 WIP... had this working at one point, will revist in near future

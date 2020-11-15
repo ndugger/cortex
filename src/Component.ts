@@ -1,24 +1,28 @@
-import { connect } from './core/connect'
-import { create } from './core/create'
-import { depend } from './core/depend'
-import { diff } from './core/diff'
-import { render } from './core/render'
+import { connectElementToHost } from './core/connectElementToHost'
+import { createDocumentNode } from './core/createDocumentNode'
+import { createElement } from './core/createElement'
+import { findParentContext } from './core/findParentContext'
+import { mapChildToElement } from './core/mapChildToElement'
+import { mapComponentToTag } from './core/mapComponentToTag'
+import { mergeTreeChanges } from './core/mergeTreeChanges'
 
-import { childToElement } from './util/childToElement'
-
-import { Context } from './Context'
 import { Element } from './Element'
-import { Tag } from './Tag'
+import { Fragment } from './Fragment'
 
 /**
- * Symbol which represents a component's element tree
+ * Array which acts as a deque of the current branch of components
  */
-const template = Symbol('template')
+const branch: Component[] = []
 
 /**
- * Sumbol which represents whether or not there are changes during updates
+ * Symbol which represents a component's rendered tree
  */
-const staged = Symbol('staged')
+const layout = Symbol('layout')
+
+/**
+ * Sumbol which represents whether or not there are changes during update
+ */
+const flagged = Symbol('flagged')
 
 /**
  * Proxy used in order to register a custom element before it is instantiated for the first time
@@ -26,8 +30,8 @@ const staged = Symbol('staged')
 const CustomHTMLElement = new Proxy(HTMLElement, {
 
     construct(element, args, component): object {
-        const tag = Tag.of(component)
-
+        const tag = mapComponentToTag(component)
+        
         if (!window.customElements.get(tag)) {
             window.customElements.define(tag, component)
         }
@@ -44,31 +48,29 @@ export class Component extends CustomHTMLElement {
     /**
      * Field in which component's template is stored
      */
-    private [ template ]: Element.Optional[]
+    private [ layout ]: Element.Optional[]
 
     /**
      * Field in which component render status is stored
      */
-    private [ staged ]: boolean
-
+    private [ flagged ]: boolean
+    
     /**
      * Part of custom elements API: called when element mounts to a DOM
      */
     protected connectedCallback(): void {
+        this.dispatchEvent(new Component.LifecycleEvent('componentconnect'))
+        this.update()
+
+        /**
+         * In order to increase type safety, each element receives a `className` equal to its class' name
+         */
+        if (!this.classList.contains(this.constructor.name)) {
+            this.classList.add(this.constructor.name)
+        }
+
         window.requestAnimationFrame(() => {
-            this.dispatchEvent(new Component.LifecycleEvent('componentconnect'))
-            this.updatedCallback()
-
-            /**
-             * In order to increase type safety, each element receives a `className` equal to its class' name
-             */
-            if (!this.classList.contains(this.constructor.name)) {
-                this.classList.add(this.constructor.name)
-            }
-
-            window.requestAnimationFrame(() => {
-                this.dispatchEvent(new Component.LifecycleEvent('componentready'))
-            })
+            this.dispatchEvent(new Component.LifecycleEvent('componentready'))
         })
     }
 
@@ -85,35 +87,39 @@ export class Component extends CustomHTMLElement {
      * Custom lifecycle hook: called when element is ready or updated
      */
     protected updatedCallback(): void {
-        const style = render(HTMLStyleElement, { textContent: this.theme() })
-        const tree = this.render().concat(style).map(childToElement)
+        branch.push(this)
+
+        const style = createElement(HTMLStyleElement, { textContent: this.theme() })
+        const elements = this.render().concat(style).map(mapChildToElement)
 
         /**
          * If first time render, just save new tree
          * Otherwise diff tree recursively
          */
-        if (!this[ template ]) {
-            this[ template ] = tree
+        if (!this[ layout ]) {
+            this[ layout ] = elements
         }
         else {
-            this[ template ] = diff(this[ template ], tree)
+            this[ layout ] = mergeTreeChanges(this[ layout ], elements)
         }
 
         /**
          * Wire up any new component elements with DOM elements
          */
-        for (const element of this[ template ]) if (element) {
+        for (const element of this[ layout ]) if (element) {
 
             if (!element.node) {
-                element.node = create(element)
+                element.node = createDocumentNode(element)
             }
 
-            connect(element, this.shadowRoot as ShadowRoot)
+            connectElementToHost(element, this.shadowRoot as ShadowRoot)
         }
 
         window.requestAnimationFrame(() => {
-            this.dispatchEvent(new Component.LifecycleEvent('componentrender'))
+            this.dispatchEvent(new Component.LifecycleEvent('componentrender')) 
         })
+        
+        branch.pop()
     }
 
     /**
@@ -153,23 +159,6 @@ export class Component extends CustomHTMLElement {
     protected handleComponentUpdate(event: Component.LifecycleEvent): void {}
 
     /**
-     * Retrieves a dependency from context.
-     * @param key Object which acts as the key of the stored value.
-     */
-    protected getContext<Dependency extends Context>(dependency: new() => Dependency): Dependency[ 'value' ] {
-        const found = depend(this, dependency)
-
-        /**
-         * Since it will be unknown whether you are within the specified context, throw if not found
-         */
-        if (!found) {
-            throw new Context.RuntimeError(`Missing context: ${ dependency.name }`)
-        }
-
-        return found.value
-    }
-
-    /**
      * Constructs a component's template
      */
     protected render(): Element.Child[] {
@@ -184,23 +173,40 @@ export class Component extends CustomHTMLElement {
     }
 
     /**
-     * Attaches lifecycle listeners upon instantiation, initializes shadow root
+     * Creates a component, attaches lifecycle listeners upon instantiation, and initializes shadow root
      */
     public constructor() {
         super()
 
-        this.attachShadow({ mode: 'open' })
-
-        this.addEventListener('componentconnect', event => {this.handleComponentConnect(event)})
+        this.addEventListener('componentconnect', event => this.handleComponentConnect(event))
         this.addEventListener('componentcreate', event => this.handleComponentCreate(event))
         this.addEventListener('componentdisconnect', event => this.handleComponentDisconnect(event))
         this.addEventListener('componentready', event => this.handleComponentReady(event))
         this.addEventListener('componentrender', event => this.handleComponentRender(event))
         this.addEventListener('componentupdate', event => this.handleComponentUpdate(event))
 
+        this.attachShadow({ mode: 'open' })
+
         window.requestAnimationFrame(() => {
             this.dispatchEvent(new Component.LifecycleEvent('componentcreate'))
         })
+    }
+
+    /**
+     * Retrieves a dependency from context.
+     * @param dependency Object which acts as the key of the stored value
+     */
+    public getContext<Dependency extends Component.Context>(dependency: new() => Dependency): Dependency[ 'value' ] {
+        const found = findParentContext(this, dependency)
+
+        /**
+         * Since it will be unknown whether you are within the specified context, throw if not found
+         */
+        if (!found) {
+            // TODO (delay functional render so context is rendered before functions called) throw new Error(`Missing context: ${ dependency.name }`)
+        }
+
+        return found?.value
     }
 
     /**
@@ -209,7 +215,7 @@ export class Component extends CustomHTMLElement {
      * @param immediate Whether or not to attempt an update this frame
      */
     public update(props: object = {}, immediate = false): Promise<void> {
-        this[ staged ] = true
+        this[ flagged ] = true
 
         for (const prop of Object.keys(props)) {
 
@@ -225,9 +231,12 @@ export class Component extends CustomHTMLElement {
             }
         }
 
+        /**
+         * If immediate mode enabled, don't batch update
+         */
         if (immediate) {
-            this[ staged ] = false
-
+            this[ flagged ] = false
+            
             this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
 
             try {
@@ -239,14 +248,17 @@ export class Component extends CustomHTMLElement {
             }
         }
 
+        /**
+         * If immediate mode not enabled, batch updates
+         */
         return new Promise((resolve, reject) => {
             window.requestAnimationFrame(() => {
 
-                if (!this[ staged ]) {
+                if (!this[ flagged ]) {
                     return
                 }
 
-                this[ staged ] = false;
+                this[ flagged ] = false;
                 this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
 
                 try {
@@ -264,10 +276,8 @@ export class Component extends CustomHTMLElement {
 export namespace Component {
 
     /**
-     * JSX component factory
+     * Adds `children` to props, useful for function-based components
      */
-    export const Factory = render
-
     export type PropsWithChildren<Props = unknown> = Partial<Props> & {
         children?: Element.Child[]
     }
@@ -275,13 +285,13 @@ export namespace Component {
     /**
      * Defines any component
      */
-    export type Any<Props> = Constructor<Node & Props> | Fn<Props>
+    export type Any<Props> = Constructor<Node & Props> | Fn<Props> | (new() => Node)
 
     /**
      * Defines a class-based component
      */
     export interface Constructor<Type extends Node = Node> {
-        new(): Type & Node
+        new(): Type
     }
 
     /**
@@ -300,11 +310,20 @@ export namespace Component {
     }
 
     /**
-     * Decides if a component is a classical component
+     * Decides if a component is a node constructor
      * @param constructor
      */
     export function isConstructor<Props>(constructor: Any<Props>): constructor is Constructor<Node & Props> {
-        return constructor === constructor?.prototype?.constructor
+
+        if (!constructor || constructor === Object) {
+            return false
+        }
+
+        if (constructor as any === Node) {
+            return true
+        }
+
+        return isConstructor(Object.getPrototypeOf(constructor))
     }
 
     /**
@@ -316,9 +335,100 @@ export namespace Component {
     }
 
     /**
+     * Decides if a node is a portal mirror
+     * @param node 
+     */
+    export function isMirror(node: Node | undefined): node is Component.Portal.Mirror {
+        return node instanceof Component.Portal.Mirror
+    }
+
+    /**
+     * Used to provide contextual state within a given component tree
+     */
+    export class Context<Data extends object = {}> extends Component {
+
+        public value?: Data
+    
+        public render(): Element[] {
+            return [ 
+                createElement(HTMLSlotElement)
+            ]
+        }
+    
+        public theme(): string {
+            return `
+                :host {
+                    display: contents;
+                }
+            `
+        }
+    }
+
+    /**
      * Event interface used for component lifecycle triggers
      */
     export class LifecycleEvent extends Event {
 
+    }
+
+    /**
+     * Map of model types to their respective instances
+     */
+    const portals = new Map<Constructor<Portal>, Portal[]>()
+
+    /**
+     * Used to inject elements from one tree into another
+     */
+    export class Portal extends Component {
+
+        /**
+         * Returns a Portal.Mirror bound to a specific portal type
+         */
+        public static get Access() {
+            return (props: PropsWithChildren) => [
+                createElement(Portal.Mirror, { target: this }, ...(props.children ?? []))
+            ]
+        }
+    
+        protected render(): Element.Child[] {
+            return [
+                createElement(HTMLSlotElement)
+            ]
+        }
+    
+        protected theme(): string {
+            return `
+                :host {
+                    display: contents;
+                }
+            `
+        }
+
+        public constructor() {
+            super()
+
+            if (!portals.has(this.constructor as Constructor<Portal>)) {
+                portals.set(this.constructor as Constructor<Portal>, [ this ])
+            } else {
+                portals.get(this.constructor as Constructor<Portal>)?.push(this)
+            }
+        }
+    }
+    
+    export namespace Portal {
+    
+        /**
+         * Used as the injection method for portals
+         */
+        export class Mirror extends Fragment {
+    
+            public target: Constructor<Portal>
+
+            public reflect() {
+                for (const portal of portals.get(this.target) ?? []) {
+                    portal.append(this)
+                }
+            }
+        }
     }
 }
