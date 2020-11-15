@@ -1,10 +1,14 @@
-import { Context } from '../Context';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.findParentContext = void 0;
+const Component_1 = require("../Component");
 /**
  * Traverses up the DOM tree to find context which a component may depend on
  * @param root Node from where to search
  * @param key Key used to retrieve object from context
  */
-export function findParentContext(root, key) {
+function findParentContext(root, key) {
+    var _a;
     /**
      * If we reach the top, return undefined
      */
@@ -14,7 +18,7 @@ export function findParentContext(root, key) {
     /**
      * If context found, return
      */
-    if (root instanceof Context && root.constructor === key) {
+    if (root instanceof Component_1.Component.Context && root.constructor === key) {
         return root;
     }
     /**
@@ -26,6 +30,7 @@ export function findParentContext(root, key) {
     /**
      * Go up a level
      */
-    return findParentContext(root.parentNode ?? undefined, key);
+    return findParentContext((_a = root.parentNode) !== null && _a !== void 0 ? _a : undefined, key);
 }
+exports.findParentContext = findParentContext;
 //# sourceMappingURL=findParentContext.js.map

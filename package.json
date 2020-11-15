@@ -1,6 +1,6 @@
 {
     "name": "cortex",
-    "version": "3.0.0-alpha",
+    "version": "3.0.0",
     "description": "Lightweight Web Component Framework",
     "main": "pkg/index.js",
     "scripts": {

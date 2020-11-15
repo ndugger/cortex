@@ -1,7 +1,10 @@
-export { createVirtualElement } from './core/createVirtualElement';
+import { Component } from './Component';
+export { createElement } from './core/createElement';
 export { defineCustomElement as tag } from './core/defineCustomElement';
 export { Component } from './Component';
-export { Context } from './Context';
 export { Element } from './Element';
 export { Fragment } from './Fragment';
-export { Portal } from './Portal';
+export declare const Context: typeof Component.Context;
+export declare type Context = Component.Context;
+export declare const Portal: typeof Component.Portal;
+export declare type Portal = Component.Portal;

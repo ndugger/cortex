@@ -1,15 +1,24 @@
-import { Element } from './Element';
 import { Component } from './Component';
-declare const cache: unique symbol;
-export declare class Fragment extends DocumentFragment {
-    private [cache];
-    template: Component.Fn;
+import { Element } from './Element';
+declare const layout: unique symbol;
+export declare class Fragment<Props extends object = {}> extends DocumentFragment {
+    private [layout];
+    template?: Fragment.Template<Props>;
     protected render(children: Element.Child[]): Element.Child[];
     remove(): void;
     update(children: Element.Child[]): void;
 }
 export declare namespace Fragment {
-    const Factory: () => void;
+    interface Constructor<Props extends object = {}> {
+        new (): Fragment<Props>;
+    }
+    interface Props {
+        template: Template;
+    }
+    interface Template<Props extends object = {}> {
+        constructor: Component.Fn;
+        properties?: Props;
+    }
     function isFragment(node: Node | undefined): node is Fragment;
 }
 export {};

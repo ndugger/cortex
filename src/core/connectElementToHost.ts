@@ -2,7 +2,7 @@ import { Component } from '../Component';
 import { Element } from '../Element';
 import { Fragment } from '../Fragment';
 
-import { createNativeElement } from './createNativeElement';
+import { createDocumentNode } from './createDocumentNode';
 
 const XML_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 
@@ -18,13 +18,14 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
      * If node hasn't been initialized (unlikely), try again
      */
     if (!element.node) {
-        element.node = createNativeElement(element)
+        element.node = createDocumentNode(element)
     }
 
     /**
      * If it still doesn't exist, something is probably wrong
      */
     if (!element.node) {
+        console.error('Unable to create node for element:', element)
         return
     }
 
@@ -130,15 +131,28 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
     if (Element.isNative(element) && !element.node.classList.contains(element.constructor.name)) {
         element.node.classList.add(element.constructor.name)
     }
-    
+
     if (Fragment.isFragment(element.node)) {
+
+        if (element.properties) for (const property of Object.keys(element.properties)) {
+            if (element.node[ property ] && typeof element.node[ property ] === 'object' && !Array.isArray(element.properties[ property ])) {
+                Object.assign(element.node[ property ], element.properties[ property ])
+            }
+            else {
+                element.node[ property ] = element.properties[ property ]
+            }
+        }
+
         element.node.update(element.children)
     }
     else for (const child of element.children) if (child) {
         connectElementToHost(child, element.node)
     }
 
-    if (host !== element.node.parentNode) {
+    if (Component.isMirror(element.node)) {
+        element.node.reflect()
+    }
+    else if (host !== element.node.parentNode) {
         host.appendChild(element.node)
     }
     else if (Component.isComponent(element.node)) {

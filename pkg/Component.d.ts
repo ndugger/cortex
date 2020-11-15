@@ -1,9 +1,9 @@
-import { Context } from './Context';
 import { Element } from './Element';
+import { Fragment } from './Fragment';
 /**
  * Symbol which represents a component's rendered tree
  */
-declare const cache: unique symbol;
+declare const layout: unique symbol;
 /**
  * Sumbol which represents whether or not there are changes during update
  */
@@ -22,7 +22,7 @@ export declare class Component extends CustomHTMLElement {
     /**
      * Field in which component's template is stored
      */
-    private [cache];
+    private [layout];
     /**
      * Field in which component render status is stored
      */
@@ -78,14 +78,14 @@ export declare class Component extends CustomHTMLElement {
      */
     protected theme(): string;
     /**
-     * Attaches lifecycle listeners upon instantiation, initializes shadow root
+     * Creates a component, attaches lifecycle listeners upon instantiation, and initializes shadow root
      */
     constructor();
     /**
      * Retrieves a dependency from context.
-     * @param dependency Object which acts as the key of the stored value.
+     * @param dependency Object which acts as the key of the stored value
      */
-    getContext<Dependency extends Context>(dependency: new () => Dependency): Dependency['value'];
+    getContext<Dependency extends Component.Context>(dependency: new () => Dependency): Dependency['value'];
     /**
      * Triggers an update
      * @param props Optional properties to update with
@@ -94,18 +94,21 @@ export declare class Component extends CustomHTMLElement {
     update(props?: object, immediate?: boolean): Promise<void>;
 }
 export declare namespace Component {
+    /**
+     * Adds `children` to props, useful for function-based components
+     */
     type PropsWithChildren<Props = unknown> = Partial<Props> & {
         children?: Element.Child[];
     };
     /**
      * Defines any component
      */
-    type Any<Props> = Constructor<Node & Props> | Fn<Props>;
+    type Any<Props> = Constructor<Node & Props> | Fn<Props> | (new () => Node);
     /**
      * Defines a class-based component
      */
     interface Constructor<Type extends Node = Node> {
-        new (): Type & Node;
+        new (): Type;
     }
     /**
      * Defines a function-based component
@@ -119,7 +122,7 @@ export declare namespace Component {
      */
     function isComponent(node: Node | undefined): node is Component;
     /**
-     * Decides if a component is a classical component
+     * Decides if a component is a node constructor
      * @param constructor
      */
     function isConstructor<Props>(constructor: Any<Props>): constructor is Constructor<Node & Props>;
@@ -129,9 +132,43 @@ export declare namespace Component {
      */
     function isFn<Props>(constructor: Any<Props>): constructor is Fn<Props>;
     /**
+     * Decides if a node is a portal mirror
+     * @param node
+     */
+    function isMirror(node: Node | undefined): node is Component.Portal.Mirror;
+    /**
+     * Used to provide contextual state within a given component tree
+     */
+    class Context<Data extends object = {}> extends Component {
+        value?: Data;
+        render(): Element[];
+        theme(): string;
+    }
+    /**
      * Event interface used for component lifecycle triggers
      */
     class LifecycleEvent extends Event {
+    }
+    /**
+     * Used to inject elements from one tree into another
+     */
+    class Portal extends Component {
+        /**
+         * Returns a Portal.Mirror bound to a specific portal type
+         */
+        static get Access(): (props: PropsWithChildren) => Element<Portal.Mirror>[];
+        protected render(): Element.Child[];
+        protected theme(): string;
+        constructor();
+    }
+    namespace Portal {
+        /**
+         * Used as the injection method for portals
+         */
+        class Mirror extends Fragment {
+            target: Constructor<Portal>;
+            reflect(): void;
+        }
     }
 }
 export {};

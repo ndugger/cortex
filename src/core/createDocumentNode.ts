@@ -8,12 +8,13 @@ const HTML_CLASS_NAME_LOOKUP = {
     [ HTMLOListElement.name ]: 'ol',
     [ HTMLParagraphElement.name ]: 'p',
     [ HTMLQuoteElement.name ]: 'q',
+    [ HTMLTableRowElement.name ]: 'tr',
     [ HTMLUListElement.name ]: 'ul'
 };
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-export function createNativeElement<Constructor extends Node>(element: Element<Constructor>): Constructor | undefined {
+export function createDocumentNode<Constructor extends Node>(element: Element<Constructor>): Constructor | undefined {
     let node: Node
 
     if (Element.isNative(element)) {
@@ -36,8 +37,9 @@ export function createNativeElement<Constructor extends Node>(element: Element<C
             if (element?.properties?.tag) {
                 node = window.document.createElement(element.properties.tag)
             }
-
-            node = window.document.createElement(element.constructor.name.replace(/HTML(.*?)Element/, '$1').toLowerCase())
+            else {
+                node = window.document.createElement(element.constructor.name.replace(/HTML(.*?)Element/, '$1').toLowerCase())
+            }
         }
         else if (element.constructor as unknown === SVGElement) {
             node = window.document.createElementNS(SVG_NAMESPACE, element.properties?.tag ?? mapComponentToTag(HTMLUnknownElement))
@@ -58,16 +60,8 @@ export function createNativeElement<Constructor extends Node>(element: Element<C
         node = new element.constructor()
     }
 
-    console.log('==============================')
-    console.log('constructor', element.constructor, element.constructor.prototype.constructor)
-    console.log('prototype', Object.getPrototypeOf(element.constructor))
-    console.dir(element.constructor)
-    console.log('class', Component.isConstructor(element.constructor))
-    console.log('function', Component.isFn(element.constructor))
-    console.log('==============================')
-
     for (const child of element.children) if (child) {
-        child.node = createNativeElement(child)
+        child.node = createDocumentNode(child)
 
         if (child.node) {
             node.appendChild(child.node)
