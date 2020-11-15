@@ -8,7 +8,7 @@ class TestContext extends Context {
     value?: TestValue
 }
 
-class TestPortal extends Portal { 
+class TestPortal extends Portal {
 
     protected theme(): string {
         return `

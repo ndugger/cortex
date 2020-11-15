@@ -31,7 +31,7 @@ const CustomHTMLElement = new Proxy(HTMLElement, {
 
     construct(element, args, component): object {
         const tag = mapComponentToTag(component)
-        
+
         if (!window.customElements.get(tag)) {
             window.customElements.define(tag, component)
         }
@@ -54,7 +54,7 @@ export class Component extends CustomHTMLElement {
      * Field in which component render status is stored
      */
     private [ flagged ]: boolean
-    
+
     /**
      * Part of custom elements API: called when element mounts to a DOM
      */
@@ -116,9 +116,9 @@ export class Component extends CustomHTMLElement {
         }
 
         window.requestAnimationFrame(() => {
-            this.dispatchEvent(new Component.LifecycleEvent('componentrender')) 
+            this.dispatchEvent(new Component.LifecycleEvent('componentrender'))
         })
-        
+
         branch.pop()
     }
 
@@ -236,7 +236,7 @@ export class Component extends CustomHTMLElement {
          */
         if (immediate) {
             this[ flagged ] = false
-            
+
             this.dispatchEvent(new Component.LifecycleEvent('componentupdate'))
 
             try {
@@ -336,7 +336,7 @@ export namespace Component {
 
     /**
      * Decides if a node is a portal mirror
-     * @param node 
+     * @param node
      */
     export function isMirror(node: Node | undefined): node is Component.Portal.Mirror {
         return node instanceof Component.Portal.Mirror
@@ -348,13 +348,13 @@ export namespace Component {
     export class Context<Data extends object = {}> extends Component {
 
         public value?: Data
-    
+
         public render(): Element[] {
-            return [ 
+            return [
                 createElement(HTMLSlotElement)
             ]
         }
-    
+
         public theme(): string {
             return `
                 :host {
@@ -389,13 +389,13 @@ export namespace Component {
                 createElement(Portal.Mirror, { target: this }, ...(props.children ?? []))
             ]
         }
-    
+
         protected render(): Element.Child[] {
             return [
                 createElement(HTMLSlotElement)
             ]
         }
-    
+
         protected theme(): string {
             return `
                 :host {
@@ -414,14 +414,14 @@ export namespace Component {
             }
         }
     }
-    
+
     export namespace Portal {
-    
+
         /**
          * Used as the injection method for portals
          */
         export class Mirror extends Fragment {
-    
+
             public target: Constructor<Portal>
 
             public reflect() {

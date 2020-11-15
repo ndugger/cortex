@@ -13,7 +13,7 @@ export function mergeTreeChanges(existing: Element.Optional[], incoming: Element
     for (let index = 0; index < Math.max(existing.length, incoming.length); ++index) {
         const existingElement = existing[ index ]
         const incomingElement = incoming[ index ]
-        
+
         /**
          * If there is no existing element at this index, use incoming element
          */
@@ -28,7 +28,7 @@ export function mergeTreeChanges(existing: Element.Optional[], incoming: Element
          */
         if (!incomingElement) {
             outgoing.push(undefined)
-            
+
             if (Component.isComponent(existingElement.node) || Fragment.isFragment(existingElement.node)) {
                 existingElement.node.remove()
             }
@@ -45,7 +45,7 @@ export function mergeTreeChanges(existing: Element.Optional[], incoming: Element
          */
         if (existingElement.constructor !== incomingElement.constructor) {
             outgoing.push(incomingElement)
-            
+
             if (Component.isComponent(existingElement.node) || Fragment.isFragment(existingElement.node)) {
                 existingElement.node.remove()
             }

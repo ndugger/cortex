@@ -14,7 +14,7 @@ export function createElement<Constructor extends Node>(constructor: Component.C
 export function createElement<Props extends object>(constructor: Component.Fn<Props>, properties?: Props, ...children: Element.Child[]): Element<Fragment<Props>>
 export function createElement<Props extends object>(constructor: Fragment.Constructor<Props>, properties?: Fragment.Props, ...children: Element.Child[]): Element<Fragment<Props>>
 export function createElement<Props extends object>(constructor: Component.Any<Props>, properties?: Props, ...children: Element.Child[]): Element<Node> {
-    
+
     /**
      * If rendering a functional component, return a fragment with the children being included with the props
      */

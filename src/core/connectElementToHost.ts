@@ -14,7 +14,7 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
         return
     }
 
-    /** 
+    /**
      * If node hasn't been initialized (unlikely), try again
      */
     if (!element.node) {
@@ -35,8 +35,8 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
     else if ((Element.isNative(element) || Element.isCustom(element)) && element.properties) {
 
         for (const property of Object.keys(element.properties)) {
-            
-            /** 
+
+            /**
              * Add attribute namespaces to DOM node
              */
             if (property === 'namespaces') {
@@ -46,13 +46,13 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
                 }
             }
 
-            /** 
+            /**
              * Add attributes to DOM node
              */
             if (property === 'attributes') {
 
                 for (const attribute of Array.from(element.node?.attributes ?? [])) {
-                    
+
                     /**
                      * Remove extra attributes
                      */
@@ -82,14 +82,14 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
                      * If attribute is an object, iterate over fields
                      */
                     if (typeof object === 'object') for (const [ key, value ] of Object.entries(object)) {
-                        
+
                         /**
                          * Skip 'nulled' attributes
                          */
                         if (value === false || value === undefined || value === null) {
                             continue
                         }
-    
+
                         /**
                          * Apply namespaced attributes
                          */
@@ -98,7 +98,7 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
                         }
                         else {
                             const root = (host as Host).querySelector(`xmlns:${ attribute }`)
-    
+
                             if (root) {
                                 element.node.setAttributeNS(root.getAttribute(`xmlns:${ attribute }`), `${ attribute }:${ key }`, String(value))
                             }
@@ -118,7 +118,7 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
             if (element.node[ property ] === element.properties[ property ]) {
                 continue
             }
-    
+
             if (element.node[ property ] && typeof element.node[ property ] === 'object' && !Array.isArray(element.properties[ property ])) {
                 Object.assign(element.node[ property ], element.properties[ property ])
             }

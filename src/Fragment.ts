@@ -78,7 +78,7 @@ export namespace Fragment {
         constructor: Component.Fn
         properties?: Props
     }
-    
+
     export function isFragment(node: Node | undefined): node is Fragment {
         return node instanceof Fragment
     }

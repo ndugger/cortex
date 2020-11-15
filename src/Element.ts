@@ -13,7 +13,7 @@ export interface Element<Props extends Node = Node> {
      * Child elements
      */
     children: Element.Optional[]
-    
+
     /**
      * Component constructor
      */
@@ -67,7 +67,7 @@ export namespace Element {
         Constructor extends SVGElement ?
             Partial<{ [ Key in keyof Constructor ]: string }> :
         Constructor extends Node ?
-            Partial<Constructor> : 
+            Partial<Constructor> :
         unknown) & {
             attributes?: {
                 [ K: string ]: any
@@ -82,7 +82,7 @@ export namespace Element {
 
     /**
      * Determines if constructor is a custom element
-     * @param element 
+     * @param element
      */
     export function isCustom(element: Element): element is Element<Component> {
         return Boolean(window.customElements.get(mapComponentToTag(element.constructor)))
@@ -90,7 +90,7 @@ export namespace Element {
 
     /**
      * Determines if constructor is a built-in element type
-     * @param constructor 
+     * @param constructor
      */
     export function isNative(element: Element): element is Element<HTMLElement> | Element<SVGElement>  {
         return element.constructor.name in globalThis && element.constructor.name.endsWith('Element')
@@ -98,7 +98,7 @@ export namespace Element {
 
     /**
      * Determines if constructor is a text node
-     * @param element 
+     * @param element
      */
     export function isText(element: Element): element is Element<Text> {
         return element.constructor === Text
@@ -117,7 +117,7 @@ declare global {
     }
 
     interface Text {
-        JSX_PROPERTY_TYPES_DO_NOT_USE: Element.TypedProperties<Text> 
+        JSX_PROPERTY_TYPES_DO_NOT_USE: Element.TypedProperties<Text>
     }
 
     namespace JSX {
