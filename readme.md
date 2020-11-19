@@ -1,12 +1,18 @@
 # cortex
 Lightweight Web Component Framework
 
+<<<<<<< Updated upstream
 ## Attention
 Cortex is currently being rewritten to add functional components, fragments, and portals. To install the current working version (`2.0.0`) you may run the following command:
 
 ```
 npm install github:ndugger/cortex#2.0.0 --save
 ```
+=======
+Cortex is a thin orchestration layer on top of "native" web components. It helps diff changes, and enables lifecycle triggers like rendering, connecting, and updating.
+
+The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality like plain CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very small.
+>>>>>>> Stashed changes
 
 The current up to date `3.0.0-alpha` may be installed with the following command:
 
@@ -20,7 +26,6 @@ npm install github:ndugger/cortex --save
 - [Element](doc/Element.md)
 - [Fragment](doc/Fragment.md)
 - [Portal](doc/Portal.md)
-- [Tag](doc/Tag.md)
 
 ## 2.0.0 Documentation
 
@@ -37,9 +42,9 @@ The main goal is to keep the orchestration to a minimum, and rely heavily on alr
 
 ### Example
 ```typescript
-import * as Cortex from 'cortex'
+import { Component, createElement } from 'cortex'
 
-class Example extends Cortex.Component {
+class Example extends Component {
 
     private handleClick(event: Event): void {
         alert('button was clicked!')
@@ -47,7 +52,7 @@ class Example extends Cortex.Component {
 
     public render(): Cortex.Element[] {
         return [
-            <HTMLButtonElement onclick={ e => this.handleClick(e) }>
+            <HTMLButtonElement onclick={ event => this.handleClick(event) }>
                 <HTMLSlotElement/>
             </HTMLButtonElement>
         ]
@@ -63,12 +68,16 @@ class Example extends Cortex.Component {
     }
 }
 
-const example = new Example()
-
-example.append(new Text('Hello World'))
-
-document.body.append(example)
+document.body.append(new Example())
 ```
+<<<<<<< Updated upstream
+=======
+<p align='center'>
+    <img align='center' src='https://i.imgur.com/6nMCuib.png'/>
+</p>
+
+&nbsp;
+>>>>>>> Stashed changes
 
 ![](https://i.imgur.com/6nMCuib.png)
 
@@ -88,6 +97,7 @@ export class Example extends Cortex.Component {
 There are two public methods that you can/should override: `render` & `theme`. The `render` method returns an array of `Cortex.Element`s (which is a virtual representation of that component's tree). The `theme` method returns a string containing the CSS for that component.
 
 ```typescript
+<<<<<<< Updated upstream
 public render(): Cortex.Element[] {
     return []
 }
@@ -98,20 +108,69 @@ public theme(): string {
 ```
 
 Cortex also supports JSX, so within the render method, you can markup your components very similarly to React.
+=======
+export class Example extends Component {
+    
+    protected render(): Element.Child[] {
+        return []
+    }
+
+    protected theme(): string {
+        return ``
+    }
+}
+```
+
+Since cortex uses shadow DOM under the hood, not only is your CSS properly scoped to the component, but you can also make use of slot-based content. Instead of accessing children through a property of that component, simply render an `HTMLSlotElement` and watch as the DOM automatically inserts your content within.
 
 ```typescript
-public render(): Cortex.Element[] {
+<HTMLButtonElement>
+    <HTMLSlotElement/>
+</HTMLButtonElement>
+```
+
+&nbsp;
+
+---
+
+&nbsp;
+
+### JSX Support
+Cortex also supports JSX within the render method so you can markup your components very similarly to React.
+>>>>>>> Stashed changes
+
+```typescript
+public render(): Element.Child[] {
     return [
         <HTMLButtonElement/>
     ]
 }
 ```
 
+<<<<<<< Updated upstream
 **Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class into the JSX; no "literals" allowed, like `div`, `button`, etc.
 
 If there is no standalone class for an element (like `section`, `header`, etc.), you may do `<HTMLElement tag='section'/>`.
 
 Because you must always pass in a class, cortex takes some "left turns" when it comes to certain things, like with CSS classes. Cortex will automatically apply a `className` that is equal to the class' name that you passed in for the element.
+=======
+In order to enable JSX for cotex, you must add the following to your TypeScript compiler options:
+
+```json
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "jsxFactory": "createElement"
+    }
+}
+```
+
+**Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class (or function) to the JSX factory; no "literals" allowed, like `div`, `button`, `a`, etc.
+
+If there is no standalone class for an element (like `section`, `header`, etc.), you may use `<HTMLElement tag='section'/>`.
+
+Because you must always pass in a class, cortex makes some opinionated decisions when it comes to certain things, like with CSS classes. Cortex will automatically apply a `className` that is equal to the class' name that you passed in for the element.
+>>>>>>> Stashed changes
 
 This means that `<HTMLButtonElement/>` becomes `<button class='HTMLButtonElement'/>` in the DOM.
 
@@ -127,6 +186,7 @@ public theme(): Cortex.Element[] {
 }
 ```
 
+<<<<<<< Updated upstream
 Since cortex uses shadow DOM under the hood, not only is your CSS properly scoped to the component, but you can also make use of slot-based content. Instead of accessing children through a property of that component, simply render an `HTMLSlotElement` and watch as the DOM automatically inserts your content within.
 
 ```typescript
@@ -201,6 +261,9 @@ class AppContext extends Cortex.Context<App> {
     }
 }
 ```
+=======
+&nbsp;
+>>>>>>> Stashed changes
 
 ```typescript
 class Page extends Cortex.Component {
