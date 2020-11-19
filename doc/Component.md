@@ -97,7 +97,7 @@ Dispatched every time the component's state changes.
 State management is missing from Cortex, as that level of control is up to you. As it stands, you may update fields on a component and initiate a manual update with the `update()` method.
 
 ```typescript
-class Root extends Cortex.Component {
+class Root extends Component {
 
     private foo: boolean;
 
@@ -126,16 +126,13 @@ It is important to note that use of `<HTMLSlotElement/>` inside of functional co
 ```typescript
 import { Component, createElement } from 'cortex'
 
-export const Example: Component.Fn<Example.Props> = ({
-    children = []
-    name = ''
-}) => [
+export const Example: Component.Fn<Example.Props> = props => [
     <HTMLDivElement>
         <HTMLSpanElement>
-            Hello, { name }
+            Hello, { props.name }
         </HTMLSpanElement>
         <HTMLDivElement>
-            { ...children }
+            { ...props.children }
         </HTMLDivElement>
     </HTMLDivElement>
 ]
