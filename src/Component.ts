@@ -60,7 +60,6 @@ export class Component extends CustomHTMLElement {
      */
     protected connectedCallback(): void {
         this.dispatchEvent(new Component.LifecycleEvent('componentconnect'))
-        this.update()
 
         /**
          * In order to increase type safety, each element receives a `className` equal to its class' name
@@ -69,7 +68,10 @@ export class Component extends CustomHTMLElement {
             this.classList.add(this.constructor.name)
         }
 
-        window.requestAnimationFrame(() => {
+        /**
+         * Initialize component layout, then dispatch readiness
+         */
+        this.update().then(() => {
             this.dispatchEvent(new Component.LifecycleEvent('componentready'))
         })
     }
