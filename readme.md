@@ -126,6 +126,12 @@ In order to enable JSX for cotex, you must add the following to your TypeScript 
 }
 ```
 
+Make sure to always import `createElement` from cortex at the top of your modules.
+
+```typescript
+import { createElement } from 'cortex'
+```
+
 &nbsp;
 
 > **Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class (or function) to the JSX factory; no "literals" allowed, like `div`, `button`, `a`, etc (ex: `<HTMLButtonElement/>`).
