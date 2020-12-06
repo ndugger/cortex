@@ -126,9 +126,13 @@ In order to enable JSX for cotex, you must add the following to your TypeScript 
 }
 ```
 
-**Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class (or function) to the JSX factory; no "literals" allowed, like `div`, `button`, `a`, etc.
+&nbsp;
 
-If there is no standalone class for an element (like `section`, `header`, etc.), you may use `<HTMLElement tag='section'/>`.
+> **Important!** Cortex does not support "intrinsic elements", meaning that you must always pass a class (or function) to the JSX factory; no "literals" allowed, like `div`, `button`, `a`, etc (ex: `<HTMLButtonElement/>`).
+
+&nbsp;
+
+If there is no standalone class for an element (like `section`, `header`, etc.), you may use `<HTMLElement is='section'/>`.
 
 Because you must always pass in a class, cortex makes some opinionated decisions when it comes to certain things, like with CSS classes. Cortex will automatically apply a `className` that is equal to the class' name that you passed in for the element.
 

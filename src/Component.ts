@@ -118,7 +118,7 @@ export class Component extends CustomHTMLElement {
         }
 
         window.requestAnimationFrame(() => {
-            this.dispatchEvent(new Component.LifecycleEvent('componentrender')) 
+            this.dispatchEvent(new Component.LifecycleEvent('componentrender'))
         })
         
         branch.pop()

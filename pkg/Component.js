@@ -58,14 +58,16 @@ class Component extends CustomHTMLElement {
      */
     connectedCallback() {
         this.dispatchEvent(new Component.LifecycleEvent('componentconnect'));
-        this.update();
         /**
          * In order to increase type safety, each element receives a `className` equal to its class' name
          */
         if (!this.classList.contains(this.constructor.name)) {
             this.classList.add(this.constructor.name);
         }
-        window.requestAnimationFrame(() => {
+        /**
+         * Initialize component layout, then dispatch readiness
+         */
+        this.update().then(() => {
             this.dispatchEvent(new Component.LifecycleEvent('componentready'));
         });
     }

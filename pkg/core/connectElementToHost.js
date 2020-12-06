@@ -120,7 +120,7 @@ function connectElementToHost(element, host) {
                     element.node[property] = element.properties[property];
                 }
             }
-        element.node.update(element.children);
+        element.node.connect(element.children);
     }
     else
         for (const child of element.children)

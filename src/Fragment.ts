@@ -18,18 +18,7 @@ export class Fragment<Props extends object = {}> extends DocumentFragment {
         return children
     }
 
-    public remove(): void {
-        for (const element of this[ layout ]) {
-
-            if (Fragment.isFragment(element?.node)) {
-                element?.node.remove();
-            }
-
-            element?.node?.parentNode?.removeChild(element?.node)
-        }
-    }
-
-    public update(children: Element.Child[]): void {
+    public connect(children: Element.Child[]): void {
         let tree: Element.Optional[]
 
         if (this.template) {
@@ -60,6 +49,17 @@ export class Fragment<Props extends object = {}> extends DocumentFragment {
             }
 
             connectElementToHost(element, this)
+        }
+    }
+
+    public remove(): void {
+        for (const element of this[ layout ]) {
+
+            if (Fragment.isFragment(element?.node)) {
+                element?.node.remove();
+            }
+
+            element?.node?.parentNode?.removeChild(element?.node)
         }
     }
 }

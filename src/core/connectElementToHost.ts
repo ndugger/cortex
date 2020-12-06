@@ -135,6 +135,7 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
     if (Fragment.isFragment(element.node)) {
 
         if (element.properties) for (const property of Object.keys(element.properties)) {
+
             if (element.node[ property ] && typeof element.node[ property ] === 'object' && !Array.isArray(element.properties[ property ])) {
                 Object.assign(element.node[ property ], element.properties[ property ])
             }
@@ -143,7 +144,7 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
             }
         }
 
-        element.node.update(element.children)
+        element.node.connect(element.children)
     }
     else for (const child of element.children) if (child) {
         connectElementToHost(child, element.node)

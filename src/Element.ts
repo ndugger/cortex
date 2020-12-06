@@ -75,7 +75,7 @@ export namespace Element {
             namespaces?: {
                 [ K: string ]: string
             }
-            tag?: string
+            is?: string
         }
 
     export const create = createElement

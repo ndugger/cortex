@@ -1,14 +1,14 @@
 import { Component, Context, Element, Portal, createElement } from '../src'
 
-interface TestValue {
+interface Item {
     foo: string
 }
 
-class TestContext extends Context {
-    value?: TestValue
+class ItemContext extends Context {
+    value?: Item
 }
 
-class TestPortal extends Portal { 
+class BlackBoxPortal extends Portal { 
 
     protected theme(): string {
         return `
@@ -24,29 +24,27 @@ class TestPortal extends Portal {
     }
 }
 
-const Div: Component.Fn<TestValue> = props => {
-    return [
-        <HTMLDivElement>
-            { props.children }
-        </HTMLDivElement>
-    ]
-}
+const Div: Component.Fn<Item> = props => [
+    <HTMLDivElement>
+        { props.children }
+    </HTMLDivElement>
+]
 
-const Span: Component.Fn = props => {
-    return [
-        <HTMLSpanElement>
-            { props.children }
-        </HTMLSpanElement>
-    ]
-}
+const Span: Component.Fn = props => [
+    <HTMLSpanElement>
+        { props.children }
+    </HTMLSpanElement>
+]
 
-const Slot: Component.Fn = () => {
-    return [
-        <HTMLSlotElement/>
-    ]
-}
+const Slot: Component.Fn = () => [
+    <HTMLSlotElement/>
+]
 
-class PortalAccessTest extends Component {
+const Divider: Component.Fn = () => [
+    <HTMLElement className='fragmented' is='hr'/>
+]
+
+class Swapper extends Component {
 
     private counter = 1
 
@@ -57,20 +55,20 @@ class PortalAccessTest extends Component {
 
             if (this.counter % 2) {
                 return [
-                    <TestPortal.Access>
+                    <BlackBoxPortal.Access>
                         <Span>
                             world
                         </Span>
-                    </TestPortal.Access>
+                    </BlackBoxPortal.Access>
                 ]
             }
 
             return [
-                <TestPortal.Access>
+                <BlackBoxPortal.Access>
                     <Span>
                         hello
                     </Span>
-                </TestPortal.Access>
+                </BlackBoxPortal.Access>
             ]
         }
 
@@ -79,22 +77,22 @@ class PortalAccessTest extends Component {
                 <Span>
                     world&nbsp;
                 </Span>
-                <TestPortal.Access>
+                <BlackBoxPortal.Access>
                     <Span>
                         hello&nbsp;
                     </Span>
-                </TestPortal.Access>
+                </BlackBoxPortal.Access>
                 { this.counter % 2 > 0 && (
                     <Span>
                         ({ this.counter })
                     </Span>
                 ) }
                 { this.counter % 2 > 0 && (
-                    <TestPortal.Access>
+                    <BlackBoxPortal.Access>
                         <Span>
                             ({ this.counter })
                         </Span>
-                    </TestPortal.Access>
+                    </BlackBoxPortal.Access>
                 ) }
                 <Div foo='2'>
                     <Slot/>
@@ -102,50 +100,72 @@ class PortalAccessTest extends Component {
             </Div>
         ]
     }
-}
 
-class PortalWrapperTest extends Component {
-
-    protected render() {
-        setTimeout(() => this.update(), 1000)
-
-        return [
-            <Slot/>
-        ]
+    protected theme() {
+        return `
+            :host {
+                display: block;
+            }
+        `
     }
 }
 
-class PortalTest extends Component {
+class Wrapper extends Component {
+
+    protected render() {
+        // setTimeout(() => this.update(), 1000)
+
+        return [
+            <HTMLSlotElement/>
+        ]
+    }
+
+    protected theme() {
+        return `
+            :host {
+                background: rgba(0, 0, 0, 0.1);
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.33);
+                display: block;
+                padding: 10px;
+            }
+        `
+    }
+}
+
+class Root extends Component {
 
     protected render(): Element.Child[] {
         return [
-            <PortalWrapperTest className='ROOT'>
-                <TestContext value={ { foo: 'bar' } }>
-                    <PortalWrapperTest>
-                        <TestPortal/>
-                        <PortalAccessTest>
+            <Wrapper className='ROOT'>
+                <ItemContext value={ { foo: 'bar' } }>
+                    <Wrapper>
+                        <BlackBoxPortal/>
+                        <Divider/>
+                        <HTMLElement is='hr'/>
+                        <Swapper>
                             A
-                            <TestPortal.Access>
+                            <BlackBoxPortal.Access>
                                 <Div foo='3'>
                                     B
                                 </Div>
-                            </TestPortal.Access>
-                        </PortalAccessTest>
+                            </BlackBoxPortal.Access>
+                        </Swapper>
                         <HTMLTableElement>
-                            <HTMLTableSectionElement tag='thead'>
+                            <HTMLTableSectionElement is='thead'>
                                 <HTMLTableRowElement>
-                                    { ...Array(15).fill(undefined).map(() => (
-                                        <HTMLTableCellElement tag='th'>
+                                    { ...Array(2).fill(undefined).map(() => (
+                                        <HTMLTableCellElement is='th'>
                                             C
                                         </HTMLTableCellElement>
                                     )) }
                                 </HTMLTableRowElement>
                             </HTMLTableSectionElement>
-                            <HTMLTableSectionElement tag='tbody'>
-                                { ...Array(100).fill(undefined).map(() => (
+                            <HTMLTableSectionElement is='tbody'>
+                                { ...Array(1).fill(undefined).map(() => (
                                     <HTMLTableRowElement>
-                                        { ...Array(15).fill(undefined).map(() => (
-                                            <HTMLTableCellElement tag='td'>
+                                        { ...Array(2).fill(undefined).map(() => (
+                                            <HTMLTableCellElement is='td'>
                                                 D
                                             </HTMLTableCellElement>
                                         )) }
@@ -153,9 +173,9 @@ class PortalTest extends Component {
                                 )) }
                             </HTMLTableSectionElement>
                         </HTMLTableElement>
-                    </PortalWrapperTest>
-                </TestContext>
-            </PortalWrapperTest>
+                    </Wrapper>
+                </ItemContext>
+            </Wrapper>
         ]
     }
 
@@ -171,4 +191,16 @@ class PortalTest extends Component {
     }
 }
 
-document.body.append(new PortalTest())
+class Debugger extends Component {
+
+    protected render() {
+        return [
+            <Wrapper>
+                <Div>hello</Div>
+                <HTMLDivElement>world</HTMLDivElement>
+            </Wrapper>
+        ]
+    }
+}
+
+document.body.append(new Root())

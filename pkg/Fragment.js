@@ -10,16 +10,7 @@ class Fragment extends DocumentFragment {
     render(children) {
         return children;
     }
-    remove() {
-        var _a, _b;
-        for (const element of this[layout]) {
-            if (Fragment.isFragment(element === null || element === void 0 ? void 0 : element.node)) {
-                element === null || element === void 0 ? void 0 : element.node.remove();
-            }
-            (_b = (_a = element === null || element === void 0 ? void 0 : element.node) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.removeChild(element === null || element === void 0 ? void 0 : element.node);
-        }
-    }
-    update(children) {
+    connect(children) {
         let tree;
         if (this.template) {
             tree = this.template.constructor(Object.assign(Object.assign({}, this.template.properties), { children: this.render(children) })).map(mapChildToElement_1.mapChildToElement);
@@ -47,6 +38,15 @@ class Fragment extends DocumentFragment {
                 }
                 connectElementToHost_1.connectElementToHost(element, this);
             }
+    }
+    remove() {
+        var _a, _b;
+        for (const element of this[layout]) {
+            if (Fragment.isFragment(element === null || element === void 0 ? void 0 : element.node)) {
+                element === null || element === void 0 ? void 0 : element.node.remove();
+            }
+            (_b = (_a = element === null || element === void 0 ? void 0 : element.node) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.removeChild(element === null || element === void 0 ? void 0 : element.node);
+        }
     }
 }
 exports.Fragment = Fragment;

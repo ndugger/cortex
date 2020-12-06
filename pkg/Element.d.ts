@@ -55,7 +55,7 @@ export declare namespace Element {
         namespaces?: {
             [K: string]: string;
         };
-        tag?: string;
+        is?: string;
     };
     const create: typeof createElement;
     /**

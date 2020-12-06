@@ -5,8 +5,8 @@ export declare class Fragment<Props extends object = {}> extends DocumentFragmen
     private [layout];
     template?: Fragment.Template<Props>;
     protected render(children: Element.Child[]): Element.Child[];
+    connect(children: Element.Child[]): void;
     remove(): void;
-    update(children: Element.Child[]): void;
 }
 export declare namespace Fragment {
     interface Constructor<Props extends object = {}> {
