@@ -342,4 +342,3 @@ exports.Component = Component;
         Portal.Mirror = Mirror;
     })(Portal = Component.Portal || (Component.Portal = {}));
 })(Component = exports.Component || (exports.Component = {}));
-//# sourceMappingURL=Component.js.map

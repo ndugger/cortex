@@ -19,4 +19,3 @@ function createElement(constructor, properties, ...children) {
     };
 }
 exports.createElement = createElement;
-//# sourceMappingURL=createElement.js.map

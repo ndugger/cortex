@@ -15,4 +15,3 @@ var Fragment_1 = require("./Fragment");
 Object.defineProperty(exports, "Fragment", { enumerable: true, get: function () { return Fragment_1.Fragment; } });
 exports.Context = Component_1.Component.Context;
 exports.Portal = Component_1.Component.Portal;
-//# sourceMappingURL=index.js.map

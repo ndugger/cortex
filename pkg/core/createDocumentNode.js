@@ -60,4 +60,3 @@ function createDocumentNode(element) {
     return node;
 }
 exports.createDocumentNode = createDocumentNode;
-//# sourceMappingURL=createDocumentNode.js.map

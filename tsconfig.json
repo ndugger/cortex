@@ -11,10 +11,6 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "outDir": "pkg",
-        "paths": {
-            
-        },
-        "sourceMap": true,
         "strictNullChecks": true,
         "target": "es6"
     },

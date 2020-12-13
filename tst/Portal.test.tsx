@@ -133,12 +133,24 @@ class Wrapper extends Component {
     }
 }
 
+class ItemReader extends Component {
+
+    public render() {
+        const item = this.getContext(ItemContext)
+
+        console.log(item)
+
+        return []
+    }
+}
+
 class Root extends Component {
 
     protected render(): Element.Child[] {
         return [
             <Wrapper className='ROOT'>
                 <ItemContext value={ { foo: 'bar' } }>
+                    <ItemReader/>
                     <Wrapper>
                         <BlackBoxPortal/>
                         <Divider/>

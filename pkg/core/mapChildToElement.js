@@ -12,4 +12,3 @@ function mapChildToElement(child) {
     return child || undefined;
 }
 exports.mapChildToElement = mapChildToElement;
-//# sourceMappingURL=mapChildToElement.js.map

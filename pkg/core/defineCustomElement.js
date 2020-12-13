@@ -9,4 +9,3 @@ function defineCustomElement(tag) {
     };
 }
 exports.defineCustomElement = defineCustomElement;
-//# sourceMappingURL=defineCustomElement.js.map

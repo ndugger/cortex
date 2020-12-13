@@ -33,4 +33,3 @@ function findParentContext(root, key) {
     return findParentContext((_a = root.parentNode) !== null && _a !== void 0 ? _a : undefined, key);
 }
 exports.findParentContext = findParentContext;
-//# sourceMappingURL=findParentContext.js.map

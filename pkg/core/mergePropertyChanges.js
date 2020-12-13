@@ -10,4 +10,3 @@ function mergePropertyChanges(existing, incoming) {
     return Object.assign({}, existing, incoming);
 }
 exports.mergePropertyChanges = mergePropertyChanges;
-//# sourceMappingURL=mergePropertyChanges.js.map

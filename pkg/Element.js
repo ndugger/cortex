@@ -31,4 +31,3 @@ var Element;
     }
     Element.isText = isText;
 })(Element = exports.Element || (exports.Element = {}));
-//# sourceMappingURL=Element.js.map

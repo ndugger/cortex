@@ -13,4 +13,3 @@ function mapComponentToTag(type) {
     return `${type.name.replace(/([A-Z])/g, c => `-${c.toLowerCase()}`).replace(/^-/, '')}-component`;
 }
 exports.mapComponentToTag = mapComponentToTag;
-//# sourceMappingURL=mapComponentToTag.js.map
