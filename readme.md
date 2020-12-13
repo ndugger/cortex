@@ -26,7 +26,7 @@ npm install github:ndugger/cortex --save
 
 ### Example
 ```typescript
-import { Component, createElement } from 'cortex'
+import { Component, Element, createElement } from 'cortex'
 
 class Example extends Component {
 
@@ -34,7 +34,7 @@ class Example extends Component {
         alert('button was clicked!')
     }
 
-    public render(): Cortex.Element[] {
+    public render(): Element.Child[] {
         return [
             <HTMLButtonElement onclick={ event => this.handleClick(event) }>
                 <HTMLSlotElement/>
@@ -124,6 +124,12 @@ In order to enable JSX for cotex, you must add the following to your TypeScript 
         "jsxFactory": "createElement"
     }
 }
+```
+
+Make sure to always import `createElement` from cortex at the top of your modules.
+
+```typescript
+import { createElement } from 'cortex'
 ```
 
 &nbsp;
