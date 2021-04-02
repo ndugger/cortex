@@ -52,6 +52,9 @@ function mergeTreeChanges(existing, incoming) {
                 children: mergeTreeChanges(existingElement.children, incomingElement.children),
                 properties: incomingElement.properties // TODO properly merge props (consider defaults)
             }));
+            if (existingElement instanceof Component_1.Component) {
+                console.log(existingElement);
+            }
         }
     }
     return outgoing;

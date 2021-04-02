@@ -115,6 +115,41 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
                 }
             }
 
+            /**
+             * Allow direct child element insertion by first removing all children, then appending all to target node
+             */
+            if (property === 'children') {
+
+                for (const child of Array.from(element.node.children ?? [])) {
+                    element.node.removeChild(child)
+                }
+
+                if (typeof element.properties.children === 'string') {
+                    element.node.appendChild(new Text(element.properties.children))
+                }
+                else for (const child of Array.from(element.properties.children ?? [])) {
+                    element.node.appendChild(child)
+                }
+
+                continue
+            }
+
+            /**
+             * Allow direct child node insertion by first removing all child nodes, then appending all to target node
+             */
+            if (property === 'childNodes') {
+
+                for (const childNode of Array.from(element.node.childNodes ?? [])) {
+                    element.node.removeChild(childNode)
+                }
+
+                for (const childNode of Array.from(element.properties.childNodes ?? [])) {
+                    element.node.appendChild(childNode)
+                }
+
+                continue
+            }
+
             if (element.node[ property ] === element.properties[ property ]) {
                 continue
             }
@@ -150,13 +185,13 @@ export function connectElementToHost<Constructor extends Node>(element: Element<
         connectElementToHost(child, element.node)
     }
 
-    if (Component.isMirror(element.node)) {
-        element.node.reflect()
+    if (element.node instanceof Fragment && typeof (element.node as any).reflect === 'function') {
+        (element.node as any).reflect() // OOF I may need to rearchitect some of this project due to circular dependencies
     }
     else if (host !== element.node.parentNode) {
         host.appendChild(element.node)
     }
     else if (Component.isComponent(element.node)) {
-        element.node.update()
+        element.node.update() // TODO only do if props changed?
     }
 }

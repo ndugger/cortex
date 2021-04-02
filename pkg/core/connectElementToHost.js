@@ -7,7 +7,7 @@ const Fragment_1 = require("../Fragment");
 const createDocumentNode_1 = require("./createDocumentNode");
 const XML_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 function connectElementToHost(element, host) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
     if (!element.constructor) {
         return;
     }
@@ -96,6 +96,34 @@ function connectElementToHost(element, host) {
                     continue;
                 }
             }
+            /**
+             * Allow direct child element insertion by first removing all children, then appending all to target node
+             */
+            if (property === 'children') {
+                for (const child of Array.from((_o = element.node.children) !== null && _o !== void 0 ? _o : [])) {
+                    element.node.removeChild(child);
+                }
+                if (typeof element.properties.children === 'string') {
+                    element.node.appendChild(new Text(element.properties.children));
+                }
+                else
+                    for (const child of Array.from((_p = element.properties.children) !== null && _p !== void 0 ? _p : [])) {
+                        element.node.appendChild(child);
+                    }
+                continue;
+            }
+            /**
+             * Allow direct child node insertion by first removing all child nodes, then appending all to target node
+             */
+            if (property === 'childNodes') {
+                for (const childNode of Array.from((_q = element.node.childNodes) !== null && _q !== void 0 ? _q : [])) {
+                    element.node.removeChild(childNode);
+                }
+                for (const childNode of Array.from((_r = element.properties.childNodes) !== null && _r !== void 0 ? _r : [])) {
+                    element.node.appendChild(childNode);
+                }
+                continue;
+            }
             if (element.node[property] === element.properties[property]) {
                 continue;
             }
@@ -127,14 +155,14 @@ function connectElementToHost(element, host) {
             if (child) {
                 connectElementToHost(child, element.node);
             }
-    if (Component_1.Component.isMirror(element.node)) {
-        element.node.reflect();
+    if (element.node instanceof Fragment_1.Fragment && typeof element.node.reflect === 'function') {
+        element.node.reflect(); // OOF I may need to rearchitect some of this project due to circular dependencies
     }
     else if (host !== element.node.parentNode) {
         host.appendChild(element.node);
     }
     else if (Component_1.Component.isComponent(element.node)) {
-        element.node.update();
+        element.node.update(); // TODO only do if props changed?
     }
 }
 exports.connectElementToHost = connectElementToHost;

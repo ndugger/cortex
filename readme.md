@@ -1,9 +1,9 @@
 # cortex
 Lightweight Web Component Framework
 
-Cortex is a thin orchestration layer on top of "native" web components. It helps diff changes, and enables lifecycle triggers like rendering, connecting, and updating.
+Cortex is a thin layer on top of "native" web components. It manages state differentiation, and enables orchestration though various lifecycle hooks.
 
-The main goal is to keep the orchestration to a minimum, and rely heavily on already built-in functionality like plain CSS, Custom Elements, and Shadow DOM. This allows us to keep the library size very small.
+The primary purpose is to enable the construction of progressive web applications through familiar abstraction. [React](https://github.com/facebook/react) was a very large source of inspiration for coming up with the library's feature set, but watch out; some concepts named similarly in both libraries work fundamentally differently, though the purpose is identical.
 
 See [how to enable JSX](#JSX-Support) below.
 
@@ -16,6 +16,7 @@ npm install github:ndugger/cortex --save
 - [Context](doc/Context.md)
 - [Element](doc/Element.md)
 - [Fragment](doc/Fragment.md)
+- [Hook](doc/Hook.md)
 - [Portal](doc/Portal.md)
 
 &nbsp;

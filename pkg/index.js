@@ -1,17 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Portal = exports.Context = exports.Fragment = exports.Element = exports.Component = exports.tag = exports.createElement = void 0;
+exports.Context = exports.Portal = exports.Hook = exports.Fragment = exports.Element = exports.Component = exports.attachHook = exports.getContext = exports.tag = exports.createElement = void 0;
 const Component_1 = require("./Component");
 Object.defineProperty(exports, "Component", { enumerable: true, get: function () { return Component_1.Component; } });
 var createElement_1 = require("./core/createElement");
 Object.defineProperty(exports, "createElement", { enumerable: true, get: function () { return createElement_1.createElement; } });
 var defineCustomElement_1 = require("./core/defineCustomElement"); // aliased temporarily until new decorators implementation
 Object.defineProperty(exports, "tag", { enumerable: true, get: function () { return defineCustomElement_1.defineCustomElement; } });
+var getContext_1 = require("./util/getContext");
+Object.defineProperty(exports, "getContext", { enumerable: true, get: function () { return getContext_1.getContext; } });
+var attachHook_1 = require("./util/attachHook");
+Object.defineProperty(exports, "attachHook", { enumerable: true, get: function () { return attachHook_1.attachHook; } });
 var Component_2 = require("./Component");
 Object.defineProperty(exports, "Component", { enumerable: true, get: function () { return Component_2.Component; } });
 var Element_1 = require("./Element");
 Object.defineProperty(exports, "Element", { enumerable: true, get: function () { return Element_1.Element; } });
 var Fragment_1 = require("./Fragment");
 Object.defineProperty(exports, "Fragment", { enumerable: true, get: function () { return Fragment_1.Fragment; } });
+var Hook_1 = require("./Hook");
+Object.defineProperty(exports, "Hook", { enumerable: true, get: function () { return Hook_1.Hook; } });
+var Portal_1 = require("./Portal");
+Object.defineProperty(exports, "Portal", { enumerable: true, get: function () { return Portal_1.Portal; } });
 exports.Context = Component_1.Component.Context;
-exports.Portal = Component_1.Component.Portal;

@@ -58,6 +58,10 @@ export function mergeTreeChanges(existing: Element.Optional[], incoming: Element
                 children: mergeTreeChanges(existingElement.children, incomingElement.children),
                 properties: incomingElement.properties // TODO properly merge props (consider defaults)
             }))
+
+            if (existingElement instanceof Component) {
+                console.log(existingElement)
+            }
         }
     }
 

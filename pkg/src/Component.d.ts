@@ -1,9 +1,6 @@
 import { Element } from './Element';
+import { Fragment } from './Fragment';
 import { Hook } from './Hook';
-/**
- * Symbol which represents a flag to determine whether a component is connected
- */
-declare const connected: unique symbol;
 /**
  * Symbol which represents which hooks are attached to a component
  */
@@ -31,10 +28,6 @@ declare const CustomHTMLElement: {
  * Base component class from which all custom components must extend
  */
 export declare class Component extends CustomHTMLElement {
-    /**\
-     * Field in which a component's connected status is stored
-     */
-    private [connected];
     /**
      * Field in which component's registered hooks are stored
      */
@@ -110,7 +103,7 @@ export declare class Component extends CustomHTMLElement {
      * @param context Object which acts as the key of the stored value
      */
     getContext<Context extends Component.Context>(context: new () => Context): Context['value'] | undefined;
-    attachHook<State>(hook: Hook<State>): State | undefined;
+    useHook<State>(hook: Hook<State>): State;
     /**
      * Triggers an update
      * @param props Optional properties to update with
@@ -156,11 +149,16 @@ export declare namespace Component {
      * @param constructor
      */
     function isFn<Props>(constructor: Any<Props>): constructor is Fn<Props>;
+    /**
+     * Decides if a node is a portal mirror
+     * @param node
+     */
+    function isMirror(node: Node | undefined): node is Component.Portal.Mirror;
     function getCurrentBranch(): Component;
     /**
      * Used to provide contextual state within a given component tree
      */
-    class Context<Data = any> extends Component {
+    class Context<Data extends object = {}> extends Component {
         value?: Data;
         render(): Element[];
         theme(): string;
@@ -169,6 +167,27 @@ export declare namespace Component {
      * Event interface used for component lifecycle triggers
      */
     class LifecycleEvent extends Event {
+    }
+    /**
+     * Used to inject elements from one tree into another
+     */
+    class Portal extends Component {
+        /**
+         * Returns a Portal.Mirror bound to a specific portal type
+         */
+        static get Access(): (props: PropsWithChildren) => Element<Portal.Mirror>[];
+        protected render(): Element.Child[];
+        protected theme(): string;
+        constructor();
+    }
+    namespace Portal {
+        /**
+         * Used as the content reflection method for portals
+         */
+        class Mirror extends Fragment {
+            target: Constructor<Portal>;
+            reflect(): void;
+        }
     }
 }
 export {};

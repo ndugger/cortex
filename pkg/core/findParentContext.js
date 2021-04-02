@@ -13,6 +13,9 @@ function findParentContext(root, key) {
      * If we reach the top, return undefined
      */
     if (!root) {
+        if (root.shadowRoot.querySelector(`.${key.name}`)) {
+            console.log(243856723458762345876);
+        }
         return;
     }
     /**

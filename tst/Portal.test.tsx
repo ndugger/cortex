@@ -113,7 +113,7 @@ class Swapper extends Component {
 class Wrapper extends Component {
 
     protected render() {
-        // setTimeout(() => this.update(), 1000)
+        console.log(this.childNodes)
 
         return [
             <HTMLSlotElement/>

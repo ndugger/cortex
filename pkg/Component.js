@@ -1,4 +1,5 @@
 "use strict";
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Component = void 0;
 const connectElementToHost_1 = require("./core/connectElementToHost");
@@ -8,27 +9,38 @@ const findParentContext_1 = require("./core/findParentContext");
 const mapChildToElement_1 = require("./core/mapChildToElement");
 const mapComponentToTag_1 = require("./core/mapComponentToTag");
 const mergeTreeChanges_1 = require("./core/mergeTreeChanges");
-const Fragment_1 = require("./Fragment");
 /**
  * Array which acts as a deque of the current branch of components
  */
 const branch = [];
 /**
+ * Symbol which represents a flag to determine whether a component is connected
+ */
+const connected = Symbol('connected');
+/**
+ * Symbol which represents which hooks are attached to a component
+ */
+const hooks = Symbol('hooks');
+/**
  * Symbol which represents a component's rendered tree
  */
 const layout = Symbol('layout');
 /**
- * Sumbol which represents whether or not there are changes during update
+ * Symbol which represents whether or not there are changes during update
  */
 const flagged = Symbol('flagged');
+/**
+ * Symbol which represents which contexts a component is subscribed to
+ */
+const subscriptions = Symbol('subscriptions');
 /**
  * Proxy used in order to register a custom element before it is instantiated for the first time
  */
 const CustomHTMLElement = new Proxy(HTMLElement, {
     construct(element, args, component) {
         const tag = mapComponentToTag_1.mapComponentToTag(component);
-        if (!window.customElements.get(tag)) {
-            window.customElements.define(tag, component);
+        if (!globalThis.customElements.get(tag)) {
+            globalThis.customElements.define(tag, component);
         }
         return Reflect.construct(element, args, component);
     }
@@ -42,6 +54,26 @@ class Component extends CustomHTMLElement {
      */
     constructor() {
         super();
+        /**\
+         * Field in which a component's connected status is stored
+         */
+        this[_a] = false;
+        /**
+         * Field in which component's registered hooks are stored
+         */
+        this[_b] = [];
+        /**
+         * Field in which component's template is stored
+         */
+        this[_c] = [];
+        /**
+         * Field in which component render status is stored
+         */
+        this[_d] = false;
+        /**
+         * Field in which component's subscribed contexts is stored
+         */
+        this[_e] = new Map();
         this.addEventListener('componentconnect', event => this.handleComponentConnect(event));
         this.addEventListener('componentcreate', event => this.handleComponentCreate(event));
         this.addEventListener('componentdisconnect', event => this.handleComponentDisconnect(event));
@@ -57,6 +89,7 @@ class Component extends CustomHTMLElement {
      * Part of custom elements API: called when element mounts to a DOM
      */
     connectedCallback() {
+        this[connected] = true;
         this.dispatchEvent(new Component.LifecycleEvent('componentconnect'));
         /**
          * In order to increase type safety, each element receives a `className` equal to its class' name
@@ -75,6 +108,8 @@ class Component extends CustomHTMLElement {
      * Part of custom elements API: called when element is removed from its DOM
      */
     disconnectedCallback() {
+        this[connected] = false;
+        this[subscriptions].clear();
         window.requestAnimationFrame(() => {
             this.dispatchEvent(new Component.LifecycleEvent('componentdisconnect'));
         });
@@ -84,8 +119,14 @@ class Component extends CustomHTMLElement {
      */
     updatedCallback() {
         branch.push(this);
-        const style = createElement_1.createElement(HTMLStyleElement, { textContent: this.theme() });
-        const elements = this.render().concat(style).map(mapChildToElement_1.mapChildToElement);
+        /**
+         * Only render if element connected to a host in case of context subscription leaks
+         */
+        const elements = this[connected]
+            ? this.render()
+                .concat(createElement_1.createElement(HTMLStyleElement, { textContent: this.theme() }))
+                .map(mapChildToElement_1.mapChildToElement)
+            : [];
         /**
          * If first time render, just save new tree
          * Otherwise diff tree recursively
@@ -155,17 +196,53 @@ class Component extends CustomHTMLElement {
     }
     /**
      * Retrieves a dependency from context.
-     * @param dependency Object which acts as the key of the stored value
+     * @param context Object which acts as the key of the stored value
      */
-    getContext(dependency) {
-        const found = findParentContext_1.findParentContext(this, dependency);
+    getContext(context) {
+        var _f;
         /**
-         * Since it will be unknown whether you are within the specified context, throw if not found
+         * Return cached context if found
+         */
+        if (this[subscriptions].has(context)) {
+            return (_f = this[subscriptions].get(context)) === null || _f === void 0 ? void 0 : _f.value;
+        }
+        /**
+         * Otherwise walk up DOM tree to find context
+         */
+        const found = findParentContext_1.findParentContext(this, context);
+        /**
+         * Return nothing if looking outside of any matching context's tree
          */
         if (!found) {
+            // TODO is the following todo still relevant? (oops)
             // TODO (delay functional render so context is rendered before functions called) throw new Error(`Missing context: ${ dependency.name }`)
+            return;
+        }
+        /**
+         * If retrieving context for the first time, subscribe to its updates
+         */
+        if (!this[subscriptions].has(context)) {
+            const contextListener = () => {
+                this.update();
+            };
+            this[subscriptions].set(context, found);
+            found.addEventListener('componentupdate', contextListener);
+            this.addEventListener('componentdisconnect', () => {
+                this[subscriptions].delete(context);
+                found.removeEventListener('componentupdate', contextListener);
+            });
         }
         return found === null || found === void 0 ? void 0 : found.value;
+    }
+    attachHook(hook) {
+        if (this[hooks].includes(hook)) {
+            return hook.state;
+        }
+        hook.addEventListener('hookupdate', () => {
+            this.update();
+        });
+        this[hooks].push(hook);
+        return hook.state;
     }
     /**
      * Triggers an update
@@ -221,6 +298,7 @@ class Component extends CustomHTMLElement {
     }
 }
 exports.Component = Component;
+_a = connected, _b = hooks, _c = layout, _d = flagged, _e = subscriptions;
 (function (Component) {
     /**
      * Decides if a node is a Component
@@ -252,18 +330,18 @@ exports.Component = Component;
         return !isConstructor(constructor);
     }
     Component.isFn = isFn;
-    /**
-     * Decides if a node is a portal mirror
-     * @param node
-     */
-    function isMirror(node) {
-        return node instanceof Component.Portal.Mirror;
+    function getCurrentBranch() {
+        return branch[branch.length - 1];
     }
-    Component.isMirror = isMirror;
+    Component.getCurrentBranch = getCurrentBranch;
     /**
      * Used to provide contextual state within a given component tree
      */
     class Context extends Component {
+        constructor() {
+            super(...arguments);
+            this.value = this;
+        }
         render() {
             return [
                 createElement_1.createElement(HTMLSlotElement)
@@ -284,61 +362,4 @@ exports.Component = Component;
     class LifecycleEvent extends Event {
     }
     Component.LifecycleEvent = LifecycleEvent;
-    /**
-     * Map of model types to their respective instances
-     */
-    const portals = new Map();
-    /**
-     * Used to inject elements from one tree into another
-     */
-    class Portal extends Component {
-        /**
-         * Returns a Portal.Mirror bound to a specific portal type
-         */
-        static get Access() {
-            return (props) => {
-                var _a;
-                return [
-                    createElement_1.createElement(Portal.Mirror, { target: this }, ...((_a = props.children) !== null && _a !== void 0 ? _a : []))
-                ];
-            };
-        }
-        render() {
-            return [
-                createElement_1.createElement(HTMLSlotElement)
-            ];
-        }
-        theme() {
-            return `
-                :host {
-                    display: contents;
-                }
-            `;
-        }
-        constructor() {
-            var _a;
-            super();
-            if (!portals.has(this.constructor)) {
-                portals.set(this.constructor, [this]);
-            }
-            else {
-                (_a = portals.get(this.constructor)) === null || _a === void 0 ? void 0 : _a.push(this);
-            }
-        }
-    }
-    Component.Portal = Portal;
-    (function (Portal) {
-        /**
-         * Used as the injection method for portals
-         */
-        class Mirror extends Fragment_1.Fragment {
-            reflect() {
-                var _a;
-                for (const portal of (_a = portals.get(this.target)) !== null && _a !== void 0 ? _a : []) {
-                    portal.append(this);
-                }
-            }
-        }
-        Portal.Mirror = Mirror;
-    })(Portal = Component.Portal || (Component.Portal = {}));
 })(Component = exports.Component || (exports.Component = {}));

@@ -11,25 +11,30 @@ export function findParentContext<Dependency extends Component.Context>(root: No
      * If we reach the top, return undefined
      */
     if (!root) {
-        return;
+
+        if ((root as any).shadowRoot.querySelector(`.${ key.name }`)) {
+            console.log(243856723458762345876)
+        }
+
+        return
     }
 
     /**
      * If context found, return
      */
     if (root instanceof Component.Context && root.constructor === key) {
-        return root as Dependency;
+        return root as Dependency
     }
 
     /**
      * If we've reached the top of a shadow's tree, try the host next
      */
     if (root instanceof ShadowRoot) {
-        return findParentContext(root.host, key);
+        return findParentContext(root.host, key)
     }
 
     /**
      * Go up a level
      */
-    return findParentContext(root.parentNode ?? undefined, key);
+    return findParentContext(root.parentNode ?? undefined, key)
 }
