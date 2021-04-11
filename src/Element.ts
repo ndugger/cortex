@@ -116,6 +116,10 @@ declare global {
         }
     }
 
+    interface ShadowRoot {
+        adoptedStyleSheets: CSSStyleSheet[]
+    }
+
     interface Text {
         JSX_PROPERTY_TYPES_DO_NOT_USE: Element.TypedProperties<Text> 
     }

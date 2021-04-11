@@ -100,7 +100,7 @@ export declare class Component extends CustomHTMLElement {
     /**
      * Constructs a component's stylesheet
      */
-    protected theme(): string;
+    protected theme(): Component.Style[];
     /**
      * Creates a component, attaches lifecycle listeners upon instantiation, and initializes shadow root
      */
@@ -109,7 +109,7 @@ export declare class Component extends CustomHTMLElement {
      * Retrieves a dependency from context.
      * @param context Object which acts as the key of the stored value
      */
-    getContext<Context extends Component.Context>(context: new () => Context): Context['value'] | undefined;
+    getContext<Ctx extends Component.Context>(context: new () => Ctx): Ctx['value'] | undefined;
     attachHook<State>(hook: Hook<State>): State | undefined;
     /**
      * Triggers an update
@@ -128,7 +128,11 @@ export declare namespace Component {
     /**
      * Defines any component
      */
-    type Any<Props> = Constructor<Node & Props> | Fn<Props> | (new () => Node);
+    type Any<Props = unknown> = Constructor<Node & Props> | Fn<Props> | (new () => Node);
+    /**
+     * Defines returnable types for styling a component
+     */
+    type Style = CSSStyleSheet | string;
     /**
      * Defines a class-based component
      */
@@ -142,7 +146,7 @@ export declare namespace Component {
         (props: PropsWithChildren<Props>): Element[];
     }
     /**
-     * Decides if a node is a Component
+     * Decides if a node is a component
      * @param node
      */
     function isComponent(node: Node | undefined): node is Component;
@@ -160,10 +164,10 @@ export declare namespace Component {
     /**
      * Used to provide contextual state within a given component tree
      */
-    class Context<Data = any> extends Component {
-        value?: Data;
+    class Context<Data = null> extends Component {
+        value?: Data extends null ? ThisType<Context> : Data;
         render(): Element[];
-        theme(): string;
+        theme(): Component.Style[];
     }
     /**
      * Event interface used for component lifecycle triggers

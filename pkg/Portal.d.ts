@@ -10,7 +10,7 @@ export declare class Portal extends Component {
      */
     static get Access(): (props: Component.PropsWithChildren) => Element<Portal.Mirror>[];
     protected render(): Element.Child[];
-    protected theme(): string;
+    protected theme(): Component.Style[];
     constructor();
 }
 export declare namespace Portal {

@@ -8,6 +8,7 @@ import { mergeTreeChanges } from './core/mergeTreeChanges'
 
 import { Element } from './Element'
 import { Hook } from './Hook'
+import { displayContents } from './util/displayContents'
 
 /**
  * Array which acts as a deque of the current branch of components
@@ -33,6 +34,11 @@ const layout = Symbol('layout')
  * Symbol which represents whether or not there are changes during update
  */
 const flagged = Symbol('flagged')
+
+/**
+ * Symbol which represents a component's adopted style sheets
+ */
+const styles = Symbol('styles')
 
 /**
  * Symbol which represents which contexts a component is subscribed to
@@ -126,24 +132,28 @@ export class Component extends CustomHTMLElement {
     protected updatedCallback(): void {
         branch.push(this)
 
-        /**
-         * Only render if element connected to a host in case of context subscription leaks
-         */
-        const elements = this[ connected ] 
-            ? this.render()
-                .concat(createElement(HTMLStyleElement, { textContent: this.theme() }))
-                .map(mapChildToElement) 
-            : []
+        if (!this[ connected ] || !this.shadowRoot) {
+            return void branch.pop()
+        }
+
+        const elements = this.render()
+        const styles = this.theme()
+        const css = styles.filter(style => typeof style ==='string').join('\n')
+        
+        this.shadowRoot.adoptedStyleSheets = styles.filter(style => style instanceof CSSStyleSheet) as CSSStyleSheet[]
+
+        const style = createElement(HTMLStyleElement, { textContent: css })
+        const template = elements.concat(style).map(mapChildToElement)
 
         /**
          * If first time render, just save new tree
          * Otherwise diff tree recursively
          */
         if (!this[ layout ]) {
-            this[ layout ] = elements
+            this[ layout ] = template
         }
         else {
-            this[ layout ] = mergeTreeChanges(this[ layout ], elements)
+            this[ layout ] = mergeTreeChanges(this[ layout ], template)
         }
 
         /**
@@ -155,7 +165,7 @@ export class Component extends CustomHTMLElement {
                 element.node = createDocumentNode(element)
             }
 
-            connectElementToHost(element, this.shadowRoot as ShadowRoot)
+            connectElementToHost(element, this.shadowRoot)
         }
 
         window.requestAnimationFrame(() => {
@@ -211,8 +221,8 @@ export class Component extends CustomHTMLElement {
     /**
      * Constructs a component's stylesheet
      */
-    protected theme(): string {
-        return ''
+    protected theme(): Component.Style[] {
+        return []
     }
 
     /**
@@ -230,6 +240,10 @@ export class Component extends CustomHTMLElement {
 
         this.attachShadow({ mode: 'open' })
 
+        if (this.shadowRoot) {
+            this.shadowRoot.adoptedStyleSheets = []
+        }
+
         window.requestAnimationFrame(() => {
             this.dispatchEvent(new Component.LifecycleEvent('componentcreate'))
         })
@@ -239,13 +253,13 @@ export class Component extends CustomHTMLElement {
      * Retrieves a dependency from context.
      * @param context Object which acts as the key of the stored value
      */
-    public getContext<Context extends Component.Context>(context: new() => Context): Context[ 'value' ] | undefined {
+    public getContext<Ctx extends Component.Context>(context: new() => Ctx): Ctx[ 'value' ] | undefined {
 
         /**
          * Return cached context if found
          */
         if (this[ subscriptions ].has(context)) {
-            return this[ subscriptions ].get(context)?.value
+            return this[ subscriptions ].get(context)?.value as Ctx[ 'value' ] | undefined
         }
 
         /**
@@ -257,8 +271,6 @@ export class Component extends CustomHTMLElement {
          * Return nothing if looking outside of any matching context's tree
          */
         if (!found) {
-            // TODO is the following todo still relevant? (oops)
-            // TODO (delay functional render so context is rendered before functions called) throw new Error(`Missing context: ${ dependency.name }`)
             return
         }
 
@@ -374,8 +386,12 @@ export namespace Component {
     /**
      * Defines any component
      */
-    export type Any<Props> = Constructor<Node & Props> | Fn<Props> | (new() => Node)
+    export type Any<Props = unknown> = Constructor<Node & Props> | Fn<Props> | (new() => Node)
 
+    /**
+     * Defines returnable types for styling a component
+     */
+    export type Style = CSSStyleSheet | string
     /**
      * Defines a class-based component
      */
@@ -391,7 +407,7 @@ export namespace Component {
     }
 
     /**
-     * Decides if a node is a Component
+     * Decides if a node is a component
      * @param node
      */
     export function isComponent(node: Node | undefined): node is Component {
@@ -430,9 +446,9 @@ export namespace Component {
     /**
      * Used to provide contextual state within a given component tree
      */
-    export class Context<Data = any> extends Component {
+    export class Context<Data = null> extends Component {
 
-        public value?: Data = this as any
+        public value?: Data extends null ? ThisType<Context> : Data = this as any
     
         public render(): Element[] {
             return [ 
@@ -440,12 +456,10 @@ export namespace Component {
             ]
         }
     
-        public theme(): string { // https://developers.google.com/web/updates/2019/02/constructable-stylesheets
-            return `
-                :host {
-                    display: contents;
-                }
-            `
+        public theme(): Component.Style[] {
+            return [ 
+                displayContents() 
+            ]
         }
     }
 

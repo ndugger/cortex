@@ -44,12 +44,12 @@ class Example extends Component {
     }
 
     public theme(): string {
-        return `
-            .${ HTMLButtonElement.name } {
+        return [
+            `.${ HTMLButtonElement.name } {
                 background: blue;
                 color: white;
-            }
-        `
+            }`
+        ]
     }
 }
 
@@ -85,8 +85,8 @@ export class Example extends Component {
         return []
     }
 
-    protected theme(): string {
-        return ``
+    protected theme(): Component.Style[] {
+        return []
     }
 }
 ```
@@ -149,11 +149,11 @@ This also contributes to styling your components, because you can now target you
 
 ```typescript
 public theme(): Cortex.Element[] {
-    return `
-        .${ HTMLButtonElement.name } {
-
-        }
-    `
+    return [
+        `.${ HTMLButtonElement.name } {
+            ...
+        }`
+    ]
 }
 ```
 

@@ -3,6 +3,7 @@ import { createElement } from './core/createElement'
 import { Component } from './Component'
 import { Element } from './Element'
 import { Fragment } from './Fragment'
+import { displayContents } from './util/displayContents'
 
 /**
  * Map of model types to their respective instances
@@ -29,21 +30,21 @@ export class Portal extends Component {
         ]
     }
 
-    protected theme(): string {
-        return `
-            :host {
-                display: contents;
-            }
-        `
+    protected theme(): Component.Style[] {
+        return [ 
+            displayContents()
+         ]
     }
 
     public constructor() {
         super()
+        
+        const constructor = this.constructor as Component.Constructor<Portal>
 
-        if (!portals.has(this.constructor as Component.Constructor<Portal>)) {
-            portals.set(this.constructor as Component.Constructor<Portal>, [ this ])
+        if (!portals.has(constructor)) {
+            portals.set(constructor, [ this ])
         } else {
-            portals.get(this.constructor as Component.Constructor<Portal>)?.push(this)
+            portals.get(constructor)?.push(this)
         }
     }
 }

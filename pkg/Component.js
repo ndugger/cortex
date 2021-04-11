@@ -9,6 +9,7 @@ const findParentContext_1 = require("./core/findParentContext");
 const mapChildToElement_1 = require("./core/mapChildToElement");
 const mapComponentToTag_1 = require("./core/mapComponentToTag");
 const mergeTreeChanges_1 = require("./core/mergeTreeChanges");
+const displayContents_1 = require("./util/displayContents");
 /**
  * Array which acts as a deque of the current branch of components
  */
@@ -29,6 +30,10 @@ const layout = Symbol('layout');
  * Symbol which represents whether or not there are changes during update
  */
 const flagged = Symbol('flagged');
+/**
+ * Symbol which represents a component's adopted style sheets
+ */
+const styles = Symbol('styles');
 /**
  * Symbol which represents which contexts a component is subscribed to
  */
@@ -81,6 +86,9 @@ class Component extends CustomHTMLElement {
         this.addEventListener('componentrender', event => this.handleComponentRender(event));
         this.addEventListener('componentupdate', event => this.handleComponentUpdate(event));
         this.attachShadow({ mode: 'open' });
+        if (this.shadowRoot) {
+            this.shadowRoot.adoptedStyleSheets = [];
+        }
         window.requestAnimationFrame(() => {
             this.dispatchEvent(new Component.LifecycleEvent('componentcreate'));
         });
@@ -119,23 +127,24 @@ class Component extends CustomHTMLElement {
      */
     updatedCallback() {
         branch.push(this);
-        /**
-         * Only render if element connected to a host in case of context subscription leaks
-         */
-        const elements = this[connected]
-            ? this.render()
-                .concat(createElement_1.createElement(HTMLStyleElement, { textContent: this.theme() }))
-                .map(mapChildToElement_1.mapChildToElement)
-            : [];
+        if (!this[connected] || !this.shadowRoot) {
+            return void branch.pop();
+        }
+        const elements = this.render();
+        const styles = this.theme();
+        const css = styles.filter(style => typeof style === 'string').join('\n');
+        this.shadowRoot.adoptedStyleSheets = styles.filter(style => style instanceof CSSStyleSheet);
+        const style = createElement_1.createElement(HTMLStyleElement, { textContent: css });
+        const template = elements.concat(style).map(mapChildToElement_1.mapChildToElement);
         /**
          * If first time render, just save new tree
          * Otherwise diff tree recursively
          */
         if (!this[layout]) {
-            this[layout] = elements;
+            this[layout] = template;
         }
         else {
-            this[layout] = mergeTreeChanges_1.mergeTreeChanges(this[layout], elements);
+            this[layout] = mergeTreeChanges_1.mergeTreeChanges(this[layout], template);
         }
         /**
          * Wire up any new component elements with DOM elements
@@ -192,7 +201,7 @@ class Component extends CustomHTMLElement {
      * Constructs a component's stylesheet
      */
     theme() {
-        return '';
+        return [];
     }
     /**
      * Retrieves a dependency from context.
@@ -214,8 +223,6 @@ class Component extends CustomHTMLElement {
          * Return nothing if looking outside of any matching context's tree
          */
         if (!found) {
-            // TODO is the following todo still relevant? (oops)
-            // TODO (delay functional render so context is rendered before functions called) throw new Error(`Missing context: ${ dependency.name }`)
             return;
         }
         /**
@@ -301,7 +308,7 @@ exports.Component = Component;
 _a = connected, _b = hooks, _c = layout, _d = flagged, _e = subscriptions;
 (function (Component) {
     /**
-     * Decides if a node is a Component
+     * Decides if a node is a component
      * @param node
      */
     function isComponent(node) {
@@ -348,11 +355,9 @@ _a = connected, _b = hooks, _c = layout, _d = flagged, _e = subscriptions;
             ];
         }
         theme() {
-            return `
-                :host {
-                    display: contents;
-                }
-            `;
+            return [
+                displayContents_1.displayContents()
+            ];
         }
     }
     Component.Context = Context;

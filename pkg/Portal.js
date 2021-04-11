@@ -4,6 +4,7 @@ exports.Portal = void 0;
 const createElement_1 = require("./core/createElement");
 const Component_1 = require("./Component");
 const Fragment_1 = require("./Fragment");
+const displayContents_1 = require("./util/displayContents");
 /**
  * Map of model types to their respective instances
  */
@@ -29,20 +30,19 @@ class Portal extends Component_1.Component {
         ];
     }
     theme() {
-        return `
-            :host {
-                display: contents;
-            }
-        `;
+        return [
+            displayContents_1.displayContents()
+        ];
     }
     constructor() {
         var _a;
         super();
-        if (!portals.has(this.constructor)) {
-            portals.set(this.constructor, [this]);
+        const constructor = this.constructor;
+        if (!portals.has(constructor)) {
+            portals.set(constructor, [this]);
         }
         else {
-            (_a = portals.get(this.constructor)) === null || _a === void 0 ? void 0 : _a.push(this);
+            (_a = portals.get(constructor)) === null || _a === void 0 ? void 0 : _a.push(this);
         }
     }
 }

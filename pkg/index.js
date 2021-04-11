@@ -1,16 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Context = exports.Portal = exports.Hook = exports.Fragment = exports.Element = exports.Component = exports.attachHook = exports.getContext = exports.tag = exports.createElement = void 0;
+exports.Context = exports.Portal = exports.Hook = exports.Fragment = exports.Element = exports.Component = exports.getContext = exports.displayContents = exports.attachHook = exports.tag = exports.createElement = void 0;
 const Component_1 = require("./Component");
 Object.defineProperty(exports, "Component", { enumerable: true, get: function () { return Component_1.Component; } });
 var createElement_1 = require("./core/createElement");
 Object.defineProperty(exports, "createElement", { enumerable: true, get: function () { return createElement_1.createElement; } });
 var defineCustomElement_1 = require("./core/defineCustomElement"); // aliased temporarily until new decorators implementation
 Object.defineProperty(exports, "tag", { enumerable: true, get: function () { return defineCustomElement_1.defineCustomElement; } });
-var getContext_1 = require("./util/getContext");
-Object.defineProperty(exports, "getContext", { enumerable: true, get: function () { return getContext_1.getContext; } });
 var attachHook_1 = require("./util/attachHook");
 Object.defineProperty(exports, "attachHook", { enumerable: true, get: function () { return attachHook_1.attachHook; } });
+var displayContents_1 = require("./util/displayContents");
+Object.defineProperty(exports, "displayContents", { enumerable: true, get: function () { return displayContents_1.displayContents; } });
+var getContext_1 = require("./util/getContext");
+Object.defineProperty(exports, "getContext", { enumerable: true, get: function () { return getContext_1.getContext; } });
 var Component_2 = require("./Component");
 Object.defineProperty(exports, "Component", { enumerable: true, get: function () { return Component_2.Component; } });
 var Element_1 = require("./Element");
