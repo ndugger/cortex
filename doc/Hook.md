@@ -14,4 +14,27 @@ Although they are used similarly to React hooks, the way they work under the hoo
 
   This is an important point as to how the library works under the hood. Hooks will tie themselves to the closest encompassing classical component, as functional components do not render any root node to the DOM. This means that any functional component which causes a hook to update may cause its siblings to re-render, depending on the circumstances.
 
+&nbsp;
 
+---
+
+&nbsp;
+
+```typescript
+import { Component, Hook, attachHook, createElement } from 'cortex'
+
+const counter = new Hook(0)
+
+export const Clicker: Component.Fn = () => {
+    const count = attachHook(counter)
+
+    return [
+      <HTMLHeadingElement is='h1'>
+          Clicked { count } times
+      </HTMLHeadingElement>,
+      <HTMLButtonElement onclick={ () => counter.update(count + 1) }>
+          Click Here
+      </HTMLButtonElement>
+    ]
+}
+```
